@@ -3,7 +3,7 @@
 <item>
     <clip>
         <bitmap xmlns:android="http://schemas.android.com/apk/res/android"
-            android:src="@drawable/Seek_bar"
+            android:src="@drawable/seek_bar"
             android:tileMode="repeat"
             android:antialias="true"
             android:dither="false"

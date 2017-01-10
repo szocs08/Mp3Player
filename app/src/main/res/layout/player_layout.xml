@@ -49,11 +49,14 @@
         android:id="@+id/song_thumbnail"
         android:orientation="horizontal"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="wrap_content"
         android:layout_below="@id/song_properties"
         android:paddingTop="10dp"
         android:paddingBottom="10dp"
         android:gravity="center">
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
 
     </LinearLayout>
 
@@ -62,10 +65,11 @@
         android:id="@+id/song_duration"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_above="@id/seek_bar"
         android:layout_marginLeft="20dp"
         android:layout_marginRight="20dp"
-        android:layout_marginBottom="10dp">
+        android:layout_marginBottom="10dp"
+        android:orientation="horizontal"
+        android:layout_below="@+id/song_thumbnail">
 
         <TextView
             android:layout_width="match_parent"
@@ -95,10 +99,10 @@
         android:layout_marginRight="20dp"
         android:layout_marginBottom="20dp"
         android:layout_below="@id/song_thumbnail"
-        android:thumb="@drawable/seek_button"
+        android:thumb="@drawable/seek_button_layout"
         android:progressDrawable="@drawable/seekbar_progress"
-        android:paddingEnd="6dip"
-        android:paddingStart="6dip" />
+        android:paddingEnd="@dimen/activity_horizontal_margin"
+        android:paddingStart="@dimen/activity_horizontal_margin" />
 
     <LinearLayout
         android:orientation="horizontal"
@@ -114,19 +118,11 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             app:srcCompat="@drawable/repeat_button"
-            android:scaleX="10"
             android:id="@+id/repeat_button"
             android:layout_weight="1"
             android:background="@null"
-            android:contentDescription="" />
-
-        <ImageButton
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            app:srcCompat="@drawable/random_button"
-            android:id="@+id/random_button"
-            android:layout_weight="1"
-            android:background="@null" />
+            android:contentDescription=""
+            android:scaleType="fitCenter" />
 
         <ImageButton
             android:layout_width="wrap_content"
@@ -134,7 +130,8 @@
             app:srcCompat="@drawable/previous_button"
             android:id="@+id/previous_buton"
             android:layout_weight="1"
-            android:background="@null" />
+            android:background="@null"
+            android:scaleType="fitCenter" />
 
         <ImageButton
             android:layout_width="wrap_content"
@@ -142,7 +139,10 @@
             app:srcCompat="@drawable/play_button"
             android:id="@+id/play_button"
             android:layout_weight="1"
-            android:background="@null" />
+            android:background="@null"
+            android:scaleX="2"
+            android:scaleY="2"
+            android:scaleType="fitCenter" />
 
         <ImageButton
             android:layout_width="wrap_content"
@@ -150,7 +150,19 @@
             app:srcCompat="@drawable/next_button"
             android:id="@+id/next_button"
             android:layout_weight="1"
-            android:background="@null" />
+            android:background="@null"
+            android:scaleType="fitCenter"
+            android:adjustViewBounds="true" />
+
+        <ImageButton
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:srcCompat="@drawable/random_button"
+            android:id="@+id/random_button"
+            android:layout_weight="1"
+            android:background="@null"
+            android:scaleType="fitCenter" />
+
     </LinearLayout>
 
 </RelativeLayout>
