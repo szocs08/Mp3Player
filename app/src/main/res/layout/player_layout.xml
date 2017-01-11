@@ -78,7 +78,8 @@
             android:layout_weight="1"
             android:textColor="@android:color/holo_blue_dark"
             android:textStyle="bold"
-            android:gravity="start" />
+            android:gravity="start"
+            android:text="0:00" />
 
         <TextView
             android:layout_width="match_parent"
@@ -87,22 +88,24 @@
             android:layout_weight="1"
             android:gravity="end"
             android:textColor="@android:color/holo_blue_dark"
-            android:textStyle="bold" />
+            android:textStyle="bold"
+            android:text="0:00" />
     </LinearLayout>
 
     <!-- Seekbar -->
     <SeekBar
         android:id="@+id/seek_bar"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
         android:layout_marginLeft="20dp"
         android:layout_marginRight="20dp"
         android:layout_marginBottom="20dp"
         android:layout_below="@id/song_thumbnail"
         android:thumb="@drawable/seek_button_layout"
         android:progressDrawable="@drawable/seekbar_progress"
-        android:paddingEnd="@dimen/activity_horizontal_margin"
-        android:paddingStart="@dimen/activity_horizontal_margin" />
+        android:layout_marginTop="20dp"
+        android:layout_height="wrap_content"
+        android:layout_centerVertical="false"
+        android:layout_centerHorizontal="true" />
 
     <LinearLayout
         android:orientation="horizontal"
@@ -121,8 +124,7 @@
             android:id="@+id/repeat_button"
             android:layout_weight="1"
             android:background="@null"
-            android:contentDescription=""
-            android:scaleType="fitCenter" />
+            android:contentDescription="" />
 
         <ImageButton
             android:layout_width="wrap_content"
@@ -130,8 +132,7 @@
             app:srcCompat="@drawable/previous_button"
             android:id="@+id/previous_buton"
             android:layout_weight="1"
-            android:background="@null"
-            android:scaleType="fitCenter" />
+            android:background="@null" />
 
         <ImageButton
             android:layout_width="wrap_content"
@@ -139,10 +140,7 @@
             app:srcCompat="@drawable/play_button"
             android:id="@+id/play_button"
             android:layout_weight="1"
-            android:background="@null"
-            android:scaleX="2"
-            android:scaleY="2"
-            android:scaleType="fitCenter" />
+            android:background="@null" />
 
         <ImageButton
             android:layout_width="wrap_content"
@@ -151,7 +149,6 @@
             android:id="@+id/next_button"
             android:layout_weight="1"
             android:background="@null"
-            android:scaleType="fitCenter"
             android:adjustViewBounds="true" />
 
         <ImageButton
@@ -160,8 +157,7 @@
             app:srcCompat="@drawable/random_button"
             android:id="@+id/random_button"
             android:layout_weight="1"
-            android:background="@null"
-            android:scaleType="fitCenter" />
+            android:background="@null" />
 
     </LinearLayout>
 

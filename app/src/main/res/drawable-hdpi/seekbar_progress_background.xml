@@ -8,7 +8,7 @@
             android:antialias="true"
             android:dither="false"
             android:filter="false"
-            android:gravity="left"/>
+            android:gravity="start"/>
     </clip>
 </item>
 </layer-list>
