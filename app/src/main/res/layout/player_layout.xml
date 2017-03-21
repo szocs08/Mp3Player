@@ -53,10 +53,15 @@
         android:layout_below="@id/song_properties"
         android:paddingTop="10dp"
         android:paddingBottom="10dp"
-        android:gravity="center">
+        android:gravity="center"
+        android:weightSum="1">
+
         <ImageView
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
+            android:layout_height="wrap_content"
+            android:background="@android:drawable/picture_frame"
+            android:contentDescription=""
+            app:srcCompat="@drawable/img_adele" />
 
     </LinearLayout>
 
@@ -79,7 +84,7 @@
             android:textColor="@android:color/holo_blue_dark"
             android:textStyle="bold"
             android:gravity="start"
-            android:text="0:00" />
+            android:text="@string/start_time" />
 
         <TextView
             android:layout_width="match_parent"
@@ -89,75 +94,83 @@
             android:gravity="end"
             android:textColor="@android:color/holo_blue_dark"
             android:textStyle="bold"
-            android:text="0:00" />
+            android:text="@string/end_time" />
     </LinearLayout>
 
     <!-- Seekbar -->
     <SeekBar
         android:id="@+id/seek_bar"
         android:layout_width="match_parent"
-        android:layout_marginLeft="20dp"
-        android:layout_marginRight="20dp"
-        android:layout_marginBottom="20dp"
-        android:layout_below="@id/song_thumbnail"
-        android:thumb="@drawable/seek_button_layout"
-        android:progressDrawable="@drawable/seekbar_progress"
-        android:layout_marginTop="20dp"
         android:layout_height="wrap_content"
+        android:layout_below="@id/song_thumbnail"
+        android:layout_centerHorizontal="false"
         android:layout_centerVertical="false"
-        android:layout_centerHorizontal="true" />
+        android:layout_margin="@dimen/seekbar_margin"
+        android:progressDrawable="@drawable/seekbar_progress"
+        android:thumb="@drawable/seek_button_layout"
+        />
 
     <LinearLayout
-        android:orientation="horizontal"
-        android:layout_width="match_parent"
-        android:layout_height="100dp"
         android:id="@+id/player_buttons"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
-        android:gravity="center"
+        android:layout_below="@+id/seek_bar"
         android:background="#b5b9ff"
-        android:layout_below="@+id/seek_bar">
+        android:gravity="center"
+        android:orientation="horizontal">
 
         <ImageButton
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            app:srcCompat="@drawable/repeat_button"
             android:id="@+id/repeat_button"
-            android:layout_weight="1"
-            android:background="@null"
-            android:contentDescription="" />
-
-        <ImageButton
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            app:srcCompat="@drawable/previous_button"
+            android:layout_marginLeft="@dimen/button_margin"
+            android:layout_marginRight="@dimen/button_margin"
+            android:layout_weight="1"
+            android:background="@null"
+            android:contentDescription=""
+            app:srcCompat="@drawable/repeat_button" />
+
+        <ImageButton
             android:id="@+id/previous_buton"
-            android:layout_weight="1"
-            android:background="@null" />
-
-        <ImageButton
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            app:srcCompat="@drawable/play_button"
-            android:id="@+id/play_button"
-            android:layout_weight="1"
-            android:background="@null" />
-
-        <ImageButton
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            app:srcCompat="@drawable/next_button"
-            android:id="@+id/next_button"
+            android:layout_marginLeft="@dimen/button_margin"
+            android:layout_marginRight="@dimen/button_margin"
             android:layout_weight="1"
             android:background="@null"
-            android:adjustViewBounds="true" />
+            app:srcCompat="@drawable/previous_button" />
 
         <ImageButton
+            android:id="@+id/play_button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            app:srcCompat="@drawable/random_button"
-            android:id="@+id/random_button"
+            android:layout_marginLeft="@dimen/button_margin"
+            android:layout_marginRight="@dimen/button_margin"
             android:layout_weight="1"
-            android:background="@null" />
+            android:background="@null"
+            app:srcCompat="@drawable/play_button" />
+
+        <ImageButton
+            android:id="@+id/next_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="@dimen/button_margin"
+            android:layout_marginRight="@dimen/button_margin"
+            android:layout_weight="1"
+            android:adjustViewBounds="true"
+            android:background="@null"
+            app:srcCompat="@drawable/next_button" />
+
+        <ImageButton
+            android:id="@+id/random_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="@dimen/button_margin"
+            android:layout_marginRight="@dimen/button_margin"
+            android:layout_weight="1"
+            android:background="@null"
+            app:srcCompat="@drawable/random_button" />
 
     </LinearLayout>
 
