@@ -4,56 +4,63 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@android:color/background_light">
+    android:background="@color/background_color">
 
     <!-- Song properties -->
     <LinearLayout
-        android:orientation="vertical"
+        android:id="@+id/song_properties"
         android:layout_width="match_parent"
         android:layout_height="60dp"
-        android:id="@+id/song_properties"
+        android:layout_alignParentTop="true"
+        android:background="@color/background_color"
+        android:gravity="center"
+        android:orientation="vertical"
         android:paddingLeft="5dp"
-        android:paddingRight="5dp"
-        android:background="@android:color/background_light"
-        android:layout_alignParentTop="true">
+        android:paddingRight="5dp">
 
         <LinearLayout
             android:id="@+id/song_title_artist"
-            android:orientation="horizontal"
             android:layout_width="match_parent"
-            android:layout_height="match_parent">
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
 
             <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
                 android:id="@+id/song_artist"
-                android:layout_weight="1" />
-
-            <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Song Artist"
+                android:textColor="@color/text_color" />
+
+            <TextView
                 android:id="@+id/song_title"
-                android:layout_weight="1" />
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Song Title"
+                android:textColor="@color/text_color" />
         </LinearLayout>
 
         <TextView
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
             android:id="@+id/song_album"
-            android:layout_weight="1" />
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Album"
+            android:textColor="@color/text_color" />
 
     </LinearLayout>
 
     <!-- Song thumbnail -->
     <LinearLayout
         android:id="@+id/song_thumbnail"
-        android:orientation="horizontal"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@id/song_properties"
-        android:paddingTop="10dp"
-        android:paddingBottom="10dp"
         android:gravity="center"
+        android:orientation="horizontal"
+        android:paddingBottom="10dp"
+        android:paddingTop="10dp"
         android:weightSum="1">
 
         <ImageView
@@ -70,31 +77,31 @@
         android:id="@+id/song_duration"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_below="@+id/song_thumbnail"
+        android:layout_marginBottom="10dp"
         android:layout_marginLeft="20dp"
         android:layout_marginRight="20dp"
-        android:layout_marginBottom="10dp"
-        android:orientation="horizontal"
-        android:layout_below="@+id/song_thumbnail">
+        android:orientation="horizontal">
 
         <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
             android:id="@+id/current_time"
-            android:layout_weight="1"
-            android:textColor="@android:color/holo_blue_dark"
-            android:textStyle="bold"
-            android:gravity="start"
-            android:text="@string/start_time" />
-
-        <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:gravity="start"
+            android:text="@string/start_time"
+            android:textColor="@color/text_color"
+            android:textStyle="bold" />
+
+        <TextView
             android:id="@+id/end_time"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
             android:layout_weight="1"
             android:gravity="end"
-            android:textColor="@android:color/holo_blue_dark"
-            android:textStyle="bold"
-            android:text="@string/end_time" />
+            android:text="@string/end_time"
+            android:textColor="@color/text_color"
+            android:textStyle="bold" />
     </LinearLayout>
 
     <!-- Seekbar -->
@@ -107,8 +114,7 @@
         android:layout_centerVertical="false"
         android:layout_margin="@dimen/seekbar_margin"
         android:progressDrawable="@drawable/seekbar_progress"
-        android:thumb="@drawable/seek_button_layout"
-        />
+        android:thumb="@drawable/seek_button_layout" />
 
     <LinearLayout
         android:id="@+id/player_buttons"
@@ -116,7 +122,7 @@
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
         android:layout_below="@+id/seek_bar"
-        android:background="#b5b9ff"
+        android:background="@color/player_buttons_color"
         android:gravity="center"
         android:orientation="horizontal">
 

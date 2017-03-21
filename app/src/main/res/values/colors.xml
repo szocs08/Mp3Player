@@ -3,4 +3,10 @@
     <color name="colorPrimary">#3F51B5</color>
     <color name="colorPrimaryDark">#303F9F</color>
     <color name="colorAccent">#FF4081</color>
+    <color name="player_buttons_color">#b5b9ff</color>
+    <color name="background_color">#e8e8e8</color>
+    <color name="list_color">#e8e8e8</color>
+    <color name="list_select_color">#9fa3ff</color>
+    <color name="divider_color">#1e1e1e</color>
+    <color name="text_color">#171d5e</color>
 </resources>
