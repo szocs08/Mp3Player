@@ -8,6 +8,7 @@ import android.widget.AdapterView;
 import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.SimpleAdapter;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -20,7 +21,6 @@ public class PlayListActivity extends ListActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.playlist);
-
         ArrayList<HashMap<String,String>> songListData = new ArrayList<HashMap<String, String>>();
 
         SongsManager plm = new SongsManager();
@@ -30,6 +30,8 @@ public class PlayListActivity extends ListActivity {
         for (HashMap<String,String> song: songList) {
             songListData.add(song);
         }
+        Toast.makeText(getApplicationContext(),songListData.get(0).get("songTitle"),Toast.LENGTH_SHORT).show();
+
 
         ListAdapter adapter = new SimpleAdapter(this, songListData,
                 R.layout.playlist_item,new String[]{"songTitle"}, new int[] {R.id.song_title});

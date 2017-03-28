@@ -7,4 +7,5 @@
     <dimen name="playlist_item_pad">5dp</dimen>
     <dimen name="songtitle_pad">10dp</dimen>
     <dimen name="songtitle_texsize">15dp</dimen>
+    <dimen name="fab_margin">16dp</dimen>
 </resources>
