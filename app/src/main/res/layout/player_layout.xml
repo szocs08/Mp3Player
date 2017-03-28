@@ -18,6 +18,12 @@
         android:paddingLeft="5dp"
         android:paddingRight="5dp">
 
+        <Button
+            android:id="@+id/button_playlist"
+            android:layout_width="wrap_content"
+            android:layout_height="30dp"
+            android:text="Button" />
+
         <LinearLayout
             android:id="@+id/song_title_artist"
             android:layout_width="match_parent"
@@ -68,7 +74,7 @@
             android:layout_height="wrap_content"
             android:background="@android:drawable/picture_frame"
             android:contentDescription=""
-            app:srcCompat="@drawable/img_adele" />
+            android:src="@drawable/img_adele" />
 
     </LinearLayout>
 
@@ -135,17 +141,19 @@
             android:layout_weight="1"
             android:background="@null"
             android:contentDescription=""
-            app:srcCompat="@drawable/repeat_button" />
+            android:visibility="visible"
+            android:src="@drawable/repeat_button" />
 
         <ImageButton
-            android:id="@+id/previous_buton"
+            android:id="@+id/previous_button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginLeft="@dimen/button_margin"
             android:layout_marginRight="@dimen/button_margin"
             android:layout_weight="1"
             android:background="@null"
-            app:srcCompat="@drawable/previous_button" />
+            android:visibility="visible"
+            android:src="@drawable/previous_button" />
 
         <ImageButton
             android:id="@+id/play_button"
@@ -155,7 +163,8 @@
             android:layout_marginRight="@dimen/button_margin"
             android:layout_weight="1"
             android:background="@null"
-            app:srcCompat="@drawable/play_button" />
+            android:visibility="visible"
+            android:src="@drawable/play_button" />
 
         <ImageButton
             android:id="@+id/next_button"
@@ -166,17 +175,19 @@
             android:layout_weight="1"
             android:adjustViewBounds="true"
             android:background="@null"
-            app:srcCompat="@drawable/next_button" />
+            android:visibility="visible"
+            android:src="@drawable/next_button" />
 
         <ImageButton
-            android:id="@+id/random_button"
+            android:id="@+id/shuffle_button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginLeft="@dimen/button_margin"
             android:layout_marginRight="@dimen/button_margin"
             android:layout_weight="1"
             android:background="@null"
-            app:srcCompat="@drawable/random_button" />
+            android:visibility="visible"
+            android:src="@drawable/shuffle_button" />
 
     </LinearLayout>
 

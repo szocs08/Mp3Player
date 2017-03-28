@@ -28,4 +28,17 @@ public class Utilities {
 
         return finalTimerString;
     }
+
+    public static int getProgressPercentage(long currentDuration, long totalDuration){
+        Double percentage = 0.0;
+
+        percentage = ((double)currentDuration/totalDuration)*100;
+
+        return percentage.intValue();
+    }
+
+
+    public static int progressToTimer(int progress,long totalDuration){
+        return (int)((double)progress/100*totalDuration);
+    }
 }
