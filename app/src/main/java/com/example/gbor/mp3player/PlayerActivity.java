@@ -1,10 +1,8 @@
 /*
-pause
 fragment
 meta data
 facebook
 options
-seek
 playlist save/load
 
  */
@@ -12,6 +10,7 @@ playlist save/load
 package com.example.gbor.mp3player;
 
 import android.content.Intent;
+import android.media.MediaMetadataRetriever;
 import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.os.Handler;
@@ -48,15 +47,18 @@ public class PlayerActivity extends FragmentActivity implements MediaPlayer.OnCo
 
     private Handler mHandler = new Handler();
     private SongsManager songsManager;
-    private int songindex;
+    private int songIndex;
     private boolean isShuffle = false;
     private boolean isRepeat = false;
     private ArrayList<HashMap<String,String>> songList = new ArrayList<HashMap<String, String>>();
+    private MediaMetadataRetriever mmr = new MediaMetadataRetriever();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.player_layout);
+
+        HashMap<String,String> songData = new HashMap<String,String>();
 
         btnPlay = (ImageButton)findViewById(R.id.play_button);
         btnPrevious = (ImageButton)findViewById(R.id.previous_button);
@@ -74,10 +76,16 @@ public class PlayerActivity extends FragmentActivity implements MediaPlayer.OnCo
         mp = new MediaPlayer();
         songsManager = new SongsManager();
 
-        //progressSekbar.setOnSeekBarChangeListener(this);
+        progressSekbar.setOnSeekBarChangeListener(this);
         mp.setOnCompletionListener(this);
 
-        songList = songsManager.getPlaylist();
+        for (String song: songsManager.getPlaylist()) {
+            mmr.setDataSource(song);
+            songData.put("songArtist",mmr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_ARTIST));
+            songData.put("songTitle",mmr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_TITLE));
+            songList.add(songData);
+        }
+
 
         btnPlaylist.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -90,12 +98,12 @@ public class PlayerActivity extends FragmentActivity implements MediaPlayer.OnCo
         btnNext.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if(songindex < songList.size()-1){
-                    songindex++;
-                    playSong(songindex);
+                if(songIndex < songList.size()-1){
+                    songIndex++;
+                    playSong(songIndex);
                 }else{
-                    songindex=0;
-                    playSong(songindex);
+                    songIndex =0;
+                    playSong(songIndex);
                 }
             }
         });
@@ -103,12 +111,12 @@ public class PlayerActivity extends FragmentActivity implements MediaPlayer.OnCo
         btnPrevious.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if(songindex > 0){
-                    songindex--;
-                    playSong(songindex);
+                if(songIndex > 0){
+                    songIndex--;
+                    playSong(songIndex);
                 }else{
-                    songindex=songList.size()-1;
-                    playSong(songindex);
+                    songIndex =songList.size()-1;
+                    playSong(songIndex);
                 }
             }
         });
@@ -119,14 +127,14 @@ public class PlayerActivity extends FragmentActivity implements MediaPlayer.OnCo
                 if(isRepeat){
                     isRepeat = false;
                     Toast.makeText(getApplicationContext(),"Repeat is OFF",Toast.LENGTH_SHORT).show();
-                    btnRepeat.setImageResource(R.drawable.img_repeat);
+                    btnRepeat.setImageResource(R.drawable.repeat_button);
                 }else{
                     isRepeat = true;
                     Toast.makeText(getApplicationContext(),"Repeat is ON",Toast.LENGTH_SHORT).show();
 
                     isShuffle = false;
                     btnRepeat.setImageResource(R.drawable.img_repeat_pressed);
-                    btnShuffle.setImageResource(R.drawable.img_shuffle);
+                    btnShuffle.setImageResource(R.drawable.shuffle_button);
                 }
             }
         });
@@ -138,14 +146,27 @@ public class PlayerActivity extends FragmentActivity implements MediaPlayer.OnCo
                 if(isShuffle){
                     isShuffle = false;
                     Toast.makeText(getApplicationContext(),"Shuffle is OFF",Toast.LENGTH_SHORT).show();
-                    btnRepeat.setImageResource(R.drawable.img_shuffle);
+                    btnShuffle.setImageResource(R.drawable.shuffle_button);
                 }else{
                     isShuffle = true;
                     Toast.makeText(getApplicationContext(),"Shuffle is ON",Toast.LENGTH_SHORT).show();
 
                     isRepeat = false;
-                    btnRepeat.setImageResource(R.drawable.img_repeat);
+                    btnRepeat.setImageResource(R.drawable.repeat_button);
                     btnShuffle.setImageResource(R.drawable.img_shuffle_pressed);
+                }
+            }
+        });
+
+        btnPlay.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(mp.isPlaying()){
+                    mp.pause();
+                    btnPlay.setImageResource(R.drawable.play_button);
+                }else{
+                    mp.start();
+                    btnPlay.setImageResource(R.drawable.pause_button);
                 }
             }
         });
@@ -156,9 +177,9 @@ public class PlayerActivity extends FragmentActivity implements MediaPlayer.OnCo
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if(resultCode==100){
-            songindex = data.getExtras().getInt("SongIndex");
+            songIndex = data.getExtras().getInt("SongIndex");
 
-            playSong(songindex);
+            playSong(songIndex);
         }
     }
 
@@ -226,19 +247,19 @@ public class PlayerActivity extends FragmentActivity implements MediaPlayer.OnCo
     @Override
     public void onCompletion(MediaPlayer mp) {
         if(isRepeat){
-            songindex = songindex;
+            songIndex = songIndex;
         } else if(isShuffle){
             Random rnd = new Random();
-            songindex = rnd.nextInt((songList.size() - 1) - 1);
+            songIndex = rnd.nextInt((songList.size() - 1) - 1);
         } else {
-            if(songindex < songList.size()-1){
-                songindex++;
+            if(songIndex < songList.size()-1){
+                songIndex++;
 
             }else{
-                songindex=0;
+                songIndex =0;
 
             }
         }
-        playSong(songindex);
+        playSong(songIndex);
     }
 }

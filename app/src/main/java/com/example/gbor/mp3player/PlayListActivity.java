@@ -1,7 +1,7 @@
 package com.example.gbor.mp3player;
 
 import android.app.ListActivity;
-import android.content.Intent;
+import android.media.MediaMetadataRetriever;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.AdapterView;
@@ -15,26 +15,30 @@ import java.util.HashMap;
 
 public class PlayListActivity extends ListActivity {
 
-    public ArrayList<HashMap<String,String>> songList = new ArrayList<HashMap<String, String>>();
+    public ArrayList<String> songList = new ArrayList<String>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.playlist);
+        MediaMetadataRetriever mmr = new MediaMetadataRetriever();
         ArrayList<HashMap<String,String>> songListData = new ArrayList<HashMap<String, String>>();
-
+        HashMap<String,String> songData;
         SongsManager plm = new SongsManager();
 
         songList = plm.getPlaylist();
 
-        for (HashMap<String,String> song: songList) {
-            songListData.add(song);
+        for (String song: songList) {
+            mmr.setDataSource(song);
+            songData = new HashMap<String,String>();
+            songData.put("songArtist",mmr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_ARTIST));
+            songData.put("songTitle",mmr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_TITLE));
+            songListData.add(songData);
         }
-        Toast.makeText(getApplicationContext(),songListData.get(0).get("songTitle"),Toast.LENGTH_SHORT).show();
 
 
         ListAdapter adapter = new SimpleAdapter(this, songListData,
-                R.layout.playlist_item,new String[]{"songTitle"}, new int[] {R.id.song_title});
+                R.layout.playlist_item,new String[]{"songTitle"}, new int[] {R.id.songTitle});
 
         setListAdapter(adapter);
 
@@ -44,12 +48,12 @@ public class PlayListActivity extends ListActivity {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 int songIndex = position;
+                Toast.makeText(getApplicationContext(),"asdfg",Toast.LENGTH_SHORT).show();
+                //Intent in = new Intent(getApplicationContext(),PlayerActivity.class);
 
-                Intent in = new Intent(getApplicationContext(),PlayerActivity.class);
-
-                in.putExtra("songIndex", songIndex);
-                setResult(100,in);
-                finish();
+               // in.putExtra("songIndex", songIndex);
+                //setResult(100,in);
+                //finish();
             }
         });
     }
