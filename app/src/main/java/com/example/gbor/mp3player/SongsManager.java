@@ -19,6 +19,7 @@ public class SongsManager {
 
     public ArrayList<String> getPlaylist(){
         File home = new File(MEDIA_PATH);
+        int a = home.listFiles(new FileExtensionFilter()).length;
         if(home.listFiles(new FileExtensionFilter()).length > 0){
             for (File file:home.listFiles(new FileExtensionFilter())) {
                 songList.add(file.getPath());

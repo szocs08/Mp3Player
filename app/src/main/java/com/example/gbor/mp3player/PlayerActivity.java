@@ -1,6 +1,6 @@
 /*
+
 fragment
-list view
 facebook
 options
 playlist save/load
@@ -10,6 +10,8 @@ playlist save/load
 package com.example.gbor.mp3player;
 
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.media.MediaMetadataRetriever;
 import android.media.MediaPlayer;
 import android.os.Bundle;
@@ -18,6 +20,7 @@ import android.support.v4.app.FragmentActivity;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -35,8 +38,9 @@ public class PlayerActivity extends FragmentActivity implements MediaPlayer.OnCo
     private ImageButton btnNext;
     private ImageButton btnShuffle;
     private ImageButton btnRepeat;
+    private ImageView imgAlbum;
     private Button btnPlaylist;
-    private SeekBar progressSekbar;
+    private SeekBar progressSeekbar;
     private TextView songTitleLabel;
     private TextView songArtistLabel;
     private TextView songAlbumLabel;
@@ -50,7 +54,7 @@ public class PlayerActivity extends FragmentActivity implements MediaPlayer.OnCo
     private int songIndex;
     private boolean isShuffle = false;
     private boolean isRepeat = false;
-    private ArrayList<HashMap<String,String>> songList = new ArrayList<HashMap<String, String>>();
+    private ArrayList<HashMap<String,String>> songList = new ArrayList<>();
     private MediaMetadataRetriever mmr = new MediaMetadataRetriever();
 
     @Override
@@ -58,15 +62,16 @@ public class PlayerActivity extends FragmentActivity implements MediaPlayer.OnCo
         super.onCreate(savedInstanceState);
         setContentView(R.layout.player_layout);
 
-        HashMap<String,String> songData = new HashMap<String,String>();
+        HashMap<String,String> songData;
 
         btnPlay = (ImageButton)findViewById(R.id.play_button);
         btnPrevious = (ImageButton)findViewById(R.id.previous_button);
         btnNext = (ImageButton)findViewById(R.id.next_button);
         btnShuffle = (ImageButton)findViewById(R.id.shuffle_button);
         btnRepeat = (ImageButton)findViewById(R.id.repeat_button);
+        imgAlbum = (ImageView)findViewById(R.id.song_album_thumbnail);
         btnPlaylist = (Button)findViewById(R.id.button_playlist);
-        progressSekbar = (SeekBar)findViewById(R.id.seek_bar);
+        progressSeekbar = (SeekBar)findViewById(R.id.seek_bar);
         songTitleLabel = (TextView)findViewById(R.id.song_title);
         songArtistLabel = (TextView)findViewById(R.id.song_artist);
         songAlbumLabel = (TextView)findViewById(R.id.song_album);
@@ -76,13 +81,17 @@ public class PlayerActivity extends FragmentActivity implements MediaPlayer.OnCo
         mp = new MediaPlayer();
         songsManager = new SongsManager();
 
-        progressSekbar.setOnSeekBarChangeListener(this);
+        progressSeekbar.setOnSeekBarChangeListener(this);
         mp.setOnCompletionListener(this);
 
-        for (String song: songsManager.getPlaylist()) {
+
+        for (String song : songsManager.getPlaylist()) {
             mmr.setDataSource(song);
-            songData.put("songArtist",mmr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_ARTIST));
-            songData.put("songTitle",mmr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_TITLE));
+            songData = new HashMap<>();
+            songData.put("songPath", song);
+            songData.put("songArtist", mmr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_ARTIST));
+            songData.put("songTitle", mmr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_TITLE));
+            songData.put("songAlbum", mmr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_ALBUM));
             songList.add(songData);
         }
 
@@ -190,13 +199,20 @@ public class PlayerActivity extends FragmentActivity implements MediaPlayer.OnCo
             mp.prepare();
             mp.start();
 
-            String songTitle = songList.get(songindex).get("songTitle");
-            songTitleLabel.setText(songTitle);
+            mmr.setDataSource(songList.get(songindex).get("songPath"));
 
-            btnPlay.setImageResource(R.drawable.img_pause);
+            songTitleLabel.setText(songList.get(songindex).get("songTitle"));
+            songArtistLabel.setText(songList.get(songindex).get("songTitle"));
+            songAlbumLabel.setText(songList.get(songindex).get("songAlbum"));
+            Bitmap img = BitmapFactory.decodeByteArray(mmr.getEmbeddedPicture(),0,mmr.getEmbeddedPicture().length);
+            imgAlbum.setImageBitmap(img);
 
-            progressSekbar.setProgress(0);
-            progressSekbar.setMax(100);
+
+
+            btnPlay.setImageResource(R.drawable.pause_button);
+
+            progressSeekbar.setProgress(0);
+            progressSeekbar.setMax(100);
 
             updateProgressBar();
         }catch (IllegalArgumentException|IOException|IllegalStateException e){
@@ -215,12 +231,12 @@ public class PlayerActivity extends FragmentActivity implements MediaPlayer.OnCo
             long totalDuration = mp.getDuration();
             long currentDuration = mp.getCurrentPosition();
 
-            currentTimeLabel.setText(""+Utilities.milliSecondsToTimer(currentDuration));
-            totalTimeLabel.setText(""+Utilities.milliSecondsToTimer(totalDuration));
+            currentTimeLabel.setText(Utilities.milliSecondsToTimer(currentDuration));
+            totalTimeLabel.setText(Utilities.milliSecondsToTimer(totalDuration));
 
             int progress = Utilities.getProgressPercentage(currentDuration,totalDuration);
 
-            progressSekbar.setProgress(progress);
+            progressSeekbar.setProgress(progress);
 
             mHandler.postDelayed(this,100);
         }

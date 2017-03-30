@@ -18,12 +18,6 @@
         android:paddingLeft="5dp"
         android:paddingRight="5dp">
 
-        <Button
-            android:id="@+id/button_playlist"
-            android:layout_width="wrap_content"
-            android:layout_height="30dp"
-            android:text="Button" />
-
         <LinearLayout
             android:id="@+id/song_title_artist"
             android:layout_width="match_parent"
@@ -35,7 +29,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="Song Artist"
+                android:text="@string/song_artist"
                 android:textColor="@color/text_color" />
 
             <TextView
@@ -43,16 +37,16 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="Song Title"
+                android:text="@string/song_title"
                 android:textColor="@color/text_color" />
         </LinearLayout>
 
         <TextView
             android:id="@+id/song_album"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="0dp"
             android:layout_weight="1"
-            android:text="Album"
+            android:text="@string/album"
             android:textColor="@color/text_color" />
 
     </LinearLayout>
@@ -62,75 +56,90 @@
         android:id="@+id/song_thumbnail"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@id/song_properties"
+        android:layout_below="@+id/song_properties"
         android:gravity="center"
         android:orientation="horizontal"
         android:paddingBottom="10dp"
         android:paddingTop="10dp"
         android:weightSum="1">
 
-        <ImageView
+        <Button
+            android:id="@+id/button_playlist"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_height="30dp"
+            android:layout_weight="1"
+            android:text="Button" />
+
+        <ImageView
+            android:id="@+id/song_album_thumbnail"
+            android:layout_width="@dimen/img_width"
+            android:layout_height="@dimen/img_height"
             android:background="@android:drawable/picture_frame"
             android:contentDescription=""
+            android:scaleType="fitXY"
             android:src="@drawable/img_adele" />
 
     </LinearLayout>
 
     <!-- Song duraion -->
     <LinearLayout
-        android:id="@+id/song_duration"
+        android:id="@+id/seek_duration"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/song_thumbnail"
-        android:layout_marginBottom="10dp"
-        android:layout_marginLeft="20dp"
-        android:layout_marginRight="20dp"
-        android:orientation="horizontal">
+        android:orientation="vertical"
+        android:layout_below="@+id/song_thumbnail">
 
-        <TextView
-            android:id="@+id/current_time"
+        <LinearLayout
+            android:id="@+id/song_duration"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:gravity="start"
-            android:text="@string/start_time"
-            android:textColor="@color/text_color"
-            android:textStyle="bold" />
+            android:layout_height="match_parent"
+            android:layout_marginBottom="10dp"
+            android:layout_marginLeft="20dp"
+            android:layout_marginRight="20dp"
+            android:orientation="horizontal">
 
-        <TextView
-            android:id="@+id/end_time"
+            <TextView
+                android:id="@+id/current_time"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:gravity="start"
+                android:text="@string/start_time"
+                android:textColor="@color/text_color"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/end_time"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:gravity="end"
+                android:text="@string/end_time"
+                android:textColor="@color/text_color"
+                android:textStyle="bold" />
+        </LinearLayout>
+
+        <SeekBar
+            android:id="@+id/seek_bar"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="0dp"
+            android:layout_margin="@dimen/seekbar_margin"
             android:layout_weight="1"
-            android:gravity="end"
-            android:text="@string/end_time"
-            android:textColor="@color/text_color"
-            android:textStyle="bold" />
+            android:progressDrawable="@drawable/seekbar_progress"
+            android:thumb="@drawable/seek_button_layout" />
+
     </LinearLayout>
 
-    <!-- Seekbar -->
-    <SeekBar
-        android:id="@+id/seek_bar"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/song_thumbnail"
-        android:layout_centerHorizontal="false"
-        android:layout_centerVertical="false"
-        android:layout_margin="@dimen/seekbar_margin"
-        android:progressDrawable="@drawable/seekbar_progress"
-        android:thumb="@drawable/seek_button_layout" />
 
     <LinearLayout
         android:id="@+id/player_buttons"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
-        android:layout_below="@+id/seek_bar"
         android:background="@color/player_buttons_color"
         android:gravity="center"
-        android:orientation="horizontal">
+        android:orientation="horizontal"
+        android:layout_below="@+id/seek_duration">
 
         <ImageButton
             android:id="@+id/repeat_button"
@@ -141,8 +150,8 @@
             android:layout_weight="1"
             android:background="@null"
             android:contentDescription=""
-            android:visibility="visible"
-            android:src="@drawable/repeat_button" />
+            android:src="@drawable/repeat_button"
+            android:visibility="visible" />
 
         <ImageButton
             android:id="@+id/previous_button"
@@ -152,8 +161,8 @@
             android:layout_marginRight="@dimen/button_margin"
             android:layout_weight="1"
             android:background="@null"
-            android:visibility="visible"
-            android:src="@drawable/previous_button" />
+            android:src="@drawable/previous_button"
+            android:visibility="visible" />
 
         <ImageButton
             android:id="@+id/play_button"
@@ -163,8 +172,8 @@
             android:layout_marginRight="@dimen/button_margin"
             android:layout_weight="1"
             android:background="@null"
-            android:visibility="visible"
-            android:src="@drawable/play_button" />
+            android:src="@drawable/play_button"
+            android:visibility="visible" />
 
         <ImageButton
             android:id="@+id/next_button"
@@ -175,8 +184,8 @@
             android:layout_weight="1"
             android:adjustViewBounds="true"
             android:background="@null"
-            android:visibility="visible"
-            android:src="@drawable/next_button" />
+            android:src="@drawable/next_button"
+            android:visibility="visible" />
 
         <ImageButton
             android:id="@+id/shuffle_button"
@@ -186,8 +195,8 @@
             android:layout_marginRight="@dimen/button_margin"
             android:layout_weight="1"
             android:background="@null"
-            android:visibility="visible"
-            android:src="@drawable/shuffle_button" />
+            android:src="@drawable/shuffle_button"
+            android:visibility="visible" />
 
     </LinearLayout>
 
