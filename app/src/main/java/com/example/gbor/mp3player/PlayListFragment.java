@@ -1,16 +1,15 @@
 package com.example.gbor.mp3player;
 
 import android.app.Activity;
-import android.app.ListActivity;
-import android.content.Intent;
+import android.content.Context;
 import android.media.MediaMetadataRetriever;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.v4.app.ListFragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -18,11 +17,10 @@ import android.widget.TextView;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-public class PlayListActivity extends ListActivity {
 
-    public ArrayList<String> songList = new ArrayList<>();
+public class PlayListFragment extends ListFragment {
 
-    private class SongAdapter extends ArrayAdapter<HashMap<String,String>>{
+    private class SongAdapter extends ArrayAdapter<HashMap<String,String>> {
 
         private final ArrayList<HashMap<String,String>> songData;
         private final Activity context;
@@ -51,12 +49,25 @@ public class PlayListActivity extends ListActivity {
         }
     }
 
+    public ArrayList<String> songList = new ArrayList<>();
+
+    private OnFragmentInteractionListener interactionListener;
+
+    public interface OnFragmentInteractionListener {
+        void startSong(int position);
+    }
+
+    @Override
+    public void onListItemClick(ListView l, View v, int position, long id) {
+        interactionListener.startSong(position);
+    }
+
 
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.playlist);
+
         MediaMetadataRetriever mmr = new MediaMetadataRetriever();
         ArrayList<HashMap<String,String>> songListData = new ArrayList<>();
         HashMap<String,String> songData;
@@ -72,22 +83,32 @@ public class PlayListActivity extends ListActivity {
             songListData.add(songData);
         }
 
+        setListAdapter(new SongAdapter(getActivity(),songListData));
 
-        SongAdapter adapter = new SongAdapter(this,songListData);
-
-        setListAdapter(adapter);
-
-        ListView lv = getListView();
-
-        lv.setOnItemClickListener(new AdapterView.OnItemClickListener(){
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                Intent in = new Intent(getApplicationContext(),PlayerActivity.class);
-
-                in.putExtra("songIndex", position);
-                setResult(100,in);
-                finish();
-            }
-        });
     }
+
+
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        return inflater.inflate(R.layout.playlist,container,false);
+    }
+
+    @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+        if (context instanceof OnFragmentInteractionListener) {
+            interactionListener = (OnFragmentInteractionListener) context;
+        } else {
+            throw new RuntimeException(context.toString()
+                    + " must implement OnFragmentInteractionListener");
+        }
+    }
+
+    @Override
+    public void onDetach() {
+        super.onDetach();
+        interactionListener = null;
+    }
+
+
 }

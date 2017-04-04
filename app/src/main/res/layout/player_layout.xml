@@ -63,13 +63,6 @@
         android:paddingTop="10dp"
         android:weightSum="1">
 
-        <Button
-            android:id="@+id/button_playlist"
-            android:layout_width="wrap_content"
-            android:layout_height="30dp"
-            android:layout_weight="1"
-            android:text="Button" />
-
         <ImageView
             android:id="@+id/song_album_thumbnail"
             android:layout_width="@dimen/img_width"
