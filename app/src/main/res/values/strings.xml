@@ -2,12 +2,12 @@
     <string name="app_name">Mp3 Player</string>
     <string name="start_time">0:00</string>
     <string name="end_time">0:00</string>
-    <string name="title_activity_main2">Main2Activity</string>
     <string name="hyphen">-</string>
     <string name="album">Album</string>
     <string name="song_artist">Song Artist</string>
     <string name="song_title">Song Title</string>
-
-    <!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="last_song">Last song</string>
+    <string name="no_repeat_end">The last song on the playlist</string>
+    <string name="no_repeat_start">The first song on the playlist</string>
+    <string name="default_folder">/sdcard/</string>
 </resources>

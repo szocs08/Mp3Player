@@ -9,19 +9,25 @@ import java.util.ArrayList;
  */
 
 public class SongsManager {
-    final String MEDIA_PATH = new String("/sdcard/");
+
+
+    private String Media_path;
 
     private ArrayList<String> songList = new ArrayList<String>();
 
-    public SongsManager(){
-
+    public SongsManager(String path) {
+        Media_path = path;
     }
 
-    public ArrayList<String> getPlaylist(){
-        File home = new File(MEDIA_PATH);
+    public void setMedia_path(String media_path) {
+        Media_path = media_path;
+    }
+
+    public ArrayList<String> getPlaylist() {
+        File home = new File(Media_path);
         int a = home.listFiles(new FileExtensionFilter()).length;
-        if(home.listFiles(new FileExtensionFilter()).length > 0){
-            for (File file:home.listFiles(new FileExtensionFilter())) {
+        if (home.listFiles(new FileExtensionFilter()).length > 0) {
+            for (File file : home.listFiles(new FileExtensionFilter())) {
                 songList.add(file.getPath());
             }
         }
@@ -29,7 +35,7 @@ public class SongsManager {
         return songList;
     }
 
-    class FileExtensionFilter implements FilenameFilter{
+    class FileExtensionFilter implements FilenameFilter {
         @Override
         public boolean accept(File dir, String name) {
             return name.toLowerCase().endsWith(".mp3");

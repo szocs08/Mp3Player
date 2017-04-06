@@ -20,14 +20,14 @@ import java.util.HashMap;
 
 public class PlayListFragment extends ListFragment {
 
-    private class SongAdapter extends ArrayAdapter<HashMap<String,String>> {
+    private class SongAdapter extends ArrayAdapter<HashMap<String, String>> {
 
-        private final ArrayList<HashMap<String,String>> songData;
+        private final ArrayList<HashMap<String, String>> songData;
         private final Activity context;
 
 
-        public SongAdapter(Activity context, ArrayList<HashMap<String,String>> songData){
-            super(context,R.layout.playlist_item,songData);
+        public SongAdapter(Activity context, ArrayList<HashMap<String, String>> songData) {
+            super(context, R.layout.playlist_item, songData);
             this.context = context;
             this.songData = songData;
 
@@ -38,7 +38,7 @@ public class PlayListFragment extends ListFragment {
         @Override
         public View getView(int position, @Nullable View convertView, @NonNull ViewGroup parent) {
             LayoutInflater li = context.getLayoutInflater();
-            View v = li.inflate(R.layout.playlist_item,null,true);
+            View v = li.inflate(R.layout.playlist_item, null, true);
             TextView songArtist = (TextView) v.findViewById(R.id.songArtist);
             TextView songTitle = (TextView) v.findViewById(R.id.songTitle);
 
@@ -48,8 +48,6 @@ public class PlayListFragment extends ListFragment {
             return v;
         }
     }
-
-    public ArrayList<String> songList = new ArrayList<>();
 
     private OnFragmentInteractionListener interactionListener;
 
@@ -63,34 +61,30 @@ public class PlayListFragment extends ListFragment {
     }
 
 
-
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         MediaMetadataRetriever mmr = new MediaMetadataRetriever();
-        ArrayList<HashMap<String,String>> songListData = new ArrayList<>();
-        HashMap<String,String> songData;
-        SongsManager plm = new SongsManager();
+        ArrayList<HashMap<String, String>> songListData = new ArrayList<>();
+        HashMap<String, String> songData;
 
-        songList = plm.getPlaylist();
-
-        for (String song: songList) {
+        for (String song : getArguments().getStringArrayList("playlist")) {
             mmr.setDataSource(song);
             songData = new HashMap<>();
-            songData.put("songArtist",mmr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_ARTIST));
-            songData.put("songTitle",mmr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_TITLE));
+            songData.put("songArtist", mmr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_ARTIST));
+            songData.put("songTitle", mmr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_TITLE));
             songListData.add(songData);
         }
 
-        setListAdapter(new SongAdapter(getActivity(),songListData));
+        setListAdapter(new SongAdapter(getActivity(), songListData));
 
     }
 
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        return inflater.inflate(R.layout.playlist,container,false);
+        return inflater.inflate(R.layout.playlist, container, false);
     }
 
     @Override

@@ -6,21 +6,21 @@ package com.example.gbor.mp3player;
 
 public class Utilities {
 
-    public static String milliSecondsToTimer(long milliseconds){
+    public static String milliSecondsToTimer(long milliseconds) {
         String finalTimerString = "";
         String secondsString = "";
 
-        int hours = (int)(milliseconds /(1000*60*60));
-        int minutes = (int)(milliseconds % (1000*60*60)) / (1000*60);
-        int seconds = (int) ((milliseconds % (1000*60*60)) % (1000*60) / 1000);
+        int hours = (int) (milliseconds / (1000 * 60 * 60));
+        int minutes = (int) (milliseconds % (1000 * 60 * 60)) / (1000 * 60);
+        int seconds = (int) ((milliseconds % (1000 * 60 * 60)) % (1000 * 60) / 1000);
 
-        if(hours>0){
-            finalTimerString = hours +":";
+        if (hours > 0) {
+            finalTimerString = hours + ":";
         }
 
-        if(seconds<10){
+        if (seconds < 10) {
             secondsString = "0" + seconds;
-        }else {
+        } else {
             secondsString = "" + seconds;
         }
 
@@ -29,16 +29,16 @@ public class Utilities {
         return finalTimerString;
     }
 
-    public static int getProgressPercentage(long currentDuration, long totalDuration){
+    public static int getProgressPercentage(long currentDuration, long totalDuration) {
         Double percentage = 0.0;
 
-        percentage = ((double)currentDuration/totalDuration)*100;
+        percentage = ((double) currentDuration / totalDuration) * 100;
 
         return percentage.intValue();
     }
 
 
-    public static int progressToTimer(int progress,long totalDuration){
-        return (int)((double)progress/100*totalDuration);
+    public static int progressToTimer(int progress, long totalDuration) {
+        return (int) ((double) progress / 100 * totalDuration);
     }
 }

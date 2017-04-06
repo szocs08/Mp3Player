@@ -79,8 +79,8 @@
         android:id="@+id/seek_duration"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:layout_below="@+id/song_thumbnail">
+        android:layout_below="@+id/song_thumbnail"
+        android:orientation="vertical">
 
         <LinearLayout
             android:id="@+id/song_duration"
@@ -129,10 +129,10 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
+        android:layout_below="@+id/seek_duration"
         android:background="@color/player_buttons_color"
         android:gravity="center"
-        android:orientation="horizontal"
-        android:layout_below="@+id/seek_duration">
+        android:orientation="horizontal">
 
         <ImageButton
             android:id="@+id/repeat_button"
