@@ -25,12 +25,14 @@ import java.util.Random;
 public class PlayerActivity extends FragmentActivity implements
         PlayerFragment.OnFragmentInteractionListener,
         PlayListFragment.OnFragmentInteractionListener,
-        MediaPlayer.OnCompletionListener {
+        MediaPlayer.OnCompletionListener,
+    OptionsFragment.OnOptionsFragmentInteractionListener{
 
     private MediaPlayer mp;
 
     private PlayerFragment playerFragment = new PlayerFragment();
     private PlayListFragment playListFragment = new PlayListFragment();
+    private OptionsFragment optionsFragment = new OptionsFragment();
 
     private int songIndex;
     private boolean isShuffle = false;
@@ -55,14 +57,19 @@ public class PlayerActivity extends FragmentActivity implements
             e.printStackTrace();
         }
         PlayerPagerAdapter pagerAdapter = new PlayerPagerAdapter(getSupportFragmentManager(),
-                playlist, songIndex, playerFragment, playListFragment);
+                playlist, songIndex, playerFragment, playListFragment,optionsFragment);
 
         ViewPager viewPager = (ViewPager) findViewById(R.id.pager);
         viewPager.setAdapter(pagerAdapter);
+        //viewPager.setCurrentItem(1);
 
 
     }
 
+    @Override
+    public void asd(int position) {
+
+    }
 
     @Override
     public void play() {
@@ -169,6 +176,7 @@ public class PlayerActivity extends FragmentActivity implements
         }
     }
 
+
     @Override
     public void onCompletion(MediaPlayer mp) {
         if (!isRepeat) {
@@ -193,14 +201,17 @@ public class PlayerActivity extends FragmentActivity implements
         int songindex;
         PlayerFragment playerFragment;
         PlayListFragment playListFragment;
+        OptionsFragment optionsFragment;
 
         public PlayerPagerAdapter(FragmentManager fm, ArrayList<String> playlist, int songIndex,
-                                  PlayerFragment playerFragment, PlayListFragment playListFragment) {
+                                  PlayerFragment playerFragment, PlayListFragment playListFragment,
+                                  OptionsFragment optionsFragment) {
             super(fm);
             this.playlist = playlist;
             this.songindex = songIndex;
             this.playerFragment = playerFragment;
             this.playListFragment = playListFragment;
+            this.optionsFragment = optionsFragment;
         }
 
         @Override
@@ -209,6 +220,10 @@ public class PlayerActivity extends FragmentActivity implements
             args.putStringArrayList("playlist", playlist);
 
             switch (position) {
+                case 1:
+                    optionsFragment.setArguments(args);
+                    return optionsFragment;
+
                 case 0:
                     playerFragment.setArguments(args);
                     return playerFragment;
@@ -222,7 +237,7 @@ public class PlayerActivity extends FragmentActivity implements
 
         @Override
         public int getCount() {
-            return 2;
+            return 3;
         }
     }
 }

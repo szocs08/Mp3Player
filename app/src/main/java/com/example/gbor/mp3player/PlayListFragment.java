@@ -76,6 +76,13 @@ public class PlayListFragment extends ListFragment {
             songData.put("songTitle", mmr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_TITLE));
             songListData.add(songData);
         }
+        Context context = getActivity();
+        if (context instanceof OptionsFragment.OnOptionsFragmentInteractionListener) {
+            interactionListener = (OnFragmentInteractionListener) context;
+        } else {
+            throw new RuntimeException(getActivity().toString()
+                    + " must implement OnFragmentInteractionListener");
+        }
 
         setListAdapter(new SongAdapter(getActivity(), songListData));
 
