@@ -1,16 +1,52 @@
 package com.example.gbor.mp3player;
 
+import android.app.Activity;
 import android.content.Context;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.v4.app.ListFragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
+import android.widget.TextView;
+
+import java.util.ArrayList;
+import java.util.HashMap;
 
 public class OptionsFragment extends ListFragment {
 
+
+    private class OptionsAdapter extends ArrayAdapter<HashMap<String, String>> {
+
+        private final ArrayList<HashMap<String, String>> songData;
+        private final Activity context;
+
+
+        public OptionsAdapter(Activity context, ArrayList<HashMap<String, String>> songData) {
+            super(context, R.layout.playlist_item, songData);
+            this.context = context;
+            this.songData = songData;
+
+
+        }
+
+        @NonNull
+        @Override
+        public View getView(int position, @Nullable View convertView, @NonNull ViewGroup parent) {
+            LayoutInflater li = context.getLayoutInflater();
+            View v = li.inflate(R.layout.playlist_item, null, true);
+            TextView songArtist = (TextView) v.findViewById(R.id.songArtist);
+            TextView songTitle = (TextView) v.findViewById(R.id.songTitle);
+
+            songArtist.setText(songData.get(position).get("songArtist"));
+            songTitle.setText(songData.get(position).get("songTitle"));
+
+            return v;
+        }
+    }
 
     private OnOptionsFragmentInteractionListener interactionListener;
 

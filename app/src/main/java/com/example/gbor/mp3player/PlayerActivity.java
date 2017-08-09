@@ -23,8 +23,8 @@ import java.util.ArrayList;
 import java.util.Random;
 
 public class PlayerActivity extends FragmentActivity implements
-        PlayerFragment.OnFragmentInteractionListener,
-        PlayListFragment.OnFragmentInteractionListener,
+        PlayerFragment.OnPlayerFragmentInteractionListener,
+        PlayListFragment.OnListFragmentInteractionListener,
         MediaPlayer.OnCompletionListener,
     OptionsFragment.OnOptionsFragmentInteractionListener{
 
@@ -61,7 +61,7 @@ public class PlayerActivity extends FragmentActivity implements
 
         ViewPager viewPager = (ViewPager) findViewById(R.id.pager);
         viewPager.setAdapter(pagerAdapter);
-        //viewPager.setCurrentItem(1);
+        viewPager.setCurrentItem(1);
 
 
     }
@@ -171,6 +171,7 @@ public class PlayerActivity extends FragmentActivity implements
             mp.prepare();
             mp.start();
             playerFragment.updateUI(songindex);
+            playListFragment.updateUI(songindex);
         } catch (IllegalArgumentException | IOException | IllegalStateException e) {
             e.printStackTrace();
         }
@@ -220,11 +221,11 @@ public class PlayerActivity extends FragmentActivity implements
             args.putStringArrayList("playlist", playlist);
 
             switch (position) {
-                case 1:
+                case 0:
                     optionsFragment.setArguments(args);
                     return optionsFragment;
 
-                case 0:
+                case 1:
                     playerFragment.setArguments(args);
                     return playerFragment;
 
@@ -232,6 +233,7 @@ public class PlayerActivity extends FragmentActivity implements
                     args.putInt("index", songindex);
                     playListFragment.setArguments(args);
                     return playListFragment;
+
             }
         }
 

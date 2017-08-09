@@ -24,14 +24,20 @@ public class PlayListFragment extends ListFragment {
 
         private final ArrayList<HashMap<String, String>> songData;
         private final Activity context;
+        private int current;
 
 
-        public SongAdapter(Activity context, ArrayList<HashMap<String, String>> songData) {
+        public SongAdapter(Activity context, ArrayList<HashMap<String, String>> songData,int currentlyPlaying) {
             super(context, R.layout.playlist_item, songData);
+            this.current=currentlyPlaying;
             this.context = context;
             this.songData = songData;
 
 
+        }
+
+        public void updatePosition(int pos){
+            current=pos;
         }
 
         @NonNull
@@ -41,22 +47,34 @@ public class PlayListFragment extends ListFragment {
             View v = li.inflate(R.layout.playlist_item, null, true);
             TextView songArtist = (TextView) v.findViewById(R.id.songArtist);
             TextView songTitle = (TextView) v.findViewById(R.id.songTitle);
-
+            notifyDataSetChanged();
             songArtist.setText(songData.get(position).get("songArtist"));
             songTitle.setText(songData.get(position).get("songTitle"));
-
+            if (position==current)
+                v.setBackgroundResource(R.drawable.list_select_bg);
+            else
+                v.setBackgroundResource(R.drawable.list_bg);
             return v;
         }
     }
 
-    private OnFragmentInteractionListener interactionListener;
+    private OnListFragmentInteractionListener interactionListener;
+    private SongAdapter songAdapter;
 
-    public interface OnFragmentInteractionListener {
+
+    public interface OnListFragmentInteractionListener {
         void startSong(int position);
+    }
+
+    public void updateUI(int pos){
+        songAdapter.updatePosition(pos);
+        songAdapter.notifyDataSetChanged();
     }
 
     @Override
     public void onListItemClick(ListView l, View v, int position, long id) {
+        v.setSelected(true);
+        l.invalidate();
         interactionListener.startSong(position);
     }
 
@@ -77,14 +95,8 @@ public class PlayListFragment extends ListFragment {
             songListData.add(songData);
         }
         Context context = getActivity();
-        if (context instanceof OptionsFragment.OnOptionsFragmentInteractionListener) {
-            interactionListener = (OnFragmentInteractionListener) context;
-        } else {
-            throw new RuntimeException(getActivity().toString()
-                    + " must implement OnFragmentInteractionListener");
-        }
-
-        setListAdapter(new SongAdapter(getActivity(), songListData));
+        songAdapter = new SongAdapter(getActivity(), songListData,getArguments().getInt("index"));
+        setListAdapter(songAdapter);
 
     }
 
@@ -97,11 +109,11 @@ public class PlayListFragment extends ListFragment {
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
-        if (context instanceof OnFragmentInteractionListener) {
-            interactionListener = (OnFragmentInteractionListener) context;
+        if (context instanceof OnListFragmentInteractionListener) {
+            interactionListener = (OnListFragmentInteractionListener) context;
         } else {
             throw new RuntimeException(context.toString()
-                    + " must implement OnFragmentInteractionListener");
+                    + " must implement OnPlayerFragmentInteractionListener");
         }
     }
 

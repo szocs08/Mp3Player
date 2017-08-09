@@ -43,10 +43,10 @@ public class PlayerFragment extends Fragment implements SeekBar.OnSeekBarChangeL
     private MediaMetadataRetriever mmr = new MediaMetadataRetriever();
 
 
-    private OnFragmentInteractionListener interactionListener;
+    private OnPlayerFragmentInteractionListener interactionListener;
 
 
-    interface OnFragmentInteractionListener {
+    interface OnPlayerFragmentInteractionListener {
         void play();
 
         void previous();
@@ -153,11 +153,11 @@ public class PlayerFragment extends Fragment implements SeekBar.OnSeekBarChangeL
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
-        if (context instanceof OnFragmentInteractionListener) {
-            interactionListener = (OnFragmentInteractionListener) context;
+        if (context instanceof OnPlayerFragmentInteractionListener) {
+            interactionListener = (OnPlayerFragmentInteractionListener) context;
         } else {
             throw new RuntimeException(context.toString()
-                    + " must implement OnFragmentInteractionListener");
+                    + " must implement OnPlayerFragmentInteractionListener");
         }
     }
 
