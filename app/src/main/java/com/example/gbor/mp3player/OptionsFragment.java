@@ -2,6 +2,7 @@ package com.example.gbor.mp3player;
 
 import android.app.Activity;
 import android.content.Context;
+import android.media.MediaMetadataRetriever;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -21,14 +22,13 @@ public class OptionsFragment extends ListFragment {
 
     private class OptionsAdapter extends ArrayAdapter<HashMap<String, String>> {
 
-        private final ArrayList<HashMap<String, String>> songData;
         private final Activity context;
+        private ArrayList<HashMap<String, String>> itemData;
 
-
-        public OptionsAdapter(Activity context, ArrayList<HashMap<String, String>> songData) {
-            super(context, R.layout.playlist_item, songData);
+        public OptionsAdapter(Activity context, ArrayList<HashMap<String, String>> itemData) {
+            super(context, R.layout.options_item, itemData);
             this.context = context;
-            this.songData = songData;
+            this.itemData = itemData;
 
 
         }
@@ -37,18 +37,20 @@ public class OptionsFragment extends ListFragment {
         @Override
         public View getView(int position, @Nullable View convertView, @NonNull ViewGroup parent) {
             LayoutInflater li = context.getLayoutInflater();
-            View v = li.inflate(R.layout.playlist_item, null, true);
-            TextView songArtist = (TextView) v.findViewById(R.id.songArtist);
-            TextView songTitle = (TextView) v.findViewById(R.id.songTitle);
+            View v = li.inflate(R.layout.options_item, null, true);
+            TextView optionName = (TextView) v.findViewById(R.id.option_name);
+            TextView oprionValue = (TextView) v.findViewById(R.id.option_value);
 
-            songArtist.setText(songData.get(position).get("songArtist"));
-            songTitle.setText(songData.get(position).get("songTitle"));
+            optionName.setText(itemData.get(position).get("optionName"));
+            oprionValue.setText(itemData.get(position).get("optionValue"));
 
             return v;
         }
     }
 
     private OnOptionsFragmentInteractionListener interactionListener;
+
+    private OptionsAdapter optionsAdapter;
 
 
     public interface OnOptionsFragmentInteractionListener {
@@ -63,9 +65,24 @@ public class OptionsFragment extends ListFragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        ArrayList<HashMap<String, String>> optionDataList = new ArrayList<>();
+        HashMap<String, String> optionData;
+
+        for (String option : getResources().getStringArray(R.array.options_list)) {
+            optionData = new HashMap<>();
+            optionData.put("optionName", option);
+            optionData.put("optionValue", getResources().getString(R.string.default_folder));
+            optionDataList.add(optionData);
+        }
+
+        optionsAdapter = new OptionsAdapter(getActivity(),optionDataList);
+
+
+
+
         ArrayAdapter arrayAdapter = ArrayAdapter.createFromResource(getActivity(),
                 R.array.options_list,android.R.layout.simple_list_item_1);
-        setListAdapter(arrayAdapter);
+        setListAdapter(optionsAdapter);
     }
 
     @Override

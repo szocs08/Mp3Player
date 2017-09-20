@@ -94,7 +94,6 @@ public class PlayListFragment extends ListFragment {
             songData.put("songTitle", mmr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_TITLE));
             songListData.add(songData);
         }
-        Context context = getActivity();
         songAdapter = new SongAdapter(getActivity(), songListData,getArguments().getInt("index"));
         setListAdapter(songAdapter);
 

@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@drawable/list_selector"
@@ -11,15 +12,15 @@
         android:id="@+id/option_name"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:padding="@dimen/songtitle_pad"
-        android:textSize="@dimen/songtitle_texsize" />
+        android:padding="@dimen/option_pad"
+        android:textSize="@dimen/option_name_textsize" />
 
     <TextView
         android:id="@+id/option_value"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:padding="@dimen/songtitle_pad"
-        android:textSize="@dimen/songtitle_texsize"
-        android:textStyle="bold" />
+        android:padding="@dimen/option_pad"
+        android:textSize="@dimen/option_value_textsize"
+        android:textStyle="italic" />
 
 </LinearLayout>

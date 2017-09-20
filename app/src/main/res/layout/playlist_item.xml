@@ -12,7 +12,7 @@
         android:layout_height="wrap_content"
         android:padding="@dimen/songtitle_pad"
         android:textColor="@color/text_color"
-        android:textSize="@dimen/songtitle_texsize" />
+        android:textSize="@dimen/songtitle_textsize" />
 
     <TextView
         android:id="@+id/hyphen"
@@ -28,6 +28,6 @@
         android:layout_height="wrap_content"
         android:padding="@dimen/songtitle_pad"
         android:textColor="@color/text_color"
-        android:textSize="@dimen/songtitle_texsize" />
+        android:textSize="@dimen/songtitle_textsize" />
 
 </LinearLayout>
