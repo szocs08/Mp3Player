@@ -13,4 +13,6 @@
     <string-array name="options_list">
         <item>Music folder</item>
     </string-array>
+    <string name="title_activity_folder_chooser">FolderChooser</string>
+    <string name="folder_chooser_name">Choose a folder</string>
 </resources>

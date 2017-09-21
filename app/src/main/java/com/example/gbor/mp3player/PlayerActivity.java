@@ -9,6 +9,7 @@ playlist save/load
 
 package com.example.gbor.mp3player;
 
+import android.content.Intent;
 import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -67,8 +68,28 @@ public class PlayerActivity extends FragmentActivity implements
     }
 
     @Override
-    public void asd(int position) {
+    public void optionOperations(int position) {
+        if(position==0){
+            Intent intent = new Intent(this,FolderChooser.class);
+           // intent.setAction(Intent.ACTION_GET_CONTENT);
+           // intent.setType("file/*");
+            startActivityForResult(intent, 8);
+        }
 
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+// TODO Auto-generated method stub
+        switch(requestCode){
+            case 8:
+                if(resultCode==RESULT_OK){
+                    String FilePath = data.getData().getPath();
+                    Toast.makeText(this,FilePath,Toast.LENGTH_LONG);
+                }
+                break;
+
+        }
     }
 
     @Override

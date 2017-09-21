@@ -68,7 +68,6 @@
             android:layout_width="@dimen/img_width"
             android:layout_height="@dimen/img_height"
             android:background="@android:drawable/picture_frame"
-            android:contentDescription=""
             android:scaleType="fitXY"
             android:src="@drawable/img_adele" />
 

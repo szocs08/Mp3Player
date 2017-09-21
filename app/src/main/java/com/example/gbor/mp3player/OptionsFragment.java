@@ -54,12 +54,12 @@ public class OptionsFragment extends ListFragment {
 
 
     public interface OnOptionsFragmentInteractionListener {
-        void asd(int position);
+        void optionOperations(int position);
     }
 
     @Override
     public void onListItemClick(ListView l, View v, int position, long id) {
-        interactionListener.asd(position);
+        interactionListener.optionOperations(position);
     }
 
     @Override
