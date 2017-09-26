@@ -15,4 +15,6 @@
     </string-array>
     <string name="title_activity_folder_chooser">FolderChooser</string>
     <string name="folder_chooser_name">Choose a folder</string>
+    <string name="title_activity_sdadas">sdadas</string>
+    <string name="title_activity_sample">sample</string>
 </resources>

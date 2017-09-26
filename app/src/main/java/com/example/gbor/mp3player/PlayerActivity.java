@@ -73,7 +73,7 @@ public class PlayerActivity extends FragmentActivity implements
             Intent intent = new Intent(this,FolderChooser.class);
            // intent.setAction(Intent.ACTION_GET_CONTENT);
            // intent.setType("file/*");
-            startActivityForResult(intent, 8);
+            startActivity(intent);
         }
 
     }
