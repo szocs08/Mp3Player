@@ -12,6 +12,7 @@ package com.example.gbor.mp3player;
 import android.content.Intent;
 import android.media.MediaPlayer;
 import android.os.Bundle;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
@@ -39,6 +40,7 @@ public class PlayerActivity extends FragmentActivity implements
     private boolean isShuffle = false;
     private boolean isRepeat = false;
     private ArrayList<String> playlist;
+    private static final int FOLDER_CHOOSING_REQUEST = 1;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -71,21 +73,24 @@ public class PlayerActivity extends FragmentActivity implements
     public void optionOperations(int position) {
         if(position==0){
             Intent intent = new Intent(this,FolderChooser.class);
+            intent.putExtra("path",getResources().getString(R.string.default_folder));
            // intent.setAction(Intent.ACTION_GET_CONTENT);
            // intent.setType("file/*");
-            startActivity(intent);
+            startActivityForResult(intent,FOLDER_CHOOSING_REQUEST);
         }
 
     }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+
 // TODO Auto-generated method stub
         switch(requestCode){
-            case 8:
+            case FOLDER_CHOOSING_REQUEST:
                 if(resultCode==RESULT_OK){
-                    String FilePath = data.getData().getPath();
-                    Toast.makeText(this,FilePath,Toast.LENGTH_LONG);
+                    Toast.makeText(this,data.getDataString(),Toast.LENGTH_LONG).show();
+//                    String FilePath = data.getData().getPath();
+//                    Toast.makeText(this,FilePath,Toast.LENGTH_LONG);
                 }
                 break;
 

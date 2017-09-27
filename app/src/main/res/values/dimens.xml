@@ -6,12 +6,13 @@
     <dimen name="seekbar_margin">20dp</dimen>
     <dimen name="playlist_item_pad">5dp</dimen>
     <dimen name="songtitle_pad">10dp</dimen>
-    <dimen name="songtitle_textsize">15dp</dimen>
+    <dimen name="songtitle_textsize">15sp</dimen>
     <dimen name="fab_margin">16dp</dimen>
     <dimen name="img_width">250dp</dimen>
     <dimen name="img_height">250dp</dimen>
     <dimen name="text_margin">16dp</dimen>
-    <dimen name="option_name_textsize">14dp</dimen>
-    <dimen name="option_value_textsize">10dp</dimen>
+    <dimen name="option_name_textsize">14sp</dimen>
+    <dimen name="option_value_textsize">10sp</dimen>
     <dimen name="option_pad">1dp</dimen>
+    <dimen name="toolbar_height">35dp</dimen>
 </resources>
