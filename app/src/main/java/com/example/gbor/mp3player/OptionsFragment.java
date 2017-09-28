@@ -39,10 +39,10 @@ public class OptionsFragment extends ListFragment {
             LayoutInflater li = context.getLayoutInflater();
             View v = li.inflate(R.layout.options_item, null, true);
             TextView optionName = (TextView) v.findViewById(R.id.option_name);
-            TextView oprionValue = (TextView) v.findViewById(R.id.option_value);
+            TextView optionValue = (TextView) v.findViewById(R.id.option_value);
 
             optionName.setText(itemData.get(position).get("optionName"));
-            oprionValue.setText(itemData.get(position).get("optionValue"));
+            optionValue.setText(itemData.get(position).get("optionValue"));
 
             return v;
         }

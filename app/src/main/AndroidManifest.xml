@@ -18,7 +18,7 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".FolderChooser"
+            android:name=".DirecoryChooser"
             android:label="@string/title_activity_folder_chooser"
             android:theme="@style/AppTheme.NoActionBar" />
     </application>
