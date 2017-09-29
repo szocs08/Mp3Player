@@ -9,10 +9,13 @@
     <string name="last_song">Last song</string>
     <string name="no_repeat_end">The last song on the playlist</string>
     <string name="no_repeat_start">The first song on the playlist</string>
-    <string name="default_folder">/sdcard/</string>
+    <string name="default_folder">/sdcard</string>
     <string-array name="options_list">
         <item>Music folder</item>
     </string-array>
+    <string name="bytes">Bytes</string>
+    <string name="previous">Previous</string>
+    <string name="directory_message">Choose a directory not a file</string>
     <string name="title_activity_folder_chooser">FolderChooser</string>
     <string name="folder_chooser_name">Choose a folder</string>
     <string name="dir">DIR</string>

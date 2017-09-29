@@ -53,16 +53,20 @@ public class DirecoryChooser extends AppCompatActivity {
             TextView fileSize = (TextView) v.findViewById(R.id.file_size);
             ImageView icon = (ImageView) v.findViewById(R.id.icon_view);
 
-            fileName.setText(itemData.get(position));
+            fileName.setText(itemData.get(position).substring(itemData.get(position).lastIndexOf('/')+1));
             File file = new File(itemData.get(position));
-            String asdas =  file.getAbsoluteFile().getPath();
-
-            if(file.getAbsoluteFile().isDirectory()) {
-                fileSize.setText(getResources().getString(R.string.dir));
-                icon.setImageDrawable(ContextCompat.getDrawable(context,R.drawable.folder_icon));
+            if(!itemData.get(position).equalsIgnoreCase("..")) {
+                if (file.isDirectory()) {
+                    fileSize.setText(getResources().getString(R.string.dir));
+                    icon.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.folder_icon));
+                } else {
+                    fileSize.setText(String.valueOf(file.length() +
+                            getResources().getString(R.string.bytes)));
+                    icon.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.file_icon));
+                }
             }else{
-                fileSize.setText(String.valueOf(file.getTotalSpace()));
-                icon.setImageDrawable(ContextCompat.getDrawable(context,R.drawable.file_icon));
+                fileSize.setText(getResources().getString(R.string.previous));
+                icon.setImageDrawable(ContextCompat.getDrawable(context,R.drawable.back_icon));
             }
             return v;
         }
@@ -75,7 +79,6 @@ public class DirecoryChooser extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_directory_chooser);
-        TextView textView =(TextView) findViewById(R.id.directory_chooser_name);
 
 
         ListView listView = (ListView) findViewById(R.id.directory_list);
@@ -84,25 +87,59 @@ public class DirecoryChooser extends AppCompatActivity {
             path=getIntent().getStringExtra("path");
 
         final ArrayList<String> values = new ArrayList<String>();
+        values.add("..");
         String[] list = new File(path).list();
         if (list != null) {
             for (String file : list) {
                 if (!file.startsWith(".")) {
-                    values.add(path+file);
+                    values.add(path+"/"+file);
                 }
             }
         }
 
         categorize(values);
 
-        DirectoryAdapter directoryAdapter = new DirectoryAdapter(this,values);
+        final DirectoryAdapter directoryAdapter = new DirectoryAdapter(this,values);
 
         listView.setAdapter(directoryAdapter);
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                path=values.get(position);
-                Toast.makeText(view.getContext(),path,Toast.LENGTH_LONG).show();
+                if(!values.get(position).equalsIgnoreCase("..")) {
+                    if(new File(values.get(position)).isDirectory()) {
+                        path = values.get(position);
+                        values.clear();
+                        values.add("..");
+                        String[] list = new File(path).list();
+                        if (list != null) {
+                            for (String file : list) {
+                                if (!file.startsWith(".")) {
+                                    values.add(path+"/"+file);
+                                }
+                            }
+                        }
+                        categorize(values);
+                        directoryAdapter.notifyDataSetChanged();
+                    }else{
+                        Toast.makeText(DirecoryChooser.this, getResources().getString(R.string.directory_message), Toast.LENGTH_SHORT).show();
+                    }
+                }else{
+                    if(!path.equalsIgnoreCase(getResources().getString(R.string.default_folder))) {
+                        path = path.substring(0, path.lastIndexOf('/'));
+                        values.clear();
+                        values.add("..");
+                        String[] list = new File(path).list();
+                        if (list != null) {
+                            for (String file : list) {
+                                if (!file.startsWith(".")) {
+                                    values.add(path + "/" + file);
+                                }
+                            }
+                        }
+                        categorize(values);
+                        directoryAdapter.notifyDataSetChanged();
+                    }
+                }
             }
         });
 
@@ -124,10 +161,15 @@ public class DirecoryChooser extends AppCompatActivity {
         List valueFile = new ArrayList();
 
         for(String value:values){
-            if(new File(value).isDirectory())
+            if (new File(value).isFile()){
+                if(new File(value).isDirectory())
+                    valueDir.add(value);
+                else {
+                    valueFile.add(value);
+                }
+            }else{
                 valueDir.add(value);
-            else
-                valueFile.add(value);
+            }
         }
         Collections.sort(valueDir);
         Collections.sort(valueFile);

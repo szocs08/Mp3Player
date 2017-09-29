@@ -35,11 +35,5 @@ public class SongsManager {
         return songList;
     }
 
-    class FileExtensionFilter implements FilenameFilter {
-        @Override
-        public boolean accept(File dir, String name) {
-            return name.toLowerCase().endsWith(".mp3");
-        }
-    }
 }
 
