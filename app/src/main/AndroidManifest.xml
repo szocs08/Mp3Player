@@ -19,7 +19,7 @@
         </activity>
         <activity
             android:name=".DirecoryChooser"
-            android:label="@string/title_activity_folder_chooser"
+            android:label="@string/title_activity_directory_chooser"
             android:theme="@style/AppTheme.NoActionBar" />
     </application>
 

@@ -40,16 +40,17 @@ public class PlayerActivity extends FragmentActivity implements
     private boolean isRepeat = false;
     private ArrayList<String> playlist;
     private static final int FOLDER_CHOOSING_REQUEST = 1;
+    private String path ;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main_layout);
         songIndex = 0;
-
+        path=getString(R.string.default_folder);
 
         mp = new MediaPlayer();
-        SongsManager songsManager = new SongsManager(getString(R.string.default_folder));
+        SongsManager songsManager = new SongsManager(path);
         playlist = songsManager.getPlaylist();
         mp.setOnCompletionListener(this);
         try {
@@ -59,7 +60,7 @@ public class PlayerActivity extends FragmentActivity implements
             e.printStackTrace();
         }
         PlayerPagerAdapter pagerAdapter = new PlayerPagerAdapter(getSupportFragmentManager(),
-                playlist, songIndex, playerFragment, playListFragment,optionsFragment);
+                playlist, songIndex, playerFragment, playListFragment,optionsFragment,path);
 
         ViewPager viewPager = (ViewPager) findViewById(R.id.pager);
         viewPager.setAdapter(pagerAdapter);
@@ -72,9 +73,7 @@ public class PlayerActivity extends FragmentActivity implements
     public void optionOperations(int position) {
         if(position==0){
             Intent intent = new Intent(this,DirecoryChooser.class);
-            intent.putExtra("path",getResources().getString(R.string.default_folder));
-           // intent.setAction(Intent.ACTION_GET_CONTENT);
-           // intent.setType("file/*");
+            intent.putExtra("path",path);
             startActivityForResult(intent,FOLDER_CHOOSING_REQUEST);
         }
 
@@ -83,13 +82,13 @@ public class PlayerActivity extends FragmentActivity implements
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 
-// TODO Auto-generated method stub
         switch(requestCode){
             case FOLDER_CHOOSING_REQUEST:
                 if(resultCode==RESULT_OK){
+
                     Toast.makeText(this,data.getDataString(),Toast.LENGTH_LONG).show();
-//                    String FilePath = data.getData().getPath();
-//                    Toast.makeText(this,FilePath,Toast.LENGTH_LONG);
+                    path=data.getDataString();
+                    optionsFragment.updateUI();
                 }
                 break;
 
@@ -225,19 +224,21 @@ public class PlayerActivity extends FragmentActivity implements
 
         ArrayList<String> playlist;
         int songindex;
+        String path;
         PlayerFragment playerFragment;
         PlayListFragment playListFragment;
         OptionsFragment optionsFragment;
 
         public PlayerPagerAdapter(FragmentManager fm, ArrayList<String> playlist, int songIndex,
                                   PlayerFragment playerFragment, PlayListFragment playListFragment,
-                                  OptionsFragment optionsFragment) {
+                                  OptionsFragment optionsFragment, String path) {
             super(fm);
             this.playlist = playlist;
             this.songindex = songIndex;
             this.playerFragment = playerFragment;
             this.playListFragment = playListFragment;
             this.optionsFragment = optionsFragment;
+            this.path = path;
         }
 
         @Override
@@ -247,6 +248,7 @@ public class PlayerActivity extends FragmentActivity implements
 
             switch (position) {
                 case 0:
+                    args.putString("path",path);
                     optionsFragment.setArguments(args);
                     return optionsFragment;
 

@@ -41,4 +41,6 @@ public class Utilities {
     public static int progressToTimer(int progress, long totalDuration) {
         return (int) ((double) progress / 100 * totalDuration);
     }
+
+
 }

@@ -16,7 +16,7 @@
     <string name="bytes">Bytes</string>
     <string name="previous">Previous</string>
     <string name="directory_message">Choose a directory not a file</string>
-    <string name="title_activity_folder_chooser">FolderChooser</string>
+    <string name="title_activity_directory_chooser">DirectoryChooser</string>
     <string name="folder_chooser_name">Choose a folder</string>
     <string name="dir">DIR</string>
 </resources>

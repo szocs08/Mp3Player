@@ -2,7 +2,6 @@ package com.example.gbor.mp3player;
 
 import android.app.Activity;
 import android.content.Context;
-import android.media.MediaMetadataRetriever;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -71,17 +70,13 @@ public class OptionsFragment extends ListFragment {
         for (String option : getResources().getStringArray(R.array.options_list)) {
             optionData = new HashMap<>();
             optionData.put("optionName", option);
-            optionData.put("optionValue", getResources().getString(R.string.default_folder));
+            optionData.put("optionValue", getArguments().getString("path"));
             optionDataList.add(optionData);
         }
 
         optionsAdapter = new OptionsAdapter(getActivity(),optionDataList);
 
 
-
-
-        ArrayAdapter arrayAdapter = ArrayAdapter.createFromResource(getActivity(),
-                R.array.options_list,android.R.layout.simple_list_item_1);
         setListAdapter(optionsAdapter);
     }
 
@@ -109,6 +104,11 @@ public class OptionsFragment extends ListFragment {
     public void onDetach() {
         super.onDetach();
         interactionListener = null;
+    }
+
+    public void updateUI(){
+
+
     }
 
 

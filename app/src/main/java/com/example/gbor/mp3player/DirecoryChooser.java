@@ -1,12 +1,9 @@
 package com.example.gbor.mp3player;
 
 import android.app.Activity;
-import android.content.Context;
 import android.content.Intent;
-import android.content.res.Resources;
 import android.net.Uri;
 import android.os.Bundle;
-import android.support.annotation.LayoutRes;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
@@ -26,10 +23,6 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-
-import static android.R.attr.data;
-import static android.R.attr.resource;
-import static android.R.attr.value;
 
 public class DirecoryChooser extends AppCompatActivity {
 
@@ -57,15 +50,15 @@ public class DirecoryChooser extends AppCompatActivity {
             File file = new File(itemData.get(position));
             if(!itemData.get(position).equalsIgnoreCase("..")) {
                 if (file.isDirectory()) {
-                    fileSize.setText(getResources().getString(R.string.dir));
+                    fileSize.setText(getString(R.string.dir));
                     icon.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.folder_icon));
                 } else {
                     fileSize.setText(String.valueOf(file.length() +
-                            getResources().getString(R.string.bytes)));
+                            getString(R.string.bytes)));
                     icon.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.file_icon));
                 }
             }else{
-                fileSize.setText(getResources().getString(R.string.previous));
+                fileSize.setText(getString(R.string.previous));
                 icon.setImageDrawable(ContextCompat.getDrawable(context,R.drawable.back_icon));
             }
             return v;
@@ -82,7 +75,7 @@ public class DirecoryChooser extends AppCompatActivity {
 
 
         ListView listView = (ListView) findViewById(R.id.directory_list);
-        path = getResources().getString(R.string.default_folder);
+        path = getString(R.string.default_folder);
         if(getIntent().hasExtra("path"))
             path=getIntent().getStringExtra("path");
 
@@ -121,10 +114,10 @@ public class DirecoryChooser extends AppCompatActivity {
                         categorize(values);
                         directoryAdapter.notifyDataSetChanged();
                     }else{
-                        Toast.makeText(DirecoryChooser.this, getResources().getString(R.string.directory_message), Toast.LENGTH_SHORT).show();
+                        Toast.makeText(DirecoryChooser.this, getString(R.string.directory_message), Toast.LENGTH_SHORT).show();
                     }
                 }else{
-                    if(!path.equalsIgnoreCase(getResources().getString(R.string.default_folder))) {
+                    if(!path.equalsIgnoreCase(getString(R.string.default_folder))) {
                         path = path.substring(0, path.lastIndexOf('/'));
                         values.clear();
                         values.add("..");
@@ -149,7 +142,7 @@ public class DirecoryChooser extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 Intent data = new Intent();
-                data.setData(Uri.parse("this is the info"));
+                data.setData(Uri.parse(path));
                 setResult(RESULT_OK,data);
                 finish();
             }
