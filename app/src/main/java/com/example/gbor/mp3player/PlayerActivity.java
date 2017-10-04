@@ -23,6 +23,8 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Random;
 
+import static com.example.gbor.mp3player.R.id.pager;
+
 public class PlayerActivity extends FragmentActivity implements
         PlayerFragment.OnPlayerFragmentInteractionListener,
         PlayListFragment.OnListFragmentInteractionListener,
@@ -41,6 +43,8 @@ public class PlayerActivity extends FragmentActivity implements
     private ArrayList<String> playlist;
     private static final int FOLDER_CHOOSING_REQUEST = 1;
     private String path ;
+    private PlayerPagerAdapter pagerAdapter;
+    private SongsManager songsManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -50,7 +54,7 @@ public class PlayerActivity extends FragmentActivity implements
         path=getString(R.string.default_folder);
 
         mp = new MediaPlayer();
-        SongsManager songsManager = new SongsManager(path);
+        songsManager = new SongsManager(path);
         playlist = songsManager.getPlaylist();
         mp.setOnCompletionListener(this);
         try {
@@ -59,10 +63,10 @@ public class PlayerActivity extends FragmentActivity implements
         } catch (IOException e) {
             e.printStackTrace();
         }
-        PlayerPagerAdapter pagerAdapter = new PlayerPagerAdapter(getSupportFragmentManager(),
+        pagerAdapter = new PlayerPagerAdapter(getSupportFragmentManager(),
                 playlist, songIndex, playerFragment, playListFragment,optionsFragment,path);
 
-        ViewPager viewPager = (ViewPager) findViewById(R.id.pager);
+        ViewPager viewPager = (ViewPager) findViewById(pager);
         viewPager.setAdapter(pagerAdapter);
         viewPager.setCurrentItem(1);
 
@@ -86,9 +90,20 @@ public class PlayerActivity extends FragmentActivity implements
             case FOLDER_CHOOSING_REQUEST:
                 if(resultCode==RESULT_OK){
 
-                    Toast.makeText(this,data.getDataString(),Toast.LENGTH_LONG).show();
+
                     path=data.getDataString();
-                    optionsFragment.updateUI();
+                    optionsFragment.updateUI(path);
+                    mp = new MediaPlayer();
+                    songsManager = new SongsManager(path);
+                    playlist = songsManager.getPlaylist();
+                    mp.setOnCompletionListener(this);
+                    try {
+                        mp.setDataSource(playlist.get(0));
+                        mp.prepare();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+
                 }
                 break;
 

@@ -50,6 +50,7 @@ public class OptionsFragment extends ListFragment {
     private OnOptionsFragmentInteractionListener interactionListener;
 
     private OptionsAdapter optionsAdapter;
+    private HashMap<String, String> optionData;
 
 
     public interface OnOptionsFragmentInteractionListener {
@@ -65,7 +66,6 @@ public class OptionsFragment extends ListFragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         ArrayList<HashMap<String, String>> optionDataList = new ArrayList<>();
-        HashMap<String, String> optionData;
 
         for (String option : getResources().getStringArray(R.array.options_list)) {
             optionData = new HashMap<>();
@@ -106,8 +106,9 @@ public class OptionsFragment extends ListFragment {
         interactionListener = null;
     }
 
-    public void updateUI(){
-
+    public void updateUI( String path){
+        optionData.put("optionValue",path);
+        optionsAdapter.notifyDataSetChanged();
 
     }
 
