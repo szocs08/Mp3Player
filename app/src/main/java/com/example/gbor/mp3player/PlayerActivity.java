@@ -92,10 +92,10 @@ public class PlayerActivity extends FragmentActivity implements
 
 
                     path=data.getDataString();
-                    optionsFragment.updateUI(path);
+
                     mp = new MediaPlayer();
-                    songsManager = new SongsManager(path);
-                    playlist = songsManager.getPlaylist();
+                    songsManager.setMedia_path(path);
+                    playlist = songsManager.getNewPlaylist();
                     mp.setOnCompletionListener(this);
                     try {
                         mp.setDataSource(playlist.get(0));
@@ -103,6 +103,10 @@ public class PlayerActivity extends FragmentActivity implements
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
+                    songIndex=0;
+                    optionsFragment.updateUI(path);
+                    playListFragment.updateUI(playlist);
+                    playerFragment.updateUI(playlist);
 
                 }
                 break;

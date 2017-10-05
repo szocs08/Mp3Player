@@ -79,14 +79,8 @@ public class PlayerFragment extends Fragment implements SeekBar.OnSeekBarChangeL
 
 
         for (String song : getArguments().getStringArrayList("playlist")) {
-            mmr.setDataSource(song);
-            mmr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION);
-            songData = new HashMap<>();
-            songData.put("songPath", song);
-            songData.put("songArtist", mmr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_ARTIST));
-            songData.put("songTitle", mmr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_TITLE));
-            songData.put("songAlbum", mmr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_ALBUM));
-            songList.add(songData);
+
+            songList.add(getSongData(song));
         }
         View view = inflater.inflate(R.layout.player_layout, container, false);
 
@@ -250,6 +244,42 @@ public class PlayerFragment extends Fragment implements SeekBar.OnSeekBarChangeL
         } catch (IllegalArgumentException | IllegalStateException e) {
             e.printStackTrace();
         }
+    }
+
+    public void updateUI(ArrayList<String> playlist){
+        songIndex=0;
+        HashMap<String, String> songData;
+        songList.clear();
+
+        for (String song : playlist) {
+
+            songList.add(getSongData(song));
+        }
+        updateUI(songIndex);
+        btnPlay.setImageResource(R.drawable.play_button);
+
+    }
+
+    private HashMap<String, String> getSongData(String song){
+        HashMap<String, String> songData;
+
+        mmr.setDataSource(song);
+
+        songData = new HashMap<>();
+        songData.put("songPath", song);
+        songData.put("songArtist", mmr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_ARTIST));
+        if(songData.get("songArtist")==null)
+            songData.put("songArtist", "");
+
+        songData.put("songTitle", mmr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_TITLE));
+        if(songData.get("songTitle")==null)
+            songData.put("songTitle", "");
+
+        songData.put("songAlbum", mmr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_ALBUM));
+        if(songData.get("songAlbum")==null)
+            songData.put("songAlbum", "");
+
+        return songData;
     }
 
     public void updateProgressBar() {

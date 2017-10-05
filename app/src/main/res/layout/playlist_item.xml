@@ -1,31 +1,30 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@drawable/list_selector"
     android:gravity="center_vertical"
-    android:padding="@dimen/playlist_item_pad">
+    android:padding="@dimen/playlist_item_pad"
+    android:orientation="vertical">
 
     <TextView
         android:id="@+id/songArtist"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:maxLines="1"
         android:padding="@dimen/songtitle_pad"
+        android:scrollHorizontally="true"
+        android:scrollbars="vertical"
         android:textColor="@color/text_color"
         android:textSize="@dimen/songtitle_textsize" />
 
     <TextView
-        android:id="@+id/hyphen"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:padding="@dimen/songtitle_pad"
-        android:text="@string/hyphen"
-        android:textColor="@color/text_color" />
-
-    <TextView
         android:id="@+id/songTitle"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_weight="1"
         android:padding="@dimen/songtitle_pad"
         android:textColor="@color/text_color"
         android:textSize="@dimen/songtitle_textsize" />

@@ -34,6 +34,20 @@ public class SongsManager {
 
         return songList;
     }
+
+    public ArrayList<String> getNewPlaylist() {
+        songList.clear();
+        File home = new File(Media_path);
+        int a = home.listFiles(new FileExtensionFilter()).length;
+        if (home.listFiles(new FileExtensionFilter()).length > 0) {
+            for (File file : home.listFiles(new FileExtensionFilter())) {
+                songList.add(file.getPath());
+            }
+        }
+
+        return songList;
+    }
+
     public class FileExtensionFilter implements FilenameFilter {
         @Override
         public boolean accept(File dir, String name) {

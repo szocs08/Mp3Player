@@ -7,6 +7,7 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ListFragment;
+import android.text.method.ScrollingMovementMethod;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -46,6 +47,7 @@ public class PlayListFragment extends ListFragment {
             LayoutInflater li = context.getLayoutInflater();
             View v = li.inflate(R.layout.playlist_item, null, true);
             TextView songArtist = (TextView) v.findViewById(R.id.songArtist);
+            songArtist.setMovementMethod(new ScrollingMovementMethod());
             TextView songTitle = (TextView) v.findViewById(R.id.songTitle);
             notifyDataSetChanged();
             songArtist.setText(songData.get(position).get("songArtist"));
@@ -71,6 +73,27 @@ public class PlayListFragment extends ListFragment {
         songAdapter.notifyDataSetChanged();
     }
 
+    public void updateUI(ArrayList<String> playlist){
+        initialize(playlist);
+        songAdapter.notifyDataSetChanged();
+    }
+
+    private void initialize(ArrayList<String> playlist){
+        MediaMetadataRetriever mmr = new MediaMetadataRetriever();
+        ArrayList<HashMap<String, String>> songListData = new ArrayList<>();
+        HashMap<String, String> songData;
+
+        for (String song : playlist) {
+            mmr.setDataSource(song);
+            songData = new HashMap<>();
+            songData.put("songArtist", mmr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_ARTIST));
+            songData.put("songTitle", mmr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_TITLE));
+            songListData.add(songData);
+        }
+        songAdapter = new SongAdapter(getActivity(), songListData,getArguments().getInt("index"));
+        setListAdapter(songAdapter);
+    }
+
     @Override
     public void onListItemClick(ListView l, View v, int position, long id) {
         v.setSelected(true);
@@ -83,19 +106,7 @@ public class PlayListFragment extends ListFragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        MediaMetadataRetriever mmr = new MediaMetadataRetriever();
-        ArrayList<HashMap<String, String>> songListData = new ArrayList<>();
-        HashMap<String, String> songData;
-
-        for (String song : getArguments().getStringArrayList("playlist")) {
-            mmr.setDataSource(song);
-            songData = new HashMap<>();
-            songData.put("songArtist", mmr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_ARTIST));
-            songData.put("songTitle", mmr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_TITLE));
-            songListData.add(songData);
-        }
-        songAdapter = new SongAdapter(getActivity(), songListData,getArguments().getInt("index"));
-        setListAdapter(songAdapter);
+        initialize(getArguments().getStringArrayList("playlist"));
 
     }
 
