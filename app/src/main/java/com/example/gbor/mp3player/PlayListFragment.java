@@ -7,6 +7,7 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ListFragment;
+import android.text.TextUtils;
 import android.text.method.ScrollingMovementMethod;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -47,7 +48,8 @@ public class PlayListFragment extends ListFragment {
             LayoutInflater li = context.getLayoutInflater();
             View v = li.inflate(R.layout.playlist_item, null, true);
             TextView songArtist = (TextView) v.findViewById(R.id.songArtist);
-            songArtist.setMovementMethod(new ScrollingMovementMethod());
+
+//            songArtist.setMovementMethod(new ScrollingMovementMethod());
             TextView songTitle = (TextView) v.findViewById(R.id.songTitle);
             notifyDataSetChanged();
             songArtist.setText(songData.get(position).get("songArtist"));

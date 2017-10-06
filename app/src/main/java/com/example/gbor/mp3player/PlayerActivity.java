@@ -29,7 +29,7 @@ public class PlayerActivity extends FragmentActivity implements
         PlayerFragment.OnPlayerFragmentInteractionListener,
         PlayListFragment.OnListFragmentInteractionListener,
         MediaPlayer.OnCompletionListener,
-    OptionsFragment.OnOptionsFragmentInteractionListener{
+        OptionsFragment.OnOptionsFragmentInteractionListener{
 
     private MediaPlayer mp;
 
@@ -213,7 +213,6 @@ public class PlayerActivity extends FragmentActivity implements
             mp.setDataSource(playlist.get(songIndex));
             mp.prepare();
             mp.start();
-            playerFragment.updateUI(songIndex);
             playListFragment.updateUI(songIndex);
         } catch (IllegalArgumentException | IOException | IllegalStateException e) {
             e.printStackTrace();
