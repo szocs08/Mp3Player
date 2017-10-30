@@ -29,7 +29,10 @@
                 android:layout_weight="1"
                 android:text="@string/song_artist"
                 android:textColor="@color/text_color"
-                android:maxLines="1" />
+                android:singleLine="true"
+                android:ellipsize="marquee"
+                android:marqueeRepeatLimit="marquee_forever"
+                android:scrollHorizontally="true"/>
 
             <TextView
                 android:id="@+id/song_title"

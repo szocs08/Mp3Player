@@ -99,7 +99,8 @@ public class PlayerFragment extends Fragment implements SeekBar.OnSeekBarChangeL
         currentTimeLabel = (TextView) view.findViewById(R.id.current_time);
         totalTimeLabel = (TextView) view.findViewById(R.id.end_time);
         Animation anim = AnimationUtils.loadAnimation(getContext(),R.anim.scrolling);
-        songArtistLabel.startAnimation(anim );
+        //songArtistLabel.startAnimation(anim );
+        songArtistLabel.setSelected(true);
 
         progressSeekBar.setOnSeekBarChangeListener(this);
 
@@ -248,6 +249,7 @@ public class PlayerFragment extends Fragment implements SeekBar.OnSeekBarChangeL
         } catch (IllegalArgumentException | IllegalStateException e) {
             e.printStackTrace();
         }
+        songArtistLabel.setSelected(true);
     }
 
     public void updateUI(ArrayList<String> playlist){
