@@ -6,64 +6,24 @@
 
     <!-- Song properties -->
     <LinearLayout
-        android:id="@+id/song_properties"
+        android:id="@+id/song_thumbnail"
         android:layout_width="match_parent"
-        android:layout_height="60dp"
-        android:layout_alignParentTop="true"
-        android:background="@color/background_color"
+        android:layout_height="wrap_content"
         android:gravity="center"
         android:orientation="vertical"
-        android:paddingLeft="5dp"
-        android:paddingRight="5dp">
-
-        <LinearLayout
-            android:id="@+id/song_title_artist"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal">
-
-            <TextView
-                android:id="@+id/song_artist"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="@string/song_artist"
-                android:textColor="@color/text_color"
-                android:singleLine="true"
-                android:ellipsize="marquee"
-                android:marqueeRepeatLimit="marquee_forever"
-                android:scrollHorizontally="true"/>
-
-            <TextView
-                android:id="@+id/song_title"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="@string/song_title"
-                android:textColor="@color/text_color" />
-        </LinearLayout>
+        android:paddingBottom="10dp"
+        android:paddingTop="10dp"
+        android:weightSum="1">
 
         <TextView
             android:id="@+id/song_album"
             android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_weight="1"
+            android:layout_height="wrap_content"
+            android:gravity="center"
             android:text="@string/album"
-            android:textColor="@color/text_color" />
-
-    </LinearLayout>
-
-    <!-- Song thumbnail -->
-    <LinearLayout
-        android:id="@+id/song_thumbnail"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/song_properties"
-        android:gravity="center"
-        android:orientation="horizontal"
-        android:paddingBottom="10dp"
-        android:paddingTop="10dp"
-        android:weightSum="1">
+            android:textAlignment="center"
+            android:textColor="@color/text_color"
+            android:textStyle="bold" />
 
         <ImageView
             android:id="@+id/song_album_thumbnail"
@@ -75,12 +35,51 @@
 
     </LinearLayout>
 
+    <LinearLayout
+        android:id="@+id/song_title_artist"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/song_thumbnail"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/song_artist"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:ellipsize="marquee"
+            android:gravity="center"
+            android:marqueeRepeatLimit="marquee_forever"
+            android:scrollHorizontally="true"
+            android:singleLine="true"
+            android:text="@string/song_artist"
+            android:textAlignment="center"
+            android:textColor="@color/text_color"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/song_title"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:ellipsize="marquee"
+            android:gravity="center"
+            android:marqueeRepeatLimit="marquee_forever"
+            android:scrollHorizontally="true"
+            android:singleLine="true"
+            android:text="@string/song_title"
+            android:textAlignment="center"
+            android:textColor="@color/text_color"
+            android:textStyle="bold|italic" />
+    </LinearLayout>
+
+    <!-- Song thumbnail -->
+
     <!-- Song duraion -->
+
     <LinearLayout
         android:id="@+id/seek_duration"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/song_thumbnail"
+        android:layout_below="@+id/song_title_artist"
         android:orientation="vertical">
 
         <LinearLayout

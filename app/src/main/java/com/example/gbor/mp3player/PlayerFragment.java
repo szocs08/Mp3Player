@@ -98,9 +98,9 @@ public class PlayerFragment extends Fragment implements SeekBar.OnSeekBarChangeL
         songAlbumLabel = (TextView) view.findViewById(R.id.song_album);
         currentTimeLabel = (TextView) view.findViewById(R.id.current_time);
         totalTimeLabel = (TextView) view.findViewById(R.id.end_time);
-        Animation anim = AnimationUtils.loadAnimation(getContext(),R.anim.scrolling);
-        //songArtistLabel.startAnimation(anim );
         songArtistLabel.setSelected(true);
+        songTitleLabel.setSelected(true);
+        songAlbumLabel.setSelected(true);
 
         progressSeekBar.setOnSeekBarChangeListener(this);
 

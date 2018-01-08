@@ -209,11 +209,14 @@ public class PlayerActivity extends FragmentActivity implements
 
     public void playSong(int songIndex) {
         try {
+            playerFragment.updatePlayButton(mp.isPlaying());
             mp.reset();
             mp.setDataSource(playlist.get(songIndex));
             mp.prepare();
             mp.start();
             playListFragment.updateUI(songIndex);
+            playerFragment.updateUI(songIndex);
+
         } catch (IllegalArgumentException | IOException | IllegalStateException e) {
             e.printStackTrace();
         }
