@@ -17,4 +17,11 @@
     <string name="title_activity_directory_chooser">DirectoryChooser</string>
     <string name="folder_chooser_name">Choose a folder</string>
     <string name="dir">DIR</string>
+    <string name="album_cover">Album Cover</string>
+    <string name="repeat_button">Repeat Button</string>
+    <string name="previous_button">Previous Button</string>
+    <string name="play_button">Play Button</string>
+    <string name="next_button">Next Button</string>
+    <string name="shuffle_button">Shuffle Button</string>
+    <string name="icon">Icon</string>
 </resources>

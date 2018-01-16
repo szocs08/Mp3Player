@@ -29,7 +29,7 @@
                 android:layout_weight="1"
                 android:gravity="center_vertical"
                 android:text="@string/folder_chooser_name"
-                android:textSize="@dimen/songtitle_textsize" />
+                android:textSize="@dimen/song_title_text_size" />
         </android.support.design.widget.AppBarLayout>
     </RelativeLayout>
 

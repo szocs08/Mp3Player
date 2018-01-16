@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@drawable/list_selector"
@@ -13,9 +12,9 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_weight="1"
-        android:padding="@dimen/songtitle_pad"
+        android:padding="@dimen/song_title_pad"
         android:textColor="@color/text_color"
-        android:textSize="@dimen/songtitle_textsize"
+        android:textSize="@dimen/song_title_text_size"
         android:scrollHorizontally="true"
         android:singleLine="true"
         android:ellipsize="marquee"
@@ -27,10 +26,10 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_weight="1"
-        android:padding="@dimen/songtitle_pad"
+        android:padding="@dimen/song_title_pad"
         android:singleLine="true"
         android:ellipsize="marquee"
         android:textColor="@color/text_color"
-        android:textSize="@dimen/songtitle_textsize" />
+        android:textSize="@dimen/song_title_text_size" />
 
 </LinearLayout>

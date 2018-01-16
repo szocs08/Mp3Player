@@ -16,6 +16,7 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.ListView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -31,7 +32,7 @@ public class ActivityDirectoryChooser extends AppCompatActivity {
         private final Activity context;
         private ArrayList<String> itemData;
 
-        public DirectoryAdapter(Activity context, ArrayList<String> itemData) {
+        private DirectoryAdapter(Activity context, ArrayList<String> itemData) {
             super(context,R.layout.directory_chooser_item, itemData);
             this.context = context;
             this.itemData = itemData;
@@ -41,27 +42,34 @@ public class ActivityDirectoryChooser extends AppCompatActivity {
         @Override
         public View getView(int position, @Nullable View convertView, @NonNull ViewGroup parent) {
             LayoutInflater li = context.getLayoutInflater();
-            View v = li.inflate(R.layout.directory_chooser_item, null, true);
-            TextView fileName = (TextView) v.findViewById(R.id.file_name);
-            TextView fileSize = (TextView) v.findViewById(R.id.file_size);
-            ImageView icon = (ImageView) v.findViewById(R.id.icon_view);
+            ViewHolder holder;
+            if (convertView == null){
+                convertView = li.inflate(R.layout.directory_chooser_item, null);
+                holder = new ViewHolder();
+                holder.icon = (ImageView) convertView.findViewById(R.id.icon_view);
+                holder.fileName = (TextView) convertView.findViewById(R.id.file_name);
+                holder.fileSize = (TextView) convertView.findViewById(R.id.file_size);
+                convertView.setTag(holder);
+            }else{
+                holder = (ViewHolder) convertView.getTag();
+            }
 
-            fileName.setText(itemData.get(position).substring(itemData.get(position).lastIndexOf('/')+1));
+            holder.fileName.setText(itemData.get(position).substring(itemData.get(position).lastIndexOf('/')+1));
             File file = new File(itemData.get(position));
             if(!itemData.get(position).equalsIgnoreCase("..")) {
                 if (file.isDirectory()) {
-                    fileSize.setText(getString(R.string.dir));
-                    icon.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.folder_icon));
-                } else {
-                    fileSize.setText(String.valueOf(file.length() +
+                    holder.fileSize.setText(getString(R.string.dir));
+                    holder.icon.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.folder_icon));} else {
+                    holder.fileSize.setText(String.valueOf(file.length() +
                             getString(R.string.bytes)));
-                    icon.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.file_icon));
+                    holder.icon.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.file_icon));
                 }
             }else{
-                fileSize.setText(getString(R.string.previous));
-                icon.setImageDrawable(ContextCompat.getDrawable(context,R.drawable.back_icon));
+                holder.icon.setImageDrawable(getDrawable(R.drawable.back_icon));
+                holder.fileSize.setText(getString(R.string.previous));
+
             }
-            return v;
+            return convertView;
         }
     }
 
@@ -72,8 +80,6 @@ public class ActivityDirectoryChooser extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_directory_chooser);
-
-
         ListView listView = (ListView) findViewById(R.id.directory_list);
         path = getString(R.string.default_folder);
         if(getIntent().hasExtra("path"))
@@ -172,5 +178,9 @@ public class ActivityDirectoryChooser extends AppCompatActivity {
     }
 
 
-
+    static class ViewHolder {
+        TextView fileName;
+        TextView fileSize;
+        ImageView icon;
+    }
 }
