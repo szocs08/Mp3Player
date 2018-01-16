@@ -16,7 +16,7 @@ import android.widget.TextView;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-public class OptionsFragment extends ListFragment {
+public class FragmentOptions extends ListFragment {
 
 
     private class OptionsAdapter extends ArrayAdapter<HashMap<String, String>> {

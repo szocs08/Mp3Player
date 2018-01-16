@@ -9,7 +9,7 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <activity
-            android:name=".PlayerActivity"
+            android:name=".ActivityMainPlayer"
             android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -18,7 +18,7 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".DirecoryChooser"
+            android:name=".ActivityDirectoryChooser"
             android:label="@string/title_activity_directory_chooser"
             android:theme="@style/AppTheme.NoActionBar" />
     </application>

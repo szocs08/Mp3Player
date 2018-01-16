@@ -25,17 +25,17 @@ import java.util.Random;
 
 import static com.example.gbor.mp3player.R.id.pager;
 
-public class PlayerActivity extends FragmentActivity implements
-        PlayerFragment.OnPlayerFragmentInteractionListener,
-        PlayListFragment.OnListFragmentInteractionListener,
+public class ActivityMainPlayer extends FragmentActivity implements
+        FragmentPlayer.OnPlayerFragmentInteractionListener,
+        FragmentPlaylist.OnListFragmentInteractionListener,
         MediaPlayer.OnCompletionListener,
-        OptionsFragment.OnOptionsFragmentInteractionListener{
+        FragmentOptions.OnOptionsFragmentInteractionListener{
 
     private MediaPlayer mp;
 
-    private PlayerFragment playerFragment = new PlayerFragment();
-    private PlayListFragment playListFragment = new PlayListFragment();
-    private OptionsFragment optionsFragment = new OptionsFragment();
+    private FragmentPlayer fragmentPlayer = new FragmentPlayer();
+    private FragmentPlaylist fragmentPlaylist = new FragmentPlaylist();
+    private FragmentOptions fragmentOptions = new FragmentOptions();
 
     private int songIndex;
     private boolean isShuffle = false;
@@ -44,7 +44,6 @@ public class PlayerActivity extends FragmentActivity implements
     private static final int FOLDER_CHOOSING_REQUEST = 1;
     private String path ;
     private PlayerPagerAdapter pagerAdapter;
-    private SongsManager songsManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -54,8 +53,7 @@ public class PlayerActivity extends FragmentActivity implements
         path=getString(R.string.default_folder);
 
         mp = new MediaPlayer();
-        songsManager = new SongsManager(path);
-        playlist = songsManager.getPlaylist();
+        playlist = SongManager.getPlaylist(path);
         mp.setOnCompletionListener(this);
         try {
             mp.setDataSource(playlist.get(0));
@@ -64,7 +62,7 @@ public class PlayerActivity extends FragmentActivity implements
             e.printStackTrace();
         }
         pagerAdapter = new PlayerPagerAdapter(getSupportFragmentManager(),
-                playlist, songIndex, playerFragment, playListFragment,optionsFragment,path);
+                playlist, songIndex, fragmentPlayer, fragmentPlaylist, fragmentOptions,path);
 
         ViewPager viewPager = (ViewPager) findViewById(pager);
         viewPager.setAdapter(pagerAdapter);
@@ -76,7 +74,7 @@ public class PlayerActivity extends FragmentActivity implements
     @Override
     public void optionOperations(int position) {
         if(position==0){
-            Intent intent = new Intent(this,DirecoryChooser.class);
+            Intent intent = new Intent(this,ActivityDirectoryChooser.class);
             intent.putExtra("path",path);
             startActivityForResult(intent,FOLDER_CHOOSING_REQUEST);
         }
@@ -92,22 +90,23 @@ public class PlayerActivity extends FragmentActivity implements
 
 
                     path=data.getDataString();
-
-                    mp = new MediaPlayer();
-                    songsManager.setMedia_path(path);
-                    playlist = songsManager.getNewPlaylist();
-                    mp.setOnCompletionListener(this);
-                    try {
-                        mp.setDataSource(playlist.get(0));
-                        mp.prepare();
-                    } catch (IOException e) {
-                        e.printStackTrace();
+                    if(!SongManager.hasMP3(path))
+                        Toast.makeText(this,"asdsadasdsadsadas",Toast.LENGTH_LONG).show();
+                    else {
+                        mp = new MediaPlayer();
+                        playlist = SongManager.getPlaylist(path);
+                        mp.setOnCompletionListener(this);
+                        try {
+                            mp.setDataSource(playlist.get(0));
+                            mp.prepare();
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                        songIndex = 0;
+                        fragmentOptions.updateUI(path);
+                        fragmentPlaylist.updateUI(playlist);
+                        fragmentPlayer.updateUI(playlist);
                     }
-                    songIndex=0;
-                    optionsFragment.updateUI(path);
-                    playListFragment.updateUI(playlist);
-                    playerFragment.updateUI(playlist);
-
                 }
                 break;
 
@@ -116,7 +115,7 @@ public class PlayerActivity extends FragmentActivity implements
 
     @Override
     public void play() {
-        playerFragment.updatePlayButton(mp.isPlaying());
+        fragmentPlayer.updatePlayButton(mp.isPlaying());
         if (mp.isPlaying()) {
             mp.pause();
         } else {
@@ -166,7 +165,7 @@ public class PlayerActivity extends FragmentActivity implements
 
     @Override
     public void repeat() {
-        playerFragment.updateRepeatButton(isRepeat);
+        fragmentPlayer.updateRepeatButton(isRepeat);
         if (isRepeat) {
             isRepeat = false;
         } else {
@@ -178,7 +177,7 @@ public class PlayerActivity extends FragmentActivity implements
 
     @Override
     public void shuffle() {
-        playerFragment.updateShuffleButton(isShuffle);
+        fragmentPlayer.updateShuffleButton(isShuffle);
         if (isShuffle) {
             isShuffle = false;
         } else {
@@ -191,7 +190,7 @@ public class PlayerActivity extends FragmentActivity implements
 
     @Override
     public void update() {
-        playerFragment.timerUpdate(mp.getDuration(), mp.getCurrentPosition());
+        fragmentPlayer.timerUpdate(mp.getDuration(), mp.getCurrentPosition());
     }
 
     @Override
@@ -209,13 +208,13 @@ public class PlayerActivity extends FragmentActivity implements
 
     public void playSong(int songIndex) {
         try {
-            playerFragment.updatePlayButton(mp.isPlaying());
+            fragmentPlayer.updatePlayButton(mp.isPlaying());
             mp.reset();
             mp.setDataSource(playlist.get(songIndex));
             mp.prepare();
             mp.start();
-            playListFragment.updateUI(songIndex);
-            playerFragment.updateUI(songIndex);
+            fragmentPlaylist.updateUI(songIndex);
+            fragmentPlayer.updateUI(songIndex);
 
         } catch (IllegalArgumentException | IOException | IllegalStateException e) {
             e.printStackTrace();
@@ -246,19 +245,19 @@ public class PlayerActivity extends FragmentActivity implements
         ArrayList<String> playlist;
         int songindex;
         String path;
-        PlayerFragment playerFragment;
-        PlayListFragment playListFragment;
-        OptionsFragment optionsFragment;
+        FragmentPlayer fragmentPlayer;
+        FragmentPlaylist fragmentPlaylist;
+        FragmentOptions fragmentOptions;
 
         public PlayerPagerAdapter(FragmentManager fm, ArrayList<String> playlist, int songIndex,
-                                  PlayerFragment playerFragment, PlayListFragment playListFragment,
-                                  OptionsFragment optionsFragment, String path) {
+                                  FragmentPlayer fragmentPlayer, FragmentPlaylist fragmentPlaylist,
+                                  FragmentOptions fragmentOptions, String path) {
             super(fm);
             this.playlist = playlist;
             this.songindex = songIndex;
-            this.playerFragment = playerFragment;
-            this.playListFragment = playListFragment;
-            this.optionsFragment = optionsFragment;
+            this.fragmentPlayer = fragmentPlayer;
+            this.fragmentPlaylist = fragmentPlaylist;
+            this.fragmentOptions = fragmentOptions;
             this.path = path;
         }
 
@@ -270,17 +269,17 @@ public class PlayerActivity extends FragmentActivity implements
             switch (position) {
                 case 0:
                     args.putString("path",path);
-                    optionsFragment.setArguments(args);
-                    return optionsFragment;
+                    fragmentOptions.setArguments(args);
+                    return fragmentOptions;
 
                 case 1:
-                    playerFragment.setArguments(args);
-                    return playerFragment;
+                    fragmentPlayer.setArguments(args);
+                    return fragmentPlayer;
 
                 default:
                     args.putInt("index", songindex);
-                    playListFragment.setArguments(args);
-                    return playListFragment;
+                    fragmentPlaylist.setArguments(args);
+                    return fragmentPlaylist;
 
             }
         }

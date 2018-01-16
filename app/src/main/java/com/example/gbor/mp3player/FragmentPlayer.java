@@ -22,7 +22,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 
-public class PlayerFragment extends Fragment implements SeekBar.OnSeekBarChangeListener {
+public class FragmentPlayer extends Fragment implements SeekBar.OnSeekBarChangeListener {
 
 
     private ImageButton btnPlay;

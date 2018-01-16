@@ -20,7 +20,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 
-public class PlayListFragment extends ListFragment {
+public class FragmentPlaylist extends ListFragment {
 
     private class SongAdapter extends ArrayAdapter<HashMap<String, String>> {
 
@@ -48,16 +48,18 @@ public class PlayListFragment extends ListFragment {
             LayoutInflater li = context.getLayoutInflater();
             View v = li.inflate(R.layout.playlist_item, null, true);
             TextView songArtist = (TextView) v.findViewById(R.id.songArtist);
-
-//            songArtist.setMovementMethod(new ScrollingMovementMethod());
             TextView songTitle = (TextView) v.findViewById(R.id.songTitle);
             notifyDataSetChanged();
             songArtist.setText(songData.get(position).get("songArtist"));
             songTitle.setText(songData.get(position).get("songTitle"));
-            if (position==current)
+
+            if (position==current) {
                 v.setBackgroundResource(R.drawable.list_select_bg);
-            else
+                songArtist.setSelected(true);
+                songTitle.setSelected(true);
+            }else {
                 v.setBackgroundResource(R.drawable.list_bg);
+            }
             return v;
         }
     }

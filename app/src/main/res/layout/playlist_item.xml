@@ -16,8 +16,8 @@
         android:padding="@dimen/songtitle_pad"
         android:textColor="@color/text_color"
         android:textSize="@dimen/songtitle_textsize"
-        android:maxLines="1"
         android:scrollHorizontally="true"
+        android:singleLine="true"
         android:ellipsize="marquee"
         android:marqueeRepeatLimit ="marquee_forever"/>
 
@@ -28,6 +28,8 @@
         android:layout_height="wrap_content"
         android:layout_weight="1"
         android:padding="@dimen/songtitle_pad"
+        android:singleLine="true"
+        android:ellipsize="marquee"
         android:textColor="@color/text_color"
         android:textSize="@dimen/songtitle_textsize" />
 

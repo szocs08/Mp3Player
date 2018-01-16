@@ -24,7 +24,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-public class DirecoryChooser extends AppCompatActivity {
+public class ActivityDirectoryChooser extends AppCompatActivity {
 
     private class DirectoryAdapter extends ArrayAdapter<String>{
 
@@ -114,7 +114,7 @@ public class DirecoryChooser extends AppCompatActivity {
                         categorize(values);
                         directoryAdapter.notifyDataSetChanged();
                     }else{
-                        Toast.makeText(DirecoryChooser.this, getString(R.string.directory_message), Toast.LENGTH_SHORT).show();
+                        Toast.makeText(ActivityDirectoryChooser.this, getString(R.string.directory_message), Toast.LENGTH_SHORT).show();
                     }
                 }else{
                     if(!path.equalsIgnoreCase(getString(R.string.default_folder))) {

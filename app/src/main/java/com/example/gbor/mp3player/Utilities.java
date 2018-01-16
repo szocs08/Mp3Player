@@ -8,7 +8,7 @@ public class Utilities {
 
     public static String milliSecondsToTimer(long milliseconds) {
         String finalTimerString = "";
-        String secondsString = "";
+        String secondsString;
 
         int hours = (int) (milliseconds / (1000 * 60 * 60));
         int minutes = (int) (milliseconds % (1000 * 60 * 60)) / (1000 * 60);
@@ -30,7 +30,7 @@ public class Utilities {
     }
 
     public static int getProgressPercentage(long currentDuration, long totalDuration) {
-        Double percentage = 0.0;
+        Double percentage;
 
         percentage = ((double) currentDuration / totalDuration) * 100;
 
