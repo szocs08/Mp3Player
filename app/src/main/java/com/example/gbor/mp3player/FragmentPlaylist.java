@@ -1,5 +1,6 @@
 package com.example.gbor.mp3player;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
 import android.media.MediaMetadataRetriever;
@@ -7,8 +8,6 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ListFragment;
-import android.text.TextUtils;
-import android.text.method.ScrollingMovementMethod;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -29,7 +28,7 @@ public class FragmentPlaylist extends ListFragment {
         private int current;
 
 
-        public SongAdapter(Activity context, ArrayList<HashMap<String, String>> songData,int currentlyPlaying) {
+        SongAdapter(Activity context, ArrayList<HashMap<String, String>> songData, int currentlyPlaying) {
             super(context, R.layout.playlist_item, songData);
             this.current=currentlyPlaying;
             this.context = context;
@@ -38,7 +37,7 @@ public class FragmentPlaylist extends ListFragment {
 
         }
 
-        public void updatePosition(int pos){
+        void updatePosition(int pos){
             current=pos;
         }
 
@@ -46,7 +45,7 @@ public class FragmentPlaylist extends ListFragment {
         @Override
         public View getView(int position, @Nullable View convertView, @NonNull ViewGroup parent) {
             LayoutInflater li = context.getLayoutInflater();
-            View v = li.inflate(R.layout.playlist_item, null, true);
+            @SuppressLint("InflateParams") View v = li.inflate(R.layout.playlist_item, null, true);
             TextView songArtist = (TextView) v.findViewById(R.id.songArtist);
             TextView songTitle = (TextView) v.findViewById(R.id.songTitle);
             notifyDataSetChanged();

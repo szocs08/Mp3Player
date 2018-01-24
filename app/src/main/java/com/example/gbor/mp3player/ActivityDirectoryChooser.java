@@ -59,13 +59,14 @@ public class ActivityDirectoryChooser extends AppCompatActivity {
             if(!itemData.get(position).equalsIgnoreCase("..")) {
                 if (file.isDirectory()) {
                     holder.fileSize.setText(getString(R.string.dir));
-                    holder.icon.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.folder_icon));} else {
+                    holder.icon.setImageResource(R.drawable.folder_icon);
+                } else {
                     holder.fileSize.setText(String.valueOf(file.length() +
                             getString(R.string.bytes)));
-                    holder.icon.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.file_icon));
+                    holder.icon.setImageResource(R.drawable.file_icon);
                 }
             }else{
-                holder.icon.setImageDrawable(getDrawable(R.drawable.back_icon));
+                holder.icon.setImageResource(R.drawable.back_icon);
                 holder.fileSize.setText(getString(R.string.previous));
 
             }

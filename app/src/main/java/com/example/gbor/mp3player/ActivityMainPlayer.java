@@ -43,7 +43,6 @@ public class ActivityMainPlayer extends FragmentActivity implements
     private ArrayList<String> playlist;
     private static final int FOLDER_CHOOSING_REQUEST = 1;
     private String path ;
-    private PlayerPagerAdapter pagerAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -51,7 +50,6 @@ public class ActivityMainPlayer extends FragmentActivity implements
         setContentView(R.layout.main_layout);
         songIndex = 0;
         path=getString(R.string.default_folder);
-
         mp = new MediaPlayer();
         playlist = SongManager.getPlaylist(path);
         mp.setOnCompletionListener(this);
@@ -61,8 +59,8 @@ public class ActivityMainPlayer extends FragmentActivity implements
         } catch (IOException e) {
             e.printStackTrace();
         }
-        pagerAdapter = new PlayerPagerAdapter(getSupportFragmentManager(),
-                playlist, songIndex, fragmentPlayer, fragmentPlaylist, fragmentOptions,path);
+        PlayerPagerAdapter pagerAdapter = new PlayerPagerAdapter(getSupportFragmentManager(),
+                playlist, songIndex, fragmentPlayer, fragmentPlaylist, fragmentOptions, path);
 
         ViewPager viewPager = (ViewPager) findViewById(pager);
         viewPager.setAdapter(pagerAdapter);
@@ -249,9 +247,9 @@ public class ActivityMainPlayer extends FragmentActivity implements
         FragmentPlaylist fragmentPlaylist;
         FragmentOptions fragmentOptions;
 
-        public PlayerPagerAdapter(FragmentManager fm, ArrayList<String> playlist, int songIndex,
-                                  FragmentPlayer fragmentPlayer, FragmentPlaylist fragmentPlaylist,
-                                  FragmentOptions fragmentOptions, String path) {
+        PlayerPagerAdapter(FragmentManager fm, ArrayList<String> playlist, int songIndex,
+                           FragmentPlayer fragmentPlayer, FragmentPlaylist fragmentPlaylist,
+                           FragmentOptions fragmentOptions, String path) {
             super(fm);
             this.playlist = playlist;
             this.songindex = songIndex;
