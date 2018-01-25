@@ -7,7 +7,6 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
-import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -16,7 +15,6 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.ListView;
-import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -44,7 +42,7 @@ public class ActivityDirectoryChooser extends AppCompatActivity {
             LayoutInflater li = context.getLayoutInflater();
             ViewHolder holder;
             if (convertView == null){
-                convertView = li.inflate(R.layout.directory_chooser_item, null);
+                convertView = li.inflate(R.layout.directory_chooser_item, parent, false);
                 holder = new ViewHolder();
                 holder.icon = (ImageView) convertView.findViewById(R.id.icon_view);
                 holder.fileName = (TextView) convertView.findViewById(R.id.file_name);
@@ -86,7 +84,7 @@ public class ActivityDirectoryChooser extends AppCompatActivity {
         if(getIntent().hasExtra("path"))
             path=getIntent().getStringExtra("path");
 
-        final ArrayList<String> values = new ArrayList<String>();
+        final ArrayList<String> values = new ArrayList<>();
         values.add("..");
         String[] list = new File(path).list();
         if (list != null) {
@@ -157,8 +155,8 @@ public class ActivityDirectoryChooser extends AppCompatActivity {
     }
 
     private void categorize(ArrayList<String> values){
-        List valueDir = new ArrayList();
-        List valueFile = new ArrayList();
+        List<String> valueDir = new ArrayList<>();
+        List<String> valueFile = new ArrayList<>();
 
         for(String value:values){
             if (new File(value).isFile()){

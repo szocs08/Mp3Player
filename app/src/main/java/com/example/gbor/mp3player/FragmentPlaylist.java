@@ -1,6 +1,5 @@
 package com.example.gbor.mp3player;
 
-import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
 import android.media.MediaMetadataRetriever;
@@ -45,21 +44,29 @@ public class FragmentPlaylist extends ListFragment {
         @Override
         public View getView(int position, @Nullable View convertView, @NonNull ViewGroup parent) {
             LayoutInflater li = context.getLayoutInflater();
-            @SuppressLint("InflateParams") View v = li.inflate(R.layout.playlist_item, null, true);
-            TextView songArtist = (TextView) v.findViewById(R.id.songArtist);
-            TextView songTitle = (TextView) v.findViewById(R.id.songTitle);
+            ViewHolder holder;
+            if (convertView==null){
+                holder = new ViewHolder();
+                convertView = li.inflate(R.layout.playlist_item, parent, false);
+                holder.songArtist = (TextView) convertView.findViewById(R.id.songArtist);
+                holder.songTitle = (TextView) convertView.findViewById(R.id.songTitle);
+                convertView.setTag(holder);
+            }else{
+                holder = (ViewHolder) convertView.getTag();
+            }
+
             notifyDataSetChanged();
-            songArtist.setText(songData.get(position).get("songArtist"));
-            songTitle.setText(songData.get(position).get("songTitle"));
+            holder.songArtist.setText(songData.get(position).get("songArtist"));
+            holder.songTitle.setText(songData.get(position).get("songTitle"));
 
             if (position==current) {
-                v.setBackgroundResource(R.drawable.list_select_bg);
-                songArtist.setSelected(true);
-                songTitle.setSelected(true);
+                convertView.setBackgroundResource(R.drawable.list_select_bg);
+                holder.songArtist.setSelected(true);
+                holder.songTitle.setSelected(true);
             }else {
-                v.setBackgroundResource(R.drawable.list_bg);
+                convertView.setBackgroundResource(R.drawable.list_bg);
             }
-            return v;
+            return convertView;
         }
     }
 
@@ -134,6 +141,11 @@ public class FragmentPlaylist extends ListFragment {
     public void onDetach() {
         super.onDetach();
         interactionListener = null;
+    }
+
+    static class ViewHolder{
+        TextView songArtist;
+        TextView songTitle;
     }
 
 

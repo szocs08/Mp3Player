@@ -1,12 +1,8 @@
 package com.example.gbor.mp3player;
 
-/**
- * Created by Gábor on 2017.03.22..
- */
+class Utilities {
 
-public class Utilities {
-
-    public static String milliSecondsToTimer(long milliseconds) {
+     static String milliSecondsToTimer(long milliseconds) {
         String finalTimerString = "";
         String secondsString;
 
@@ -29,7 +25,7 @@ public class Utilities {
         return finalTimerString;
     }
 
-    public static int getProgressPercentage(long currentDuration, long totalDuration) {
+    static int getProgressPercentage(long currentDuration, long totalDuration) {
         Double percentage;
 
         percentage = ((double) currentDuration / totalDuration) * 100;
@@ -38,7 +34,7 @@ public class Utilities {
     }
 
 
-    public static int progressToTimer(int progress, long totalDuration) {
+    static int progressToTimer(int progress, long totalDuration) {
         return (int) ((double) progress / 100 * totalDuration);
     }
 

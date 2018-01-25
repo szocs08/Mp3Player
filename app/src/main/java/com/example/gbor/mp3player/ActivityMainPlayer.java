@@ -89,7 +89,7 @@ public class ActivityMainPlayer extends FragmentActivity implements
 
                     path=data.getDataString();
                     if(!SongManager.hasMP3(path))
-                        Toast.makeText(this,"asdsadasdsadsadas",Toast.LENGTH_LONG).show();
+                        Toast.makeText(this,"TEST",Toast.LENGTH_LONG).show();
                     else {
                         mp = new MediaPlayer();
                         playlist = SongManager.getPlaylist(path);
@@ -241,7 +241,7 @@ public class ActivityMainPlayer extends FragmentActivity implements
     private static class PlayerPagerAdapter extends FragmentPagerAdapter {
 
         ArrayList<String> playlist;
-        int songindex;
+        int songIndex;
         String path;
         FragmentPlayer fragmentPlayer;
         FragmentPlaylist fragmentPlaylist;
@@ -252,7 +252,7 @@ public class ActivityMainPlayer extends FragmentActivity implements
                            FragmentOptions fragmentOptions, String path) {
             super(fm);
             this.playlist = playlist;
-            this.songindex = songIndex;
+            this.songIndex = songIndex;
             this.fragmentPlayer = fragmentPlayer;
             this.fragmentPlaylist = fragmentPlaylist;
             this.fragmentOptions = fragmentOptions;
@@ -275,7 +275,7 @@ public class ActivityMainPlayer extends FragmentActivity implements
                     return fragmentPlayer;
 
                 default:
-                    args.putInt("index", songindex);
+                    args.putInt("index", songIndex);
                     fragmentPlaylist.setArguments(args);
                     return fragmentPlaylist;
 

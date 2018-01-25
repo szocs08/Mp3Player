@@ -24,7 +24,7 @@ public class FragmentOptions extends ListFragment {
         private final Activity context;
         private ArrayList<HashMap<String, String>> itemData;
 
-        public OptionsAdapter(Activity context, ArrayList<HashMap<String, String>> itemData) {
+        OptionsAdapter(Activity context, ArrayList<HashMap<String, String>> itemData) {
             super(context, R.layout.options_item, itemData);
             this.context = context;
             this.itemData = itemData;
@@ -36,14 +36,22 @@ public class FragmentOptions extends ListFragment {
         @Override
         public View getView(int position, @Nullable View convertView, @NonNull ViewGroup parent) {
             LayoutInflater li = context.getLayoutInflater();
-            View v = li.inflate(R.layout.options_item, null, true);
-            TextView optionName = (TextView) v.findViewById(R.id.option_name);
-            TextView optionValue = (TextView) v.findViewById(R.id.option_value);
+            ViewHolder holder;
+            if(convertView == null){
+                holder = new ViewHolder();
+                convertView = li.inflate(R.layout.options_item, parent, false);
+                holder.optionName = (TextView) convertView.findViewById(R.id.option_name);
+                holder.optionValue = (TextView) convertView.findViewById(R.id.option_value);
+                convertView.setTag(holder);
+            }else{
+                holder = (ViewHolder) convertView.getTag();
+            }
 
-            optionName.setText(itemData.get(position).get("optionName"));
-            optionValue.setText(itemData.get(position).get("optionValue"));
 
-            return v;
+            holder.optionName.setText(itemData.get(position).get("optionName"));
+            holder.optionValue.setText(itemData.get(position).get("optionValue"));
+
+            return convertView;
         }
     }
 
@@ -83,9 +91,8 @@ public class FragmentOptions extends ListFragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.options, container, false);
 
-        return view;
+        return inflater.inflate(R.layout.options, container, false);
     }
 
 
@@ -113,5 +120,9 @@ public class FragmentOptions extends ListFragment {
     }
 
 
+    static class ViewHolder{
+        TextView optionName;
+        TextView optionValue;
+    }
 
 }
