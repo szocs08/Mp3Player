@@ -7,6 +7,7 @@ import android.media.MediaMetadataRetriever;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.app.Fragment;
+import android.support.v4.content.ContextCompat;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -212,28 +213,30 @@ public class FragmentPlayer extends Fragment implements SeekBar.OnSeekBarChangeL
     }
 
 
-    public void updateUI(int songindex) {
+    public void updateUI(int songIndex) {
         try {
-            mmr.setDataSource(songList.get(songindex).get("songPath"));
+            mmr.setDataSource(songList.get(songIndex).get("songPath"));
 
-            if (songList.get(songindex).get("songTitle").isEmpty()) {
+            if (songList.get(songIndex).get("songTitle").isEmpty()) {
                 songTitleLabel.setText(getString(R.string.song_title));
             }else {
-                songTitleLabel.setText(songList.get(songindex).get("songTitle"));
+                songTitleLabel.setText(songList.get(songIndex).get("songTitle"));
             }
-            if (songList.get(songindex).get("songArtist").isEmpty()) {
+            if (songList.get(songIndex).get("songArtist").isEmpty()) {
                 songArtistLabel.setText(getString(R.string.song_artist));
             } else {
-                songArtistLabel.setText(songList.get(songindex).get("songArtist"));
+                songArtistLabel.setText(songList.get(songIndex).get("songArtist"));
             }
-            if (songList.get(songindex).get("songAlbum").isEmpty()) {
+            if (songList.get(songIndex).get("songAlbum").isEmpty()) {
                 songAlbumLabel.setText(getString(R.string.album));
             } else {
-                songAlbumLabel.setText(songList.get(songindex).get("songAlbum"));
+                songAlbumLabel.setText(songList.get(songIndex).get("songAlbum"));
             }
-
-            Bitmap img = BitmapFactory.decodeByteArray(mmr.getEmbeddedPicture(), 0, mmr.getEmbeddedPicture().length);
-            imgAlbum.setImageBitmap(img);
+            if(mmr.getEmbeddedPicture() != null){
+                Bitmap img = BitmapFactory.decodeByteArray(mmr.getEmbeddedPicture(), 0, mmr.getEmbeddedPicture().length);
+                imgAlbum.setImageBitmap(img);
+            }else
+                imgAlbum.setImageDrawable( ContextCompat.getDrawable(getContext(), R.drawable.img_adele));
 
 
             btnPlay.setImageResource(R.drawable.pause_button);
