@@ -1,9 +1,6 @@
 package com.example.gbor.mp3player;
 
 import android.content.Context;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.media.MediaMetadataRetriever;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.app.Fragment;
@@ -18,7 +15,6 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 
 
 public class FragmentPlayer extends Fragment implements SeekBar.OnSeekBarChangeListener {
@@ -40,8 +36,7 @@ public class FragmentPlayer extends Fragment implements SeekBar.OnSeekBarChangeL
 
     private Handler mHandler = new Handler();
     private int songIndex;
-    private ArrayList<HashMap<String, String>> songList = new ArrayList<>();
-    private MediaMetadataRetriever mmr = new MediaMetadataRetriever();
+    private ArrayList<Song> songList = new ArrayList<>();
 
 
     private OnPlayerFragmentInteractionListener interactionListener;
@@ -79,7 +74,7 @@ public class FragmentPlayer extends Fragment implements SeekBar.OnSeekBarChangeL
 
         for (String song : getArguments().getStringArrayList("playlist")) {
 
-            songList.add(getSongData(song));
+            songList.add(new Song(song));
         }
         View view = inflater.inflate(R.layout.player_layout, container, false);
 
@@ -215,28 +210,22 @@ public class FragmentPlayer extends Fragment implements SeekBar.OnSeekBarChangeL
 
     public void updateUI(int songIndex) {
         try {
-            mmr.setDataSource(songList.get(songIndex).get("songPath"));
 
-            if (songList.get(songIndex).get("songTitle").isEmpty()) {
+            if (songList.get(songIndex).getTitle() == null)
                 songTitleLabel.setText(getString(R.string.song_title));
-            }else {
-                songTitleLabel.setText(songList.get(songIndex).get("songTitle"));
-            }
-            if (songList.get(songIndex).get("songArtist").isEmpty()) {
+            else songTitleLabel.setText(songList.get(songIndex).getTitle());
+
+            if (songList.get(songIndex).getArtist() == null)
                 songArtistLabel.setText(getString(R.string.song_artist));
-            } else {
-                songArtistLabel.setText(songList.get(songIndex).get("songArtist"));
-            }
-            if (songList.get(songIndex).get("songAlbum").isEmpty()) {
+            else songArtistLabel.setText(songList.get(songIndex).getArtist());
+
+            if (songList.get(songIndex).getAlbum() == null)
                 songAlbumLabel.setText(getString(R.string.album));
-            } else {
-                songAlbumLabel.setText(songList.get(songIndex).get("songAlbum"));
-            }
-            if(mmr.getEmbeddedPicture() != null){
-                Bitmap img = BitmapFactory.decodeByteArray(mmr.getEmbeddedPicture(), 0, mmr.getEmbeddedPicture().length);
-                imgAlbum.setImageBitmap(img);
-            }else
-                imgAlbum.setImageDrawable( ContextCompat.getDrawable(getContext(), R.drawable.img_adele));
+            else songAlbumLabel.setText(songList.get(songIndex).getAlbum());
+
+            if (songList.get(songIndex).getAlbumImage() == null)
+                imgAlbum.setImageDrawable(ContextCompat.getDrawable(getContext(), R.drawable.img_adele));
+            else imgAlbum.setImageBitmap(songList.get(songIndex).getAlbumImage());
 
 
             btnPlay.setImageResource(R.drawable.pause_button);
@@ -257,34 +246,13 @@ public class FragmentPlayer extends Fragment implements SeekBar.OnSeekBarChangeL
 
         for (String song : playlist) {
 
-            songList.add(getSongData(song));
+            songList.add(new Song(song));
         }
         updateUI(songIndex);
         btnPlay.setImageResource(R.drawable.play_button);
 
     }
 
-    private HashMap<String, String> getSongData(String song){
-        HashMap<String, String> songData;
-
-        mmr.setDataSource(song);
-
-        songData = new HashMap<>();
-        songData.put("songPath", song);
-        songData.put("songArtist", mmr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_ARTIST));
-        if(songData.get("songArtist")==null)
-            songData.put("songArtist", "");
-
-        songData.put("songTitle", mmr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_TITLE));
-        if(songData.get("songTitle")==null)
-            songData.put("songTitle", "");
-
-        songData.put("songAlbum", mmr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_ALBUM));
-        if(songData.get("songAlbum")==null)
-            songData.put("songAlbum", "");
-
-        return songData;
-    }
 
     public void updateProgressBar() {
         mHandler.postDelayed(mUpdateTimeTask, 100);

@@ -4,7 +4,6 @@ package com.example.gbor.mp3player;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.media.MediaMetadataRetriever;
-import android.support.v4.content.ContextCompat;
 
 public class Song {
 
@@ -17,20 +16,6 @@ public class Song {
     public Song(String path){
         this.path = path;
         init();
-
-        /*songData.put("songArtist", mmr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_ARTIST));
-        if(songData.get("songArtist")==null)
-            songData.put("songArtist", "");
-
-        songData.put("songTitle", mmr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_TITLE));
-        if(songData.get("songTitle")==null)
-            songData.put("songTitle", "");
-
-        songData.put("songAlbum", mmr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_ALBUM));
-        if(songData.get("songAlbum")==null)
-            songData.put("songAlbum", "");
-
-        return songData;*/
     }
 
     private void init(){
@@ -55,19 +40,19 @@ public class Song {
         init();
     }
 
-    public String getArtist() {
+    String getArtist() {
         return artist;
     }
 
-    public String getTitle() {
+    String getTitle() {
         return title;
     }
 
-    public String getAlbum() {
+    String getAlbum() {
         return album;
     }
 
-    public Bitmap getAlbumImage() {
+    Bitmap getAlbumImage() {
         return albumImage;
     }
 }
