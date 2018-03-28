@@ -15,6 +15,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import java.util.ArrayList;
+import java.util.List;
 
 
 public class FragmentPlayer extends Fragment implements SeekBar.OnSeekBarChangeListener {
@@ -70,11 +71,12 @@ public class FragmentPlayer extends Fragment implements SeekBar.OnSeekBarChangeL
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              final Bundle savedInstanceState) {
+        List<String> playlist= getArguments().getStringArrayList("playlist");
+        if(playlist != null){
+            for (String song : playlist) {
 
-
-        for (String song : getArguments().getStringArrayList("playlist")) {
-
-            songList.add(new Song(song));
+                songList.add(new Song(song));
+            }
         }
         View view = inflater.inflate(R.layout.player_layout, container, false);
 
@@ -99,7 +101,6 @@ public class FragmentPlayer extends Fragment implements SeekBar.OnSeekBarChangeL
         btnNext.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
                 interactionListener.next();
 
             }
@@ -108,7 +109,6 @@ public class FragmentPlayer extends Fragment implements SeekBar.OnSeekBarChangeL
         btnPrevious.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
                 interactionListener.previous();
             }
         });
@@ -119,7 +119,6 @@ public class FragmentPlayer extends Fragment implements SeekBar.OnSeekBarChangeL
                 interactionListener.repeat();
             }
         });
-
 
         btnShuffle.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -211,22 +210,26 @@ public class FragmentPlayer extends Fragment implements SeekBar.OnSeekBarChangeL
     public void updateUI(int songIndex) {
         try {
 
-            if (songList.get(songIndex).getTitle() == null)
+            if (songList.isEmpty() || songList.get(songIndex).getTitle() == null)
                 songTitleLabel.setText(getString(R.string.song_title));
             else songTitleLabel.setText(songList.get(songIndex).getTitle());
 
-            if (songList.get(songIndex).getArtist() == null)
+            if (songList.isEmpty() || songList.get(songIndex).getArtist() == null)
                 songArtistLabel.setText(getString(R.string.song_artist));
             else songArtistLabel.setText(songList.get(songIndex).getArtist());
 
-            if (songList.get(songIndex).getAlbum() == null)
+            if (songList.isEmpty() || songList.get(songIndex).getAlbum() == null)
                 songAlbumLabel.setText(getString(R.string.album));
             else songAlbumLabel.setText(songList.get(songIndex).getAlbum());
 
-            if (songList.get(songIndex).getAlbumImage() == null)
+            if (songList.isEmpty() || songList.get(songIndex).getAlbumImage() == null)
                 imgAlbum.setImageDrawable(ContextCompat.getDrawable(getContext(), R.drawable.img_adele));
             else imgAlbum.setImageBitmap(songList.get(songIndex).getAlbumImage());
 
+            if (songList.isEmpty()) {
+                currentTimeLabel.setText(R.string.start_time);
+                currentTimeLabel.setText(R.string.end_time);
+            }
 
             btnPlay.setImageResource(R.drawable.pause_button);
 

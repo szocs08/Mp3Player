@@ -9,6 +9,7 @@ playlist save/load
 
 package com.example.gbor.mp3player;
 
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.media.MediaPlayer;
 import android.os.Bundle;
@@ -50,15 +51,18 @@ public class ActivityMainPlayer extends FragmentActivity implements
         setContentView(R.layout.main_layout);
         songIndex = 0;
         path=getString(R.string.default_folder);
-        mp = new MediaPlayer();
         playlist = SongManager.getPlaylist(path);
-        mp.setOnCompletionListener(this);
-        try {
-            mp.setDataSource(playlist.get(0));
-            mp.prepare();
-        } catch (IOException e) {
-            e.printStackTrace();
+        mp = new MediaPlayer();
+        if(!playlist.isEmpty()){
+            mp.setOnCompletionListener(this);
+            try {
+                mp.setDataSource(playlist.get(0));
+                mp.prepare();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
+
         PlayerPagerAdapter pagerAdapter = new PlayerPagerAdapter(getSupportFragmentManager(),
                 playlist, songIndex, fragmentPlayer, fragmentPlaylist, fragmentOptions, path);
 
@@ -90,7 +94,14 @@ public class ActivityMainPlayer extends FragmentActivity implements
                     path=data.getDataString();
                     if(!SongManager.hasMP3(path))
                         Toast.makeText(this,"TEST",Toast.LENGTH_LONG).show();
+
                     else {
+                        fragmentOptions.updateUI(path);
+                        ProgressDialog progress = new ProgressDialog(this);
+                        progress.setTitle("Loading");
+                        progress.setMessage("Wait while loading...");
+                        progress.setCancelable(false); // disable dismiss by tapping outside of the dialog
+                        progress.show();
                         mp = new MediaPlayer();
                         playlist = SongManager.getPlaylist(path);
                         mp.setOnCompletionListener(this);
@@ -101,6 +112,7 @@ public class ActivityMainPlayer extends FragmentActivity implements
                             e.printStackTrace();
                         }
                         songIndex = 0;
+                        progress.dismiss();
                         fragmentOptions.updateUI(path);
                         fragmentPlaylist.updateUI(playlist);
                         fragmentPlayer.updateUI(playlist);
@@ -188,7 +200,10 @@ public class ActivityMainPlayer extends FragmentActivity implements
 
     @Override
     public void update() {
-        fragmentPlayer.timerUpdate(mp.getDuration(), mp.getCurrentPosition());
+        if (playlist.isEmpty())
+            fragmentPlayer.timerUpdate(0, 0);
+        else
+            fragmentPlayer.timerUpdate(mp.getDuration(), mp.getCurrentPosition());
     }
 
     @Override
@@ -266,9 +281,9 @@ public class ActivityMainPlayer extends FragmentActivity implements
 
             switch (position) {
                 case 0:
-                    args.putString("path",path);
-                    fragmentOptions.setArguments(args);
-                    return fragmentOptions;
+                args.putString("path",path);
+                fragmentOptions.setArguments(args);
+                return fragmentOptions;
 
                 case 1:
                     fragmentPlayer.setArguments(args);

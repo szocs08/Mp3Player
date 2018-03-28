@@ -25,6 +25,11 @@ class SongManager {
         return songList;
     }
 
+    static String getFileName(String path){
+        return path.split("/")[path.split("/").length - 1];
+
+    }
+
     static boolean hasMP3(String path){
         return new File(path).listFiles(new FileExtensionFilter()).length > 0;
     }

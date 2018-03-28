@@ -40,8 +40,7 @@ public class FragmentPlaylist extends ListFragment {
             current=pos;
         }
 
-        @NonNull
-        @Override
+        @NonNull @Override
         public View getView(int position, @Nullable View convertView, @NonNull ViewGroup parent) {
             LayoutInflater li = context.getLayoutInflater();
             ViewHolder holder;
@@ -89,15 +88,19 @@ public class FragmentPlaylist extends ListFragment {
     }
 
     private void initialize(ArrayList<String> playlist){
-        MediaMetadataRetriever mmr = new MediaMetadataRetriever();
+        Song song;
         ArrayList<HashMap<String, String>> songListData = new ArrayList<>();
         HashMap<String, String> songData;
 
-        for (String song : playlist) {
-            mmr.setDataSource(song);
+        for (String entry : playlist) {
+            song = new Song(entry);
             songData = new HashMap<>();
-            songData.put("songArtist", mmr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_ARTIST));
-            songData.put("songTitle", mmr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_TITLE));
+            if(song.getArtist() == null || song.getArtist() == null)
+                songData.put("songArtist", SongManager.getFileName(song.getPath()));
+            else {
+                songData.put("songArtist", song.getArtist());
+                songData.put("songTitle", song.getTitle());
+            }
             songListData.add(songData);
         }
         songAdapter = new SongAdapter(getActivity(), songListData,getArguments().getInt("index"));
