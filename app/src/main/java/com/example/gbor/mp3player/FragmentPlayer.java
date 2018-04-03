@@ -37,7 +37,7 @@ public class FragmentPlayer extends Fragment implements SeekBar.OnSeekBarChangeL
 
     private Handler mHandler = new Handler();
     private int songIndex;
-    private ArrayList<Song> songList = new ArrayList<>();
+    private ArrayList<String> songList = new ArrayList<>();
 
 
     private OnPlayerFragmentInteractionListener interactionListener;
@@ -73,10 +73,7 @@ public class FragmentPlayer extends Fragment implements SeekBar.OnSeekBarChangeL
                              final Bundle savedInstanceState) {
         List<String> playlist= getArguments().getStringArrayList("playlist");
         if(playlist != null){
-            for (String song : playlist) {
-
-                songList.add(new Song(song));
-            }
+            songList.addAll(playlist);
         }
         View view = inflater.inflate(R.layout.player_layout, container, false);
 
@@ -209,22 +206,25 @@ public class FragmentPlayer extends Fragment implements SeekBar.OnSeekBarChangeL
 
     public void updateUI(int songIndex) {
         try {
-
-            if (songList.isEmpty() || songList.get(songIndex).getTitle() == null)
+            Boolean empty = songList.isEmpty();
+            Song song = new Song();
+            if (!empty)
+                song.setPath(songList.get(songIndex));
+            if (songList.isEmpty() || song.getTitle() == null)
                 songTitleLabel.setText(getString(R.string.song_title));
-            else songTitleLabel.setText(songList.get(songIndex).getTitle());
+            else songTitleLabel.setText(song.getTitle());
 
-            if (songList.isEmpty() || songList.get(songIndex).getArtist() == null)
+            if (songList.isEmpty() || song.getArtist() == null)
                 songArtistLabel.setText(getString(R.string.song_artist));
-            else songArtistLabel.setText(songList.get(songIndex).getArtist());
+            else songArtistLabel.setText(song.getArtist());
 
-            if (songList.isEmpty() || songList.get(songIndex).getAlbum() == null)
+            if (songList.isEmpty() || song.getAlbum() == null)
                 songAlbumLabel.setText(getString(R.string.album));
-            else songAlbumLabel.setText(songList.get(songIndex).getAlbum());
+            else songAlbumLabel.setText(song.getAlbum());
 
-            if (songList.isEmpty() || songList.get(songIndex).getAlbumImage() == null)
+            if (songList.isEmpty() || song.getAlbumImage() == null)
                 imgAlbum.setImageDrawable(ContextCompat.getDrawable(getContext(), R.drawable.img_adele));
-            else imgAlbum.setImageBitmap(songList.get(songIndex).getAlbumImage());
+            else imgAlbum.setImageBitmap(song.getAlbumImage());
 
             if (songList.isEmpty()) {
                 currentTimeLabel.setText(R.string.start_time);
@@ -235,11 +235,12 @@ public class FragmentPlayer extends Fragment implements SeekBar.OnSeekBarChangeL
 
             progressSeekBar.setProgress(0);
             progressSeekBar.setMax(100);
-
             updateProgressBar();
+
         } catch (IllegalArgumentException | IllegalStateException e) {
             e.printStackTrace();
         }
+
         songArtistLabel.setSelected(true);
     }
 
@@ -247,10 +248,7 @@ public class FragmentPlayer extends Fragment implements SeekBar.OnSeekBarChangeL
         songIndex=0;
         songList.clear();
 
-        for (String song : playlist) {
-
-            songList.add(new Song(song));
-        }
+        songList.addAll(playlist);
         updateUI(songIndex);
         btnPlay.setImageResource(R.drawable.play_button);
 

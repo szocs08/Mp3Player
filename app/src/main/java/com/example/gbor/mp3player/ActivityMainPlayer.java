@@ -93,15 +93,15 @@ public class ActivityMainPlayer extends FragmentActivity implements
 
                     path=data.getDataString();
                     if(!SongManager.hasMP3(path))
-                        Toast.makeText(this,"TEST",Toast.LENGTH_LONG).show();
+                        Toast.makeText(this,"The folder is empty",Toast.LENGTH_LONG).show();
 
                     else {
                         fragmentOptions.updateUI(path);
-                        ProgressDialog progress = new ProgressDialog(this);
-                        progress.setTitle("Loading");
-                        progress.setMessage("Wait while loading...");
-                        progress.setCancelable(false); // disable dismiss by tapping outside of the dialog
-                        progress.show();
+//                        ProgressDialog progress = new ProgressDialog(this);
+//                        progress.setTitle("Loading");
+//                        progress.setMessage("Wait while loading...");
+//                        progress.setCancelable(false); // disable dismiss by tapping outside of the dialog
+//                        progress.show();
                         mp = new MediaPlayer();
                         playlist = SongManager.getPlaylist(path);
                         mp.setOnCompletionListener(this);
@@ -112,9 +112,9 @@ public class ActivityMainPlayer extends FragmentActivity implements
                             e.printStackTrace();
                         }
                         songIndex = 0;
-                        progress.dismiss();
+//                        progress.dismiss();
                         fragmentOptions.updateUI(path);
-                        fragmentPlaylist.updateUI(playlist);
+//                        fragmentPlaylist.updateUI(playlist);
                         fragmentPlayer.updateUI(playlist);
                     }
                 }

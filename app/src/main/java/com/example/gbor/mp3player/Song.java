@@ -13,22 +13,32 @@ public class Song {
     private String album;
     private Bitmap albumImage;
 
+    public Song(){
+        init();
+    }
+
     public Song(String path){
         this.path = path;
         init();
     }
 
     private void init(){
-        MediaMetadataRetriever mediaMetadataRetriever = new MediaMetadataRetriever();
-        mediaMetadataRetriever.setDataSource(this.path);
-        artist = mediaMetadataRetriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_ARTIST);
-        title = mediaMetadataRetriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_TITLE);
-        album = mediaMetadataRetriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_ALBUM);
-        if(mediaMetadataRetriever.getEmbeddedPicture() != null)
-            albumImage = BitmapFactory.decodeByteArray(mediaMetadataRetriever.getEmbeddedPicture(),
-                    0, mediaMetadataRetriever.getEmbeddedPicture().length);
-        else
+        if(path!=null) {
+            MediaMetadataRetriever mediaMetadataRetriever = new MediaMetadataRetriever();
+            mediaMetadataRetriever.setDataSource(this.path);
+            artist = mediaMetadataRetriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_ARTIST);
+            title = mediaMetadataRetriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_TITLE);
+            album = mediaMetadataRetriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_ALBUM);
+            if (mediaMetadataRetriever.getEmbeddedPicture() != null)
+                albumImage = BitmapFactory.decodeByteArray(mediaMetadataRetriever.getEmbeddedPicture(),
+                        0, mediaMetadataRetriever.getEmbeddedPicture().length);
+            else
+                albumImage = null;
+        }else{
+            artist = title = album = null;
             albumImage = null;
+        }
+
     }
 
     public String getPath() {

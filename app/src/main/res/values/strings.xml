@@ -7,7 +7,7 @@
     <string name="song_title">Song Title</string>
     <string name="no_repeat_end">The last song on the playlist</string>
     <string name="no_repeat_start">The first song on the playlist</string>
-    <string name="default_folder">/sdcard</string>
+    <string name="default_folder">/sdcard/Music</string>
     <string-array name="options_list">
         <item>Music folder</item>
     </string-array>

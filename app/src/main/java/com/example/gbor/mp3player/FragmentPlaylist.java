@@ -7,6 +7,7 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ListFragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -53,7 +54,7 @@ public class FragmentPlaylist extends ListFragment {
             }else{
                 holder = (ViewHolder) convertView.getTag();
             }
-
+            Log.i("SONGINDEX",String.valueOf(position));
             notifyDataSetChanged();
             holder.songArtist.setText(songData.get(position).get("songArtist"));
             holder.songTitle.setText(songData.get(position).get("songTitle"));
@@ -88,12 +89,13 @@ public class FragmentPlaylist extends ListFragment {
     }
 
     private void initialize(ArrayList<String> playlist){
-        Song song;
+        Song song = new Song();
         ArrayList<HashMap<String, String>> songListData = new ArrayList<>();
         HashMap<String, String> songData;
-
-        for (String entry : playlist) {
-            song = new Song(entry);
+        int i = 15;
+        for (String path : playlist) {
+            Log.i("SONGDATA",String.valueOf(i));
+            song.setPath(path);
             songData = new HashMap<>();
             if(song.getArtist() == null || song.getArtist() == null)
                 songData.put("songArtist", SongManager.getFileName(song.getPath()));
@@ -102,6 +104,8 @@ public class FragmentPlaylist extends ListFragment {
                 songData.put("songTitle", song.getTitle());
             }
             songListData.add(songData);
+            if(--i == 0)
+                break;
         }
         songAdapter = new SongAdapter(getActivity(), songListData,getArguments().getInt("index"));
         setListAdapter(songAdapter);
