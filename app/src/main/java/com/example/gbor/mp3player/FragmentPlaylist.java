@@ -6,7 +6,6 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ListFragment;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -91,8 +90,18 @@ public class FragmentPlaylist extends ListFragment {
     private void initialize(ArrayList<String> playlist){
         ArrayList<HashMap<String, String>> songListData = new ArrayList<>();
         HashMap<String, String> songData;
+        HashMap<String, String> songDataTemp;
         for (String id : playlist) {
-            songData=SongManager.getSongData(getContext(),id);
+            songData = new HashMap<>();
+            songDataTemp = SongManager.getSongData(getContext(),id);
+            if(songDataTemp.get("artist") == null
+                    || songDataTemp.get("title") == null){
+                songData.put("artist",songDataTemp.get("displayName"));
+                songData.put("title","");
+            }else{
+                songData.put("artist",songDataTemp.get("artist"));
+                songData.put("title",songDataTemp.get("title"));
+            }
             songListData.add(songData);
         }
 

@@ -3,7 +3,6 @@ package com.example.gbor.mp3player;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.database.Cursor;
-import android.graphics.Bitmap;
 import android.os.Environment;
 import android.provider.MediaStore;
 import android.util.Log;
@@ -144,12 +143,6 @@ class SongManager {
         return returnValue;
     }
 
-
-
-    static String getFileName(String path){
-        return path.split("/")[path.split("/").length - 1];
-
-    }
 
     static boolean hasMP3(String path){
         return new File(path).listFiles(new FileExtensionFilter()).length > 0;
