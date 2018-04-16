@@ -2,7 +2,6 @@ package com.example.gbor.mp3player;
 
 import android.app.Activity;
 import android.content.Context;
-import android.media.MediaMetadataRetriever;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -17,22 +16,24 @@ import android.widget.TextView;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 
 public class FragmentPlaylist extends ListFragment {
 
     private class SongAdapter extends ArrayAdapter<HashMap<String, String>> {
 
-        private final ArrayList<HashMap<String, String>> songData;
+//        private final ArrayList<String> songList;
         private final Activity context;
         private int current;
+        private List<HashMap<String, String>> songList;
 
 
-        SongAdapter(Activity context, ArrayList<HashMap<String, String>> songData, int currentlyPlaying) {
-            super(context, R.layout.playlist_item, songData);
+        SongAdapter(Activity context, ArrayList<HashMap<String, String>> songList, int currentlyPlaying) {
+            super(context, R.layout.playlist_item, songList);
             this.current=currentlyPlaying;
             this.context = context;
-            this.songData = songData;
+            this.songList = songList;
 
 
         }
@@ -54,10 +55,9 @@ public class FragmentPlaylist extends ListFragment {
             }else{
                 holder = (ViewHolder) convertView.getTag();
             }
-            Log.i("SONGINDEX",String.valueOf(position));
             notifyDataSetChanged();
-            holder.songArtist.setText(songData.get(position).get("songArtist"));
-            holder.songTitle.setText(songData.get(position).get("songTitle"));
+            holder.songArtist.setText(songList.get(position).get("artist"));
+            holder.songTitle.setText(songList.get(position).get("title"));
 
             if (position==current) {
                 convertView.setBackgroundResource(R.drawable.list_select_bg);
@@ -89,24 +89,13 @@ public class FragmentPlaylist extends ListFragment {
     }
 
     private void initialize(ArrayList<String> playlist){
-        Song song = new Song();
         ArrayList<HashMap<String, String>> songListData = new ArrayList<>();
         HashMap<String, String> songData;
-        int i = 15;
-        for (String path : playlist) {
-            Log.i("SONGDATA",String.valueOf(i));
-            song.setPath(path);
-            songData = new HashMap<>();
-            if(song.getArtist() == null || song.getArtist() == null)
-                songData.put("songArtist", SongManager.getFileName(song.getPath()));
-            else {
-                songData.put("songArtist", song.getArtist());
-                songData.put("songTitle", song.getTitle());
-            }
+        for (String id : playlist) {
+            songData=SongManager.getSongData(getContext(),id);
             songListData.add(songData);
-            if(--i == 0)
-                break;
         }
+
         songAdapter = new SongAdapter(getActivity(), songListData,getArguments().getInt("index"));
         setListAdapter(songAdapter);
     }

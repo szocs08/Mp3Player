@@ -9,19 +9,25 @@ playlist save/load
 
 package com.example.gbor.mp3player;
 
-import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.database.Cursor;
 import android.media.MediaPlayer;
 import android.os.Bundle;
+import android.os.Environment;
+import android.provider.MediaStore;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
+import android.util.Log;
 import android.widget.Toast;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Random;
 
 import static com.example.gbor.mp3player.R.id.pager;
@@ -32,31 +38,36 @@ public class ActivityMainPlayer extends FragmentActivity implements
         MediaPlayer.OnCompletionListener,
         FragmentOptions.OnOptionsFragmentInteractionListener{
 
+    private static final int FOLDER_CHOOSING_REQUEST = 1;
+    private static final String SETTINGS_FILE = "com.example.gbor.mp3player.settings";
+
     private MediaPlayer mp;
 
     private FragmentPlayer fragmentPlayer = new FragmentPlayer();
     private FragmentPlaylist fragmentPlaylist = new FragmentPlaylist();
     private FragmentOptions fragmentOptions = new FragmentOptions();
 
+    private SharedPreferences settings;
     private int songIndex;
     private boolean isShuffle = false;
     private boolean isRepeat = false;
     private ArrayList<String> playlist;
-    private static final int FOLDER_CHOOSING_REQUEST = 1;
+
     private String path ;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        settings = getSharedPreferences(SETTINGS_FILE, Context.MODE_PRIVATE);
         setContentView(R.layout.main_layout);
         songIndex = 0;
-        path=getString(R.string.default_folder);
-        playlist = SongManager.getPlaylist(path);
+        path=settings.getString("path",Environment.getExternalStorageDirectory().toString());
+        playlist = SongManager.getPlaylist(this);
         mp = new MediaPlayer();
         if(!playlist.isEmpty()){
             mp.setOnCompletionListener(this);
             try {
-                mp.setDataSource(playlist.get(0));
+                mp.setDataSource(SongManager.getPath(this,playlist.get(0)));
                 mp.prepare();
             } catch (IOException e) {
                 e.printStackTrace();
@@ -96,14 +107,11 @@ public class ActivityMainPlayer extends FragmentActivity implements
                         Toast.makeText(this,"The folder is empty",Toast.LENGTH_LONG).show();
 
                     else {
-                        fragmentOptions.updateUI(path);
-//                        ProgressDialog progress = new ProgressDialog(this);
-//                        progress.setTitle("Loading");
-//                        progress.setMessage("Wait while loading...");
-//                        progress.setCancelable(false); // disable dismiss by tapping outside of the dialog
-//                        progress.show();
+                        SharedPreferences.Editor editor = settings.edit();
+                        editor.putString("path",path);
+                        editor.apply();
                         mp = new MediaPlayer();
-                        playlist = SongManager.getPlaylist(path);
+                        playlist = SongManager.getPlaylist(this);
                         mp.setOnCompletionListener(this);
                         try {
                             mp.setDataSource(playlist.get(0));
@@ -112,7 +120,6 @@ public class ActivityMainPlayer extends FragmentActivity implements
                             e.printStackTrace();
                         }
                         songIndex = 0;
-//                        progress.dismiss();
                         fragmentOptions.updateUI(path);
 //                        fragmentPlaylist.updateUI(playlist);
                         fragmentPlayer.updateUI(playlist);
@@ -219,7 +226,7 @@ public class ActivityMainPlayer extends FragmentActivity implements
 
     }
 
-    public void playSong(int songIndex) {
+    private void playSong(int songIndex) {
         try {
             fragmentPlayer.updatePlayButton(mp.isPlaying());
             mp.reset();
@@ -281,9 +288,9 @@ public class ActivityMainPlayer extends FragmentActivity implements
 
             switch (position) {
                 case 0:
-                args.putString("path",path);
-                fragmentOptions.setArguments(args);
-                return fragmentOptions;
+                    args.putString("path",path);
+                    fragmentOptions.setArguments(args);
+                    return fragmentOptions;
 
                 case 1:
                     fragmentPlayer.setArguments(args);

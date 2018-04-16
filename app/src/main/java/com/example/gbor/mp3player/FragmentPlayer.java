@@ -1,6 +1,7 @@
 package com.example.gbor.mp3player;
 
 import android.content.Context;
+import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.app.Fragment;
@@ -15,6 +16,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 
@@ -37,7 +39,7 @@ public class FragmentPlayer extends Fragment implements SeekBar.OnSeekBarChangeL
 
     private Handler mHandler = new Handler();
     private int songIndex;
-    private ArrayList<String> songList = new ArrayList<>();
+    private ArrayList<String> playlist = new ArrayList<>();
 
 
     private OnPlayerFragmentInteractionListener interactionListener;
@@ -71,9 +73,9 @@ public class FragmentPlayer extends Fragment implements SeekBar.OnSeekBarChangeL
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              final Bundle savedInstanceState) {
-        List<String> playlist= getArguments().getStringArrayList("playlist");
-        if(playlist != null){
-            songList.addAll(playlist);
+        List<String> songList= getArguments().getStringArrayList("playlist");
+        if(songList != null){
+            playlist.addAll(songList);
         }
         View view = inflater.inflate(R.layout.player_layout, container, false);
 
@@ -206,27 +208,27 @@ public class FragmentPlayer extends Fragment implements SeekBar.OnSeekBarChangeL
 
     public void updateUI(int songIndex) {
         try {
-            Boolean empty = songList.isEmpty();
-            Song song = new Song();
+            Boolean empty = playlist.isEmpty();
+            HashMap<String,String> song = SongManager.getSongData(getContext(),playlist.get(songIndex));
             if (!empty)
-                song.setPath(songList.get(songIndex));
-            if (songList.isEmpty() || song.getTitle() == null)
+            if (playlist.isEmpty() || song.get("title") == null)
                 songTitleLabel.setText(getString(R.string.song_title));
-            else songTitleLabel.setText(song.getTitle());
+            else songTitleLabel.setText(song.get("title"));
 
-            if (songList.isEmpty() || song.getArtist() == null)
+            if (playlist.isEmpty() || song.get("artist") == null)
                 songArtistLabel.setText(getString(R.string.song_artist));
-            else songArtistLabel.setText(song.getArtist());
+            else songArtistLabel.setText(song.get("artist"));
 
-            if (songList.isEmpty() || song.getAlbum() == null)
+            if (playlist.isEmpty() || song.get("album") == null)
                 songAlbumLabel.setText(getString(R.string.album));
-            else songAlbumLabel.setText(song.getAlbum());
+            else songAlbumLabel.setText(song.get("album"));
 
-            if (songList.isEmpty() || song.getAlbumImage() == null)
+            if (playlist.isEmpty() || SongManager.getAlbumThumbnail(getContext(),song.get("albumID")) == null)
                 imgAlbum.setImageDrawable(ContextCompat.getDrawable(getContext(), R.drawable.img_adele));
-            else imgAlbum.setImageBitmap(song.getAlbumImage());
+            else imgAlbum.setImageBitmap(BitmapFactory.decodeFile(
+                    SongManager.getAlbumThumbnail(getContext(),song.get("albumID"))));
 
-            if (songList.isEmpty()) {
+            if (playlist.isEmpty()) {
                 currentTimeLabel.setText(R.string.start_time);
                 currentTimeLabel.setText(R.string.end_time);
             }
@@ -246,9 +248,9 @@ public class FragmentPlayer extends Fragment implements SeekBar.OnSeekBarChangeL
 
     public void updateUI(ArrayList<String> playlist){
         songIndex=0;
-        songList.clear();
+        this.playlist.clear();
 
-        songList.addAll(playlist);
+        this.playlist.addAll(playlist);
         updateUI(songIndex);
         btnPlay.setImageResource(R.drawable.play_button);
 
@@ -264,7 +266,6 @@ public class FragmentPlayer extends Fragment implements SeekBar.OnSeekBarChangeL
         @Override
         public void run() {
             interactionListener.update();
-
             mHandler.postDelayed(this, 100);
         }
     };
