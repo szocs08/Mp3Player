@@ -1,7 +1,8 @@
 package com.example.gbor.mp3player;
 
+import android.content.ContentUris;
 import android.content.Context;
-import android.graphics.BitmapFactory;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.app.Fragment;
@@ -222,12 +223,14 @@ public class FragmentPlayer extends Fragment implements SeekBar.OnSeekBarChangeL
             if (playlist.isEmpty() || song.get("album") == null)
                 songAlbumLabel.setText(getString(R.string.album));
             else songAlbumLabel.setText(song.get("album"));
-
             if (playlist.isEmpty() || SongManager.getAlbumThumbnail(getContext(),song.get("albumID")) == null)
                 imgAlbum.setImageDrawable(ContextCompat.getDrawable(getContext(), R.drawable.img_adele));
-            else imgAlbum.setImageBitmap(BitmapFactory.decodeFile(
-                    SongManager.getAlbumThumbnail(getContext(),song.get("albumID"))));
-
+            else {
+                Uri sArtworkUri = Uri
+                        .parse("content://media/external/audio/albumart");
+                Uri uri = ContentUris.withAppendedId(sArtworkUri, Long.parseLong(song.get("albumID")));
+                imgAlbum.setImageURI(uri);
+            }
             if (playlist.isEmpty()) {
                 currentTimeLabel.setText(R.string.start_time);
                 currentTimeLabel.setText(R.string.end_time);

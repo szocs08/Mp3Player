@@ -7,8 +7,6 @@ import android.os.Environment;
 import android.provider.MediaStore;
 import android.util.Log;
 
-import java.io.File;
-import java.io.FilenameFilter;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -144,15 +142,55 @@ class SongManager {
     }
 
 
-    static boolean hasMP3(String path){
-        return new File(path).listFiles(new FileExtensionFilter()).length > 0;
+    static boolean hasMP3(Context context, String path){
+        Boolean returnValue = false;
+        String[] songProj = {MediaStore.Audio.Media.ARTIST};
+        String songSelect = MediaStore.Audio.Media.DATA + " like ?";
+        String[] selectArgs =  new String[]{path};
+        Cursor cursor = context.getContentResolver().query(
+                MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,
+                songProj,
+                songSelect,
+                selectArgs,
+                null);
+        if (cursor != null) {
+            returnValue = cursor.getCount() > 0;
+            cursor.close();
+        }
+
+        return returnValue ;
     }
 
-    static class FileExtensionFilter implements FilenameFilter {
-        @Override
-        public boolean accept(File dir, String name) {
-            return name.toLowerCase().endsWith(".mp3");
+    public static HashMap<String,String> getSongPlaylistData(Context context, String id){
+        HashMap<String,String> returnValue = new HashMap<>();
+        String[] songProj = {
+                MediaStore.Audio.Media.ARTIST,
+                MediaStore.Audio.Media.TITLE,
+                MediaStore.Audio.Media.DISPLAY_NAME,};
+        String songSelect = MediaStore.Audio.Media._ID + " = ?";
+        String[] selectArgs =  new String[]{id};
+        Cursor songCursor = context.getContentResolver().query(
+                MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,
+                songProj,
+                songSelect,
+                selectArgs,
+                null);
+        if (songCursor != null) {
+            songCursor.moveToFirst();
+
+            int artistColumn = songCursor.getColumnIndex(MediaStore.Audio.Media.ARTIST);
+            int titleColumn = songCursor.getColumnIndex(MediaStore.Audio.Media.TITLE);
+            int displayColumn = songCursor.getColumnIndex(MediaStore.Audio.Media.DISPLAY_NAME);
+
+            returnValue.put("artist",songCursor.getString(artistColumn));
+            returnValue.put("title",songCursor.getString(titleColumn));
+            returnValue.put("displayName",songCursor.getString(displayColumn));
+            songCursor.close();
+        } else {
+            returnValue=null;
+            Log.e("CURSOR","Cursor load failed");
         }
+        return returnValue;
     }
 
 }

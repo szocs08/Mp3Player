@@ -99,7 +99,7 @@ public class ActivityMainPlayer extends FragmentActivity implements
 
 
                     path=data.getDataString();
-                    if(!SongManager.hasMP3(path))
+                    if(!SongManager.hasMP3(this,path))
                         Toast.makeText(this,"The folder is empty",Toast.LENGTH_LONG).show();
 
                     else {
@@ -226,7 +226,7 @@ public class ActivityMainPlayer extends FragmentActivity implements
         try {
             fragmentPlayer.updatePlayButton(mp.isPlaying());
             mp.reset();
-            mp.setDataSource(playlist.get(songIndex));
+            mp.setDataSource(SongManager.getPath(this,playlist.get(songIndex)));
             mp.prepare();
             mp.start();
             fragmentPlaylist.updateUI(songIndex);

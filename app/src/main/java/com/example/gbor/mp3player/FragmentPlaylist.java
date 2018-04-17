@@ -93,7 +93,7 @@ public class FragmentPlaylist extends ListFragment {
         HashMap<String, String> songDataTemp;
         for (String id : playlist) {
             songData = new HashMap<>();
-            songDataTemp = SongManager.getSongData(getContext(),id);
+            songDataTemp = SongManager.getSongPlaylistData(getContext(),id);
             if(songDataTemp.get("artist") == null
                     || songDataTemp.get("title") == null){
                 songData.put("artist",songDataTemp.get("displayName"));

@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Environment;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
@@ -80,7 +81,7 @@ public class ActivityDirectoryChooser extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_directory_chooser);
         ListView listView = (ListView) findViewById(R.id.directory_list);
-        path = getString(R.string.default_folder);
+        path = Environment.getExternalStorageDirectory().toString();
         if(getIntent().hasExtra("path"))
             path=getIntent().getStringExtra("path");
 
@@ -122,7 +123,7 @@ public class ActivityDirectoryChooser extends AppCompatActivity {
                         Toast.makeText(ActivityDirectoryChooser.this, getString(R.string.directory_message), Toast.LENGTH_SHORT).show();
                     }
                 }else{
-                    if(!path.equalsIgnoreCase(getString(R.string.default_folder))) {
+                    if(!path.equalsIgnoreCase(Environment.getExternalStorageDirectory().toString())) {
                         path = path.substring(0, path.lastIndexOf('/'));
                         values.clear();
                         values.add("..");
