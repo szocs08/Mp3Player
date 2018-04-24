@@ -2,6 +2,7 @@ package com.example.gbor.mp3player;
 
 import android.app.Activity;
 import android.content.Context;
+import android.database.Cursor;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -26,7 +27,7 @@ public class FragmentPlaylist extends ListFragment {
         private final Activity context;
         private int current;
         private List<HashMap<String, String>> songList;
-
+        private Cursor cursor;
 
         SongAdapter(Activity context, ArrayList<HashMap<String, String>> songList, int currentlyPlaying) {
             super(context, R.layout.playlist_item, songList);
@@ -39,6 +40,18 @@ public class FragmentPlaylist extends ListFragment {
 
         void updatePosition(int pos){
             current=pos;
+        }
+
+        public Cursor swapCursor(Cursor newCursor) {
+            if (newCursor == cursor) {
+                return null;
+            }
+            Cursor oldCursor = cursor;
+            cursor = newCursor;
+            if (newCursor != null) {
+                notifyDataSetChanged();
+            }
+            return oldCursor;
         }
 
         @NonNull @Override

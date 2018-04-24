@@ -2,9 +2,12 @@ package com.example.gbor.mp3player;
 
 import android.content.ContentUris;
 import android.content.Context;
+import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
+import android.provider.MediaStore;
+import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
 import android.view.LayoutInflater;
@@ -41,7 +44,7 @@ public class FragmentPlayer extends Fragment implements SeekBar.OnSeekBarChangeL
     private Handler mHandler = new Handler();
     private int songIndex;
     private ArrayList<String> playlist = new ArrayList<>();
-
+    private Cursor cursor;
 
     private OnPlayerFragmentInteractionListener interactionListener;
 
@@ -72,7 +75,7 @@ public class FragmentPlayer extends Fragment implements SeekBar.OnSeekBarChangeL
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              final Bundle savedInstanceState) {
         List<String> songList= getArguments().getStringArrayList("playlist");
         if(songList != null){
@@ -80,18 +83,18 @@ public class FragmentPlayer extends Fragment implements SeekBar.OnSeekBarChangeL
         }
         View view = inflater.inflate(R.layout.player_layout, container, false);
 
-        btnPlay = (ImageButton) view.findViewById(R.id.play_button);
-        btnPrevious = (ImageButton) view.findViewById(R.id.previous_button);
-        btnNext = (ImageButton) view.findViewById(R.id.next_button);
-        btnShuffle = (ImageButton) view.findViewById(R.id.shuffle_button);
-        btnRepeat = (ImageButton) view.findViewById(R.id.repeat_button);
-        imgAlbum = (ImageView) view.findViewById(R.id.song_album_thumbnail);
-        progressSeekBar = (SeekBar) view.findViewById(R.id.seek_bar);
-        songTitleLabel = (TextView) view.findViewById(R.id.song_title);
-        songArtistLabel = (TextView) view.findViewById(R.id.song_artist);
-        songAlbumLabel = (TextView) view.findViewById(R.id.song_album);
-        currentTimeLabel = (TextView) view.findViewById(R.id.current_time);
-        totalTimeLabel = (TextView) view.findViewById(R.id.end_time);
+        btnPlay = view.findViewById(R.id.play_button);
+        btnPrevious = view.findViewById(R.id.previous_button);
+        btnNext = view.findViewById(R.id.next_button);
+        btnShuffle = view.findViewById(R.id.shuffle_button);
+        btnRepeat = view.findViewById(R.id.repeat_button);
+        imgAlbum = view.findViewById(R.id.song_album_thumbnail);
+        progressSeekBar = view.findViewById(R.id.seek_bar);
+        songTitleLabel = view.findViewById(R.id.song_title);
+        songArtistLabel = view.findViewById(R.id.song_artist);
+        songAlbumLabel = view.findViewById(R.id.song_album);
+        currentTimeLabel = view.findViewById(R.id.current_time);
+        totalTimeLabel = view.findViewById(R.id.end_time);
         songArtistLabel.setSelected(true);
         songTitleLabel.setSelected(true);
         songAlbumLabel.setSelected(true);
@@ -134,7 +137,7 @@ public class FragmentPlayer extends Fragment implements SeekBar.OnSeekBarChangeL
             }
         });
 
-        updateUI(songIndex);
+
         btnPlay.setImageResource(R.drawable.play_button);
         return view;
     }
@@ -209,29 +212,29 @@ public class FragmentPlayer extends Fragment implements SeekBar.OnSeekBarChangeL
 
     public void updateUI(int songIndex) {
         try {
-            Boolean empty = playlist.isEmpty();
-            HashMap<String,String> song = SongManager.getSongData(getContext(),playlist.get(songIndex));
-            if (!empty)
-            if (playlist.isEmpty() || song.get("title") == null)
+            if (!playlist.isEmpty()){
+                HashMap<String,String> song = SongManager.getSongData(getContext(),playlist.get(songIndex));
+                cursor.moveToPosition(songIndex);
+                songTitleLabel.setText(cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.TITLE)));
+
+                songArtistLabel.setText(cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.ARTIST)));
+
+                songAlbumLabel.setText(cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.ALBUM)));
+                if (SongManager.getAlbumThumbnail(getContext(),song.get("albumID")) == null)
+                    imgAlbum.setImageDrawable(ContextCompat.getDrawable(getContext(), R.drawable.img_adele));
+                else {
+                    Uri uri = ContentUris.withAppendedId(
+                            Uri.parse("content://media/external/audio/albumart"),
+                            Long.parseLong(cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.ALBUM_ID))));
+                    imgAlbum.setImageURI(uri);
+                }
+            }else {
                 songTitleLabel.setText(getString(R.string.song_title));
-            else songTitleLabel.setText(song.get("title"));
 
-            if (playlist.isEmpty() || song.get("artist") == null)
                 songArtistLabel.setText(getString(R.string.song_artist));
-            else songArtistLabel.setText(song.get("artist"));
 
-            if (playlist.isEmpty() || song.get("album") == null)
                 songAlbumLabel.setText(getString(R.string.album));
-            else songAlbumLabel.setText(song.get("album"));
-            if (playlist.isEmpty() || SongManager.getAlbumThumbnail(getContext(),song.get("albumID")) == null)
                 imgAlbum.setImageDrawable(ContextCompat.getDrawable(getContext(), R.drawable.img_adele));
-            else {
-                Uri sArtworkUri = Uri
-                        .parse("content://media/external/audio/albumart");
-                Uri uri = ContentUris.withAppendedId(sArtworkUri, Long.parseLong(song.get("albumID")));
-                imgAlbum.setImageURI(uri);
-            }
-            if (playlist.isEmpty()) {
                 currentTimeLabel.setText(R.string.start_time);
                 currentTimeLabel.setText(R.string.end_time);
             }
@@ -264,6 +267,17 @@ public class FragmentPlayer extends Fragment implements SeekBar.OnSeekBarChangeL
         mHandler.postDelayed(mUpdateTimeTask, 100);
     }
 
+    public Cursor swapCursor(Cursor newCursor) {
+        if (newCursor == cursor) {
+            return null;
+        }
+        Cursor oldCursor = cursor;
+        cursor = newCursor;
+        if (newCursor != null) {
+            updateUI(songIndex);
+        }
+        return oldCursor;
+    }
 
     private Runnable mUpdateTimeTask = new Runnable() {
         @Override

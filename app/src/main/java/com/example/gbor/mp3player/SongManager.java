@@ -32,17 +32,20 @@ class SongManager {
                     songProj,
                     songSelect,
                     selectArgs,
-                    MediaStore.Audio.Media.ARTIST+", "+MediaStore.Audio.Media.TITLE);
+                    MediaStore.Audio.Media.DISPLAY_NAME);
             if (songCursor != null) {
-                songCursor.moveToFirst();
-                do{
-                    int dataColumn = songCursor.getColumnIndex(MediaStore.Audio.Media.DATA);
-                    int idColumn = songCursor.getColumnIndex(MediaStore.Audio.Media._ID);
-                    songList.add(songCursor.getString(idColumn));
-                    Log.i("SONGS", songCursor.getString(dataColumn));
+
+                if (songCursor.getCount()!= 0) {
+                    songCursor.moveToFirst();
+                    do{
+                        int dataColumn = songCursor.getColumnIndex(MediaStore.Audio.Media.DATA);
+                        int idColumn = songCursor.getColumnIndex(MediaStore.Audio.Media._ID);
+                        songList.add(songCursor.getString(idColumn));
+                        Log.i("SONGS", songCursor.getString(dataColumn));
 
 
-                }while (songCursor.moveToNext());
+                    }while (songCursor.moveToNext());
+                }
 
                 songCursor.close();
             } else {
@@ -64,7 +67,7 @@ class SongManager {
                 songProj,
                 songSelect,
                 selectArgs,
-                MediaStore.Audio.Media._ID);
+                null);
         if (songCursor != null) {
             songCursor.moveToFirst();
 
@@ -85,7 +88,6 @@ class SongManager {
                 MediaStore.Audio.Media.ARTIST,
                 MediaStore.Audio.Media.TITLE,
                 MediaStore.Audio.Media.ALBUM,
-                MediaStore.Audio.Media.DISPLAY_NAME,
                 MediaStore.Audio.Media.ALBUM_ID};
         String songSelect = MediaStore.Audio.Media._ID + " = ?";
         String[] selectArgs =  new String[]{id};
@@ -94,20 +96,18 @@ class SongManager {
                 songProj,
                 songSelect,
                 selectArgs,
-                MediaStore.Audio.Media._ID);
+                null);
         if (songCursor != null) {
             songCursor.moveToFirst();
 
             int artistColumn = songCursor.getColumnIndex(MediaStore.Audio.Media.ARTIST);
             int titleColumn = songCursor.getColumnIndex(MediaStore.Audio.Media.TITLE);
             int albumColumn = songCursor.getColumnIndex(MediaStore.Audio.Media.ALBUM);
-            int displayColumn = songCursor.getColumnIndex(MediaStore.Audio.Media.DISPLAY_NAME);
             int albumIDColumn = songCursor.getColumnIndex(MediaStore.Audio.Media.ALBUM_ID);
 
             returnValue.put("artist",songCursor.getString(artistColumn));
             returnValue.put("title",songCursor.getString(titleColumn));
             returnValue.put("album",songCursor.getString(albumColumn));
-            returnValue.put("displayName",songCursor.getString(displayColumn));
             returnValue.put("albumID",songCursor.getString(albumIDColumn));
             songCursor.close();
         } else {
@@ -141,32 +141,11 @@ class SongManager {
         return returnValue;
     }
 
-
-    static boolean hasMP3(Context context, String path){
-        Boolean returnValue = false;
-        String[] songProj = {MediaStore.Audio.Media.ARTIST};
-        String songSelect = MediaStore.Audio.Media.DATA + " like ?";
-        String[] selectArgs =  new String[]{path};
-        Cursor cursor = context.getContentResolver().query(
-                MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,
-                songProj,
-                songSelect,
-                selectArgs,
-                null);
-        if (cursor != null) {
-            returnValue = cursor.getCount() > 0;
-            cursor.close();
-        }
-
-        return returnValue ;
-    }
-
     public static HashMap<String,String> getSongPlaylistData(Context context, String id){
         HashMap<String,String> returnValue = new HashMap<>();
         String[] songProj = {
                 MediaStore.Audio.Media.ARTIST,
-                MediaStore.Audio.Media.TITLE,
-                MediaStore.Audio.Media.DISPLAY_NAME,};
+                MediaStore.Audio.Media.TITLE};
         String songSelect = MediaStore.Audio.Media._ID + " = ?";
         String[] selectArgs =  new String[]{id};
         Cursor songCursor = context.getContentResolver().query(
@@ -180,11 +159,9 @@ class SongManager {
 
             int artistColumn = songCursor.getColumnIndex(MediaStore.Audio.Media.ARTIST);
             int titleColumn = songCursor.getColumnIndex(MediaStore.Audio.Media.TITLE);
-            int displayColumn = songCursor.getColumnIndex(MediaStore.Audio.Media.DISPLAY_NAME);
 
             returnValue.put("artist",songCursor.getString(artistColumn));
             returnValue.put("title",songCursor.getString(titleColumn));
-            returnValue.put("displayName",songCursor.getString(displayColumn));
             songCursor.close();
         } else {
             returnValue=null;

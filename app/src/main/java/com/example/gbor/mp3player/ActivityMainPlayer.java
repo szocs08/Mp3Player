@@ -1,25 +1,23 @@
-/*
-
-fragment
-facebook
-options
-playlist save/load
-
- */
-
 package com.example.gbor.mp3player;
 
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.database.Cursor;
 import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.os.Environment;
+import android.provider.MediaStore;
+import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
+import android.support.v4.app.LoaderManager.LoaderCallbacks;
+import android.support.v4.content.CursorLoader;
+import android.support.v4.content.Loader;
 import android.support.v4.view.ViewPager;
+import android.util.Log;
 import android.widget.Toast;
 
 import java.io.IOException;
@@ -32,9 +30,12 @@ public class ActivityMainPlayer extends FragmentActivity implements
         FragmentPlayer.OnPlayerFragmentInteractionListener,
         FragmentPlaylist.OnListFragmentInteractionListener,
         MediaPlayer.OnCompletionListener,
-        FragmentOptions.OnOptionsFragmentInteractionListener{
+        FragmentOptions.OnOptionsFragmentInteractionListener,
+        LoaderCallbacks<Cursor>{
 
     private static final int FOLDER_CHOOSING_REQUEST = 1;
+    private static final int SONG_QUERY = 1;
+
     private static final String SETTINGS_FILE = "com.example.gbor.mp3player.settings";
 
     private MediaPlayer mp;
@@ -48,8 +49,9 @@ public class ActivityMainPlayer extends FragmentActivity implements
     private boolean isShuffle = false;
     private boolean isRepeat = false;
     private ArrayList<String> playlist;
-
     private String path ;
+    private PlayerPagerAdapter pagerAdapter;
+    private Cursor cursor;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -58,25 +60,13 @@ public class ActivityMainPlayer extends FragmentActivity implements
         setContentView(R.layout.main_layout);
         songIndex = 0;
         path=settings.getString("path",Environment.getExternalStorageDirectory().toString());
-        playlist = SongManager.getPlaylist(this);
-        mp = new MediaPlayer();
-        if(!playlist.isEmpty()){
-            mp.setOnCompletionListener(this);
-            try {
-                mp.setDataSource(SongManager.getPath(this,playlist.get(0)));
-                mp.prepare();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
-
-        PlayerPagerAdapter pagerAdapter = new PlayerPagerAdapter(getSupportFragmentManager(),
+        ViewPager viewPager = findViewById(pager);
+        getSupportLoaderManager().initLoader(SONG_QUERY,null,this);
+        initialize();
+        pagerAdapter = new PlayerPagerAdapter(getSupportFragmentManager(),
                 playlist, songIndex, fragmentPlayer, fragmentPlaylist, fragmentOptions, path);
-
-        ViewPager viewPager = (ViewPager) findViewById(pager);
         viewPager.setAdapter(pagerAdapter);
         viewPager.setCurrentItem(1);
-
 
     }
 
@@ -99,28 +89,20 @@ public class ActivityMainPlayer extends FragmentActivity implements
 
 
                     path=data.getDataString();
-                    if(!SongManager.hasMP3(this,path))
-                        Toast.makeText(this,"The folder is empty",Toast.LENGTH_LONG).show();
-
-                    else {
-                        SharedPreferences.Editor editor = settings.edit();
-                        editor.putString("path",path);
-                        editor.apply();
-                        mp = new MediaPlayer();
-                        playlist = SongManager.getPlaylist(this);
-                        mp.setOnCompletionListener(this);
-                        try {
-                            mp.setDataSource(playlist.get(0));
-                            mp.prepare();
-                        } catch (IOException e) {
-                            e.printStackTrace();
-                        }
-                        songIndex = 0;
-                        fragmentOptions.updateUI(path);
-//                        fragmentPlaylist.updateUI(playlist);
-                        fragmentPlayer.updateUI(playlist);
-                    }
+                    SharedPreferences.Editor editor = settings.edit();
+                    editor.putString("path",path);
+                    editor.apply();
+                    mp = new MediaPlayer();
+                    playlist = SongManager.getPlaylist(this);
+                    getSupportLoaderManager().restartLoader(SONG_QUERY,null,this);
+                    mp.setOnCompletionListener(this);
+                    initialize();
+                    songIndex = 0;
+                    fragmentOptions.updateUI(path);
+                    fragmentPlaylist.updateUI(playlist);
+                    fragmentPlayer.updateUI(playlist);
                 }
+
                 break;
 
         }
@@ -226,7 +208,9 @@ public class ActivityMainPlayer extends FragmentActivity implements
         try {
             fragmentPlayer.updatePlayButton(mp.isPlaying());
             mp.reset();
-            mp.setDataSource(SongManager.getPath(this,playlist.get(songIndex)));
+            cursor.moveToPosition(songIndex);
+            String asd=cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.DATA));
+            mp.setDataSource(cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.DATA)));
             mp.prepare();
             mp.start();
             fragmentPlaylist.updateUI(songIndex);
@@ -234,6 +218,25 @@ public class ActivityMainPlayer extends FragmentActivity implements
 
         } catch (IllegalArgumentException | IOException | IllegalStateException e) {
             e.printStackTrace();
+        }
+    }
+
+    private void initialize(){
+        playlist = SongManager.getPlaylist(this);
+        mp = new MediaPlayer();
+        mp.setOnCompletionListener(this);
+        if(!playlist.isEmpty()){
+            try {
+                if(cursor!=null){
+                    int asd = cursor.getCount();
+                    cursor.moveToFirst();
+                    mp.setDataSource(cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.DATA)));
+                    mp.prepare();
+                }
+
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
     }
 
@@ -255,6 +258,42 @@ public class ActivityMainPlayer extends FragmentActivity implements
         playSong(songIndex);
     }
 
+    @NonNull
+    @Override
+    public Loader onCreateLoader(int id, Bundle args) {
+        SharedPreferences settings = getSharedPreferences(SETTINGS_FILE, Context.MODE_PRIVATE);
+
+        String[] songProj = {MediaStore.Audio.Media._ID,
+                MediaStore.Audio.Media.DATA,
+                MediaStore.Audio.Media.TITLE,
+                MediaStore.Audio.Media.ARTIST,
+                MediaStore.Audio.Media.ALBUM,
+                MediaStore.Audio.Media.ALBUM_ID
+        };
+
+        String songSelect = MediaStore.Audio.Media.DATA + " like ?";
+        String[] selectArgs = new String[]{settings.getString("path", Environment.getExternalStorageDirectory().toString()) + "%"};
+        return new CursorLoader(this, MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,
+                songProj,
+                songSelect,
+                selectArgs,
+                MediaStore.Audio.Media.DISPLAY_NAME);
+    }
+
+    @Override
+    public void onLoadFinished(@NonNull Loader loader, Cursor cursor) {
+        this.cursor=cursor;
+        initialize();
+        if(pagerAdapter!=null && cursor!=null)
+            pagerAdapter.swapCursor(cursor);
+        else
+            Log.v("asdasdasd","OnLoadFinished: mAdapter is null");
+    }
+
+    @Override
+    public void onLoaderReset(@NonNull Loader loader) {
+
+    }
 
     private static class PlayerPagerAdapter extends FragmentPagerAdapter {
 
@@ -264,6 +303,7 @@ public class ActivityMainPlayer extends FragmentActivity implements
         FragmentPlayer fragmentPlayer;
         FragmentPlaylist fragmentPlaylist;
         FragmentOptions fragmentOptions;
+        Cursor cursor;
 
         PlayerPagerAdapter(FragmentManager fm, ArrayList<String> playlist, int songIndex,
                            FragmentPlayer fragmentPlayer, FragmentPlaylist fragmentPlaylist,
@@ -304,5 +344,18 @@ public class ActivityMainPlayer extends FragmentActivity implements
         public int getCount() {
             return 3;
         }
+
+        Cursor swapCursor(Cursor newCursor) {
+            if (newCursor == cursor) {
+                return null;
+            }
+            Cursor oldCursor = cursor;
+            cursor = newCursor;
+            if (newCursor != null) {
+                fragmentPlayer.swapCursor(cursor);
+            }
+            return oldCursor;
+        }
     }
+
 }
