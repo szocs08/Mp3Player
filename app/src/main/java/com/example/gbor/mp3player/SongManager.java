@@ -41,7 +41,6 @@ class SongManager {
                         int dataColumn = songCursor.getColumnIndex(MediaStore.Audio.Media.DATA);
                         int idColumn = songCursor.getColumnIndex(MediaStore.Audio.Media._ID);
                         songList.add(songCursor.getString(idColumn));
-                        Log.i("SONGS", songCursor.getString(dataColumn));
 
 
                     }while (songCursor.moveToNext());

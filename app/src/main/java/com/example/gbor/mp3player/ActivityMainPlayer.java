@@ -21,11 +21,11 @@ import android.util.Log;
 import android.widget.Toast;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Random;
 
 import static com.example.gbor.mp3player.R.id.pager;
 
+@SuppressWarnings("ALL")
 public class ActivityMainPlayer extends FragmentActivity implements
         FragmentPlayer.OnPlayerFragmentInteractionListener,
         FragmentPlaylist.OnListFragmentInteractionListener,
@@ -40,33 +40,37 @@ public class ActivityMainPlayer extends FragmentActivity implements
 
     private MediaPlayer mp;
 
-    private FragmentPlayer fragmentPlayer = new FragmentPlayer();
-    private FragmentPlaylist fragmentPlaylist = new FragmentPlaylist();
-    private FragmentOptions fragmentOptions = new FragmentOptions();
+    private final FragmentPlayer fragmentPlayer = new FragmentPlayer();
+    private final FragmentPlaylist fragmentPlaylist = new FragmentPlaylist();
+    private final FragmentOptions fragmentOptions = new FragmentOptions();
 
     private SharedPreferences settings;
     private int songIndex;
     private boolean isShuffle = false;
     private boolean isRepeat = false;
-    private ArrayList<String> playlist;
+    private boolean isSwitching = false;
     private String path ;
     private PlayerPagerAdapter pagerAdapter;
     private Cursor cursor;
+    private ViewPager viewPager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        Log.i("DEBUG","1");
         settings = getSharedPreferences(SETTINGS_FILE, Context.MODE_PRIVATE);
         setContentView(R.layout.main_layout);
         songIndex = 0;
         path=settings.getString("path",Environment.getExternalStorageDirectory().toString());
-        ViewPager viewPager = findViewById(pager);
+
+        viewPager = findViewById(pager);
+        Log.i("DEBUG","2");
         getSupportLoaderManager().initLoader(SONG_QUERY,null,this);
-        initialize();
         pagerAdapter = new PlayerPagerAdapter(getSupportFragmentManager(),
-                playlist, songIndex, fragmentPlayer, fragmentPlaylist, fragmentOptions, path);
-        viewPager.setAdapter(pagerAdapter);
-        viewPager.setCurrentItem(1);
+                songIndex, fragmentPlayer, fragmentPlaylist, fragmentOptions, path);
+        Log.i("DEBUG","3");
+
+
 
     }
 
@@ -92,15 +96,11 @@ public class ActivityMainPlayer extends FragmentActivity implements
                     SharedPreferences.Editor editor = settings.edit();
                     editor.putString("path",path);
                     editor.apply();
-                    mp = new MediaPlayer();
-                    playlist = SongManager.getPlaylist(this);
+                    isSwitching=true;
+                    mp.stop();
                     getSupportLoaderManager().restartLoader(SONG_QUERY,null,this);
-                    mp.setOnCompletionListener(this);
-                    initialize();
                     songIndex = 0;
                     fragmentOptions.updateUI(path);
-                    fragmentPlaylist.updateUI(playlist);
-                    fragmentPlayer.updateUI(playlist);
                 }
 
                 break;
@@ -123,15 +123,15 @@ public class ActivityMainPlayer extends FragmentActivity implements
     public void next() {
         if (isShuffle) {
             Random rnd = new Random();
-            songIndex = rnd.nextInt((playlist.size() - 1) - 1);
-        } else if (songIndex < playlist.size() - 1) {
+            songIndex = rnd.nextInt((cursor.getCount() - 1) - 1);
+        } else if (songIndex < cursor.getCount() - 1) {
             songIndex++;
         } else {
             songIndex = 0;
         }
 
         if (songIndex == 0 && !isRepeat) {
-            songIndex = playlist.size() - 1;
+            songIndex = cursor.getCount() - 1;
             Toast.makeText(this, R.string.no_repeat_end, Toast.LENGTH_SHORT).show();
 
         } else {
@@ -143,13 +143,13 @@ public class ActivityMainPlayer extends FragmentActivity implements
     public void previous() {
         if (isShuffle) {
             Random rnd = new Random();
-            songIndex = rnd.nextInt((playlist.size() - 1) - 1);
+            songIndex = rnd.nextInt((cursor.getCount() - 1) - 1);
         } else if (songIndex > 0) {
             songIndex--;
         } else {
-            songIndex = playlist.size() - 1;
+            songIndex = cursor.getCount() - 1;
         }
-        if (songIndex == playlist.size() - 1 && !isRepeat) {
+        if (songIndex == cursor.getCount() - 1 && !isRepeat) {
             songIndex = 0;
             Toast.makeText(this, R.string.no_repeat_start, Toast.LENGTH_SHORT).show();
 
@@ -185,7 +185,7 @@ public class ActivityMainPlayer extends FragmentActivity implements
 
     @Override
     public void update() {
-        if (playlist.isEmpty())
+        if (cursor.getCount()<0)
             fragmentPlayer.timerUpdate(0, 0);
         else
             fragmentPlayer.timerUpdate(mp.getDuration(), mp.getCurrentPosition());
@@ -209,11 +209,10 @@ public class ActivityMainPlayer extends FragmentActivity implements
             fragmentPlayer.updatePlayButton(mp.isPlaying());
             mp.reset();
             cursor.moveToPosition(songIndex);
-            String asd=cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.DATA));
             mp.setDataSource(cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.DATA)));
             mp.prepare();
             mp.start();
-            fragmentPlaylist.updateUI(songIndex);
+//            fragmentPlaylist.updateUI(songIndex);
             fragmentPlayer.updateUI(songIndex);
 
         } catch (IllegalArgumentException | IOException | IllegalStateException e) {
@@ -222,29 +221,26 @@ public class ActivityMainPlayer extends FragmentActivity implements
     }
 
     private void initialize(){
-        playlist = SongManager.getPlaylist(this);
         mp = new MediaPlayer();
         mp.setOnCompletionListener(this);
-        if(!playlist.isEmpty()){
-            try {
-                if(cursor!=null){
-                    int asd = cursor.getCount();
-                    cursor.moveToFirst();
-                    mp.setDataSource(cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.DATA)));
-                    mp.prepare();
-                }
-
-            } catch (IOException e) {
-                e.printStackTrace();
+        try {
+            if(cursor!=null && cursor.getCount()!=0){
+                cursor.moveToFirst();
+                mp.setDataSource(cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.DATA)));
+                mp.prepare();
             }
+
+        } catch (IOException e) {
+            e.printStackTrace();
         }
+
     }
 
 
     @Override
     public void onCompletion(MediaPlayer mp) {
         if (!isRepeat) {
-            if (songIndex < playlist.size() - 1) {
+            if (songIndex < cursor.getCount() - 1) {
                 songIndex++;
 
             } else {
@@ -253,9 +249,13 @@ public class ActivityMainPlayer extends FragmentActivity implements
             }
         } else if (isShuffle) {
             Random rnd = new Random();
-            songIndex = rnd.nextInt((playlist.size() - 1) - 1);
+            songIndex = rnd.nextInt((cursor.getCount() - 1) - 1);
         }
-        playSong(songIndex);
+
+        if(isSwitching)
+            isSwitching=false;
+        else
+            playSong(songIndex);
     }
 
     @NonNull
@@ -268,7 +268,7 @@ public class ActivityMainPlayer extends FragmentActivity implements
                 MediaStore.Audio.Media.TITLE,
                 MediaStore.Audio.Media.ARTIST,
                 MediaStore.Audio.Media.ALBUM,
-                MediaStore.Audio.Media.ALBUM_ID
+                MediaStore.Audio.Media.DATA
         };
 
         String songSelect = MediaStore.Audio.Media.DATA + " like ?";
@@ -277,16 +277,21 @@ public class ActivityMainPlayer extends FragmentActivity implements
                 songProj,
                 songSelect,
                 selectArgs,
-                MediaStore.Audio.Media.DISPLAY_NAME);
+                MediaStore.Audio.Media.ARTIST);
     }
 
     @Override
     public void onLoadFinished(@NonNull Loader loader, Cursor cursor) {
         this.cursor=cursor;
         initialize();
-        if(pagerAdapter!=null && cursor!=null)
+        if(viewPager.getAdapter()==null) {
+            viewPager.setAdapter(pagerAdapter);
+            viewPager.setCurrentItem(1);
+        }
+        if(pagerAdapter!=null && cursor!=null){
             pagerAdapter.swapCursor(cursor);
-        else
+            Log.i("CURSOR","OnLoadFinished: fasza");
+        }else
             Log.v("asdasdasd","OnLoadFinished: mAdapter is null");
     }
 
@@ -297,19 +302,17 @@ public class ActivityMainPlayer extends FragmentActivity implements
 
     private static class PlayerPagerAdapter extends FragmentPagerAdapter {
 
-        ArrayList<String> playlist;
-        int songIndex;
-        String path;
-        FragmentPlayer fragmentPlayer;
-        FragmentPlaylist fragmentPlaylist;
-        FragmentOptions fragmentOptions;
+        final int songIndex;
+        final String path;
+        final FragmentPlayer fragmentPlayer;
+        final FragmentPlaylist fragmentPlaylist;
+        final FragmentOptions fragmentOptions;
         Cursor cursor;
 
-        PlayerPagerAdapter(FragmentManager fm, ArrayList<String> playlist, int songIndex,
+        PlayerPagerAdapter(FragmentManager fm, int songIndex,
                            FragmentPlayer fragmentPlayer, FragmentPlaylist fragmentPlaylist,
                            FragmentOptions fragmentOptions, String path) {
             super(fm);
-            this.playlist = playlist;
             this.songIndex = songIndex;
             this.fragmentPlayer = fragmentPlayer;
             this.fragmentPlaylist = fragmentPlaylist;
@@ -320,7 +323,6 @@ public class ActivityMainPlayer extends FragmentActivity implements
         @Override
         public Fragment getItem(int position) {
             Bundle args = new Bundle();
-            args.putStringArrayList("playlist", playlist);
 
             switch (position) {
                 case 0:
@@ -328,21 +330,22 @@ public class ActivityMainPlayer extends FragmentActivity implements
                     fragmentOptions.setArguments(args);
                     return fragmentOptions;
 
-                case 1:
+                default:
+                    args.putInt("index", songIndex);
                     fragmentPlayer.setArguments(args);
                     return fragmentPlayer;
 
-                default:
-                    args.putInt("index", songIndex);
-                    fragmentPlaylist.setArguments(args);
-                    return fragmentPlaylist;
+//                default:
+//                    args.putInt("index", songIndex);
+//                    fragmentPlaylist.setArguments(args);
+//                    return fragmentPlaylist;
 
             }
         }
 
         @Override
         public int getCount() {
-            return 3;
+            return 2;
         }
 
         Cursor swapCursor(Cursor newCursor) {

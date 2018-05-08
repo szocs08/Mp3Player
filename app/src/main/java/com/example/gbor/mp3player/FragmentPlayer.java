@@ -3,6 +3,10 @@ package com.example.gbor.mp3player;
 import android.content.ContentUris;
 import android.content.Context;
 import android.database.Cursor;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.drawable.Drawable;
+import android.media.MediaMetadataRetriever;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
@@ -19,9 +23,7 @@ import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
+import java.io.File;
 
 
 public class FragmentPlayer extends Fragment implements SeekBar.OnSeekBarChangeListener {
@@ -42,9 +44,8 @@ public class FragmentPlayer extends Fragment implements SeekBar.OnSeekBarChangeL
 
 
     private Handler mHandler = new Handler();
-    private int songIndex;
-    private ArrayList<String> playlist = new ArrayList<>();
     private Cursor cursor;
+    private Context context;
 
     private OnPlayerFragmentInteractionListener interactionListener;
 
@@ -77,12 +78,8 @@ public class FragmentPlayer extends Fragment implements SeekBar.OnSeekBarChangeL
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              final Bundle savedInstanceState) {
-        List<String> songList= getArguments().getStringArrayList("playlist");
-        if(songList != null){
-            playlist.addAll(songList);
-        }
         View view = inflater.inflate(R.layout.player_layout, container, false);
-
+        context=getContext();
         btnPlay = view.findViewById(R.id.play_button);
         btnPrevious = view.findViewById(R.id.previous_button);
         btnNext = view.findViewById(R.id.next_button);
@@ -137,8 +134,6 @@ public class FragmentPlayer extends Fragment implements SeekBar.OnSeekBarChangeL
             }
         });
 
-
-        btnPlay.setImageResource(R.drawable.play_button);
         return view;
     }
 
@@ -212,29 +207,28 @@ public class FragmentPlayer extends Fragment implements SeekBar.OnSeekBarChangeL
 
     public void updateUI(int songIndex) {
         try {
-            if (!playlist.isEmpty()){
-                HashMap<String,String> song = SongManager.getSongData(getContext(),playlist.get(songIndex));
+            if ((cursor.getCount()>0)){
                 cursor.moveToPosition(songIndex);
                 songTitleLabel.setText(cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.TITLE)));
 
                 songArtistLabel.setText(cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.ARTIST)));
 
                 songAlbumLabel.setText(cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.ALBUM)));
-                if (SongManager.getAlbumThumbnail(getContext(),song.get("albumID")) == null)
-                    imgAlbum.setImageDrawable(ContextCompat.getDrawable(getContext(), R.drawable.img_adele));
-                else {
-                    Uri uri = ContentUris.withAppendedId(
-                            Uri.parse("content://media/external/audio/albumart"),
-                            Long.parseLong(cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.ALBUM_ID))));
-                    imgAlbum.setImageURI(uri);
-                }
+
+                MediaMetadataRetriever mmr = new MediaMetadataRetriever();
+                mmr.setDataSource(cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.DATA)));
+                if(mmr.getEmbeddedPicture()!=null)
+                    imgAlbum.setImageBitmap(BitmapFactory.decodeByteArray(mmr.getEmbeddedPicture(),0,mmr.getEmbeddedPicture().length));
+                else
+                    imgAlbum.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.img_adele));
+
             }else {
                 songTitleLabel.setText(getString(R.string.song_title));
 
                 songArtistLabel.setText(getString(R.string.song_artist));
 
                 songAlbumLabel.setText(getString(R.string.album));
-                imgAlbum.setImageDrawable(ContextCompat.getDrawable(getContext(), R.drawable.img_adele));
+                imgAlbum.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.img_adele));
                 currentTimeLabel.setText(R.string.start_time);
                 currentTimeLabel.setText(R.string.end_time);
             }
@@ -250,18 +244,9 @@ public class FragmentPlayer extends Fragment implements SeekBar.OnSeekBarChangeL
         }
 
         songArtistLabel.setSelected(true);
-    }
-
-    public void updateUI(ArrayList<String> playlist){
-        songIndex=0;
-        this.playlist.clear();
-
-        this.playlist.addAll(playlist);
-        updateUI(songIndex);
-        btnPlay.setImageResource(R.drawable.play_button);
+        btnPlay.setImageResource(R.drawable.pause_button);
 
     }
-
 
     public void updateProgressBar() {
         mHandler.postDelayed(mUpdateTimeTask, 100);
@@ -274,7 +259,8 @@ public class FragmentPlayer extends Fragment implements SeekBar.OnSeekBarChangeL
         Cursor oldCursor = cursor;
         cursor = newCursor;
         if (newCursor != null) {
-            updateUI(songIndex);
+            updateUI(0);
+            btnPlay.setImageResource(R.drawable.play_button);
         }
         return oldCursor;
     }
