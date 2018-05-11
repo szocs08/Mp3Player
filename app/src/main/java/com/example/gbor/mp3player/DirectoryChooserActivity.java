@@ -24,74 +24,26 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-public class ActivityDirectoryChooser extends AppCompatActivity {
+public class DirectoryChooserActivity extends AppCompatActivity {
 
-    private class DirectoryAdapter extends ArrayAdapter<String>{
-
-        private final Activity context;
-        private ArrayList<String> itemData;
-
-        private DirectoryAdapter(Activity context, ArrayList<String> itemData) {
-            super(context,R.layout.directory_chooser_item, itemData);
-            this.context = context;
-            this.itemData = itemData;
-        }
-
-        @NonNull
-        @Override
-        public View getView(int position, @Nullable View convertView, @NonNull ViewGroup parent) {
-            LayoutInflater li = context.getLayoutInflater();
-            ViewHolder holder;
-            if (convertView == null){
-                convertView = li.inflate(R.layout.directory_chooser_item, parent, false);
-                holder = new ViewHolder();
-                holder.icon = (ImageView) convertView.findViewById(R.id.icon_view);
-                holder.fileName = (TextView) convertView.findViewById(R.id.file_name);
-                holder.fileSize = (TextView) convertView.findViewById(R.id.file_size);
-                convertView.setTag(holder);
-            }else{
-                holder = (ViewHolder) convertView.getTag();
-            }
-
-            holder.fileName.setText(itemData.get(position).substring(itemData.get(position).lastIndexOf('/')+1));
-            File file = new File(itemData.get(position));
-            if(!itemData.get(position).equalsIgnoreCase("..")) {
-                if (file.isDirectory()) {
-                    holder.fileSize.setText(getString(R.string.dir));
-                    holder.icon.setImageResource(R.drawable.folder_icon);
-                } else {
-                    holder.fileSize.setText(String.valueOf(file.length() +
-                            getString(R.string.bytes)));
-                    holder.icon.setImageResource(R.drawable.file_icon);
-                }
-            }else{
-                holder.icon.setImageResource(R.drawable.back_icon);
-                holder.fileSize.setText(getString(R.string.previous));
-
-            }
-            return convertView;
-        }
-    }
-
-
-    private String path;
+    private String mPath;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_directory_chooser);
-        ListView listView = (ListView) findViewById(R.id.directory_list);
-        path = Environment.getExternalStorageDirectory().toString();
-        if(getIntent().hasExtra("path"))
-            path=getIntent().getStringExtra("path");
+        ListView listView = findViewById(R.id.directory_list);
+        mPath = Environment.getExternalStorageDirectory().toString();
+        if(getIntent().hasExtra("mPath"))
+            mPath =getIntent().getStringExtra("mPath");
 
         final ArrayList<String> values = new ArrayList<>();
         values.add("..");
-        String[] list = new File(path).list();
+        String[] list = new File(mPath).list();
         if (list != null) {
             for (String file : list) {
                 if (!file.startsWith(".")) {
-                    values.add(path+"/"+file);
+                    values.add(mPath +"/"+file);
                 }
             }
         }
@@ -106,32 +58,32 @@ public class ActivityDirectoryChooser extends AppCompatActivity {
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 if(!values.get(position).equalsIgnoreCase("..")) {
                     if(new File(values.get(position)).isDirectory()) {
-                        path = values.get(position);
+                        mPath = values.get(position);
                         values.clear();
                         values.add("..");
-                        String[] list = new File(path).list();
+                        String[] list = new File(mPath).list();
                         if (list != null) {
                             for (String file : list) {
                                 if (!file.startsWith(".")) {
-                                    values.add(path+"/"+file);
+                                    values.add(mPath +"/"+file);
                                 }
                             }
                         }
                         categorize(values);
                         directoryAdapter.notifyDataSetChanged();
-                    }else{
-                        Toast.makeText(ActivityDirectoryChooser.this, getString(R.string.directory_message), Toast.LENGTH_SHORT).show();
+                    } else {
+                        Toast.makeText(DirectoryChooserActivity.this, getString(R.string.directory_message), Toast.LENGTH_SHORT).show();
                     }
-                }else{
-                    if(!path.equalsIgnoreCase(Environment.getExternalStorageDirectory().toString())) {
-                        path = path.substring(0, path.lastIndexOf('/'));
+                } else {
+                    if(!mPath.equalsIgnoreCase(Environment.getExternalStorageDirectory().toString())) {
+                        mPath = mPath.substring(0, mPath.lastIndexOf('/'));
                         values.clear();
                         values.add("..");
-                        String[] list = new File(path).list();
+                        String[] list = new File(mPath).list();
                         if (list != null) {
                             for (String file : list) {
                                 if (!file.startsWith(".")) {
-                                    values.add(path + "/" + file);
+                                    values.add(mPath + "/" + file);
                                 }
                             }
                         }
@@ -143,12 +95,12 @@ public class ActivityDirectoryChooser extends AppCompatActivity {
         });
 
 
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.save_button);
+        FloatingActionButton fab = findViewById(R.id.save_button);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 Intent data = new Intent();
-                data.setData(Uri.parse(path));
+                data.setData(Uri.parse(mPath));
                 setResult(RESULT_OK,data);
                 finish();
             }
@@ -177,10 +129,57 @@ public class ActivityDirectoryChooser extends AppCompatActivity {
         values.addAll(valueFile);
     }
 
-
     static class ViewHolder {
         TextView fileName;
         TextView fileSize;
         ImageView icon;
     }
+
+    private class DirectoryAdapter extends ArrayAdapter<String>{
+
+        private final Activity mContext;
+        private ArrayList<String> mItemData;
+
+        private DirectoryAdapter(Activity context, ArrayList<String> itemData) {
+            super(context,R.layout.item_file, itemData);
+            mContext = context;
+            mItemData = itemData;
+        }
+
+        @NonNull
+        @Override
+        public View getView(int position, @Nullable View convertView, @NonNull ViewGroup parent) {
+            LayoutInflater li = mContext.getLayoutInflater();
+            ViewHolder holder;
+            if (convertView == null){
+                convertView = li.inflate(R.layout.item_file, parent, false);
+                holder = new ViewHolder();
+                holder.icon = convertView.findViewById(R.id.icon_view);
+                holder.fileName = convertView.findViewById(R.id.file_name);
+                holder.fileSize = convertView.findViewById(R.id.file_size);
+                convertView.setTag(holder);
+            }else{
+                holder = (ViewHolder) convertView.getTag();
+            }
+
+            holder.fileName.setText(mItemData.get(position).substring(mItemData.get(position).lastIndexOf('/')+1));
+            File file = new File(mItemData.get(position));
+            if(!mItemData.get(position).equalsIgnoreCase("..")) {
+                if (file.isDirectory()) {
+                    holder.fileSize.setText(getString(R.string.dir));
+                    holder.icon.setImageResource(R.drawable.ic_folder);
+                } else {
+                    holder.fileSize.setText(String.valueOf(file.length() +
+                            getString(R.string.bytes)));
+                    holder.icon.setImageResource(R.drawable.ic_file);
+                }
+            }else{
+                holder.icon.setImageResource(R.drawable.ic_back);
+                holder.fileSize.setText(getString(R.string.previous));
+
+            }
+            return convertView;
+        }
+    }
+
 }
