@@ -194,7 +194,7 @@ public class PlayerFragment extends Fragment implements SeekBar.OnSeekBarChangeL
     }
 
 
-    public void updateUI(int songIndex) {
+public void updateUI(int songIndex)     {
         try {
             if ((mCursor.getCount()>0)){
                 mCursor.moveToPosition(songIndex);
@@ -233,6 +233,9 @@ public class PlayerFragment extends Fragment implements SeekBar.OnSeekBarChangeL
         }
 
         mSongArtistLabel.setSelected(true);
+        mSongTitleLabel.setSelected(true);
+        mSongAlbumLabel.setSelected(true);
+
         mBtnPlay.setImageResource(R.drawable.pause_button);
 
     }

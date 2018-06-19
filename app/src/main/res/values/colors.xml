@@ -9,4 +9,8 @@
     <color name="list_select_color">#9fa3ff</color>
     <color name="divider_color">#1e1e1e</color>
     <color name="text_color">#171d5e</color>
+    <color name="playlist_background">#00021a</color>
+    <color name="list_color_playlist">#000000</color>
+    <color name="list_playlist_text">#ffffff</color>
+    <color name="list_playlist_select_text">#6f6d6d</color>
 </resources>

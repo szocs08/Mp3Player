@@ -12,4 +12,9 @@
     <dimen name="option_value_text_size">10sp</dimen>
     <dimen name="option_pad">1dp</dimen>
     <dimen name="toolbar_height">35dp</dimen>
+    <dimen name="playlist_title_pad">8dp</dimen>
+    <dimen name="seek_bar_pad">5dp</dimen>
+    <dimen name="playlist_controls_margin">5dp</dimen>
+    <dimen name="playlist_item_text_size">20sp</dimen>
+    <dimen name="playlist_list_item_pad">15dp</dimen>
 </resources>

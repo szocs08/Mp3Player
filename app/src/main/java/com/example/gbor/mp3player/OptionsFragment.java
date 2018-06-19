@@ -39,7 +39,9 @@ public class OptionsFragment extends ListFragment {
         for (String option : getResources().getStringArray(R.array.options_list)) {
             mOptionData = new HashMap<>();
             mOptionData.put("optionName", option);
-            mOptionData.put("optionValue", getArguments().getString("path"));
+            if (getArguments() != null) {
+                mOptionData.put("optionValue", getArguments().getString("path"));
+            }
             optionDataList.add(mOptionData);
         }
 
@@ -105,8 +107,8 @@ public class OptionsFragment extends ListFragment {
             if(convertView == null){
                 holder = new ViewHolder();
                 convertView = li.inflate(R.layout.item_options, parent, false);
-                holder.optionName = (TextView) convertView.findViewById(R.id.option_name);
-                holder.optionValue = (TextView) convertView.findViewById(R.id.option_value);
+                holder.optionName =  convertView.findViewById(R.id.option_name);
+                holder.optionValue = convertView.findViewById(R.id.option_value);
                 convertView.setTag(holder);
             }else{
                 holder = (ViewHolder) convertView.getTag();

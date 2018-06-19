@@ -123,8 +123,11 @@
             android:layout_height="0dp"
             android:layout_margin="@dimen/seek_bar_margin"
             android:layout_weight="1"
+            android:paddingLeft="@dimen/seek_bar_pad"
+            android:paddingRight="@dimen/seek_bar_pad"
             android:progressDrawable="@drawable/seekbar_progress"
-            android:thumb="@drawable/seek_button_layout" />
+            android:thumb="@drawable/seek_button_layout"
+            android:thumbOffset="@dimen/seek_bar_pad" />
 
     </LinearLayout>
 
@@ -137,7 +140,11 @@
         android:layout_below="@+id/seek_duration"
         android:background="@color/player_buttons_color"
         android:gravity="center"
-        android:orientation="horizontal">
+        android:orientation="horizontal"
+        android:paddingLeft="@dimen/seek_bar_pad"
+        android:paddingStart="@dimen/seek_bar_pad"
+        android:paddingRight="@dimen/seek_bar_pad"
+        >
 
         <ImageButton
             android:id="@+id/repeat_button"

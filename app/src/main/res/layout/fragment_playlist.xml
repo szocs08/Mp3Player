@@ -1,13 +1,34 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/RelativeLayout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical">
+    android:background="@color/list_color">
+
+    <LinearLayout
+        android:id="@+id/playlist_title"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:background="@color/playlist_background"
+        android:orientation="horizontal">
+
+        <TextView
+            android:id="@+id/playlist_name"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="@dimen/playlist_title_pad"
+            android:text="@string/all_songs"
+            android:textColor="@color/list_select_color"
+            android:textSize="18sp" />
+    </LinearLayout>
 
     <ListView
         android:id="@android:id/list"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:layout_above="@+id/playlist_controls"
+        android:layout_below="@+id/playlist_title"
         android:background="@color/background_color"
         android:divider="@color/divider_color"
         android:dividerHeight="1dp"
@@ -15,4 +36,48 @@
 
     </ListView>
 
-</LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/playlist_controls"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:background="@drawable/border"
+        android:divider="@drawable/divider"
+        android:orientation="horizontal"
+        android:padding="@dimen/option_pad"
+        android:showDividers="middle">
+
+        <ImageButton
+            android:id="@+id/playlist_button"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_margin="@dimen/playlist_controls_margin"
+            android:layout_weight="1"
+            android:background="@null"
+            android:contentDescription="@string/playlist_button"
+            android:src="@drawable/playlist_button" />
+
+        <ImageButton
+            android:id="@+id/playlist_add_button"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_margin="@dimen/playlist_controls_margin"
+            android:layout_weight="1"
+            android:background="@null"
+            android:contentDescription="@string/playlist_add_button"
+            android:src="@drawable/playlist_add_button" />
+
+        <ImageButton
+            android:id="@+id/playlist_remove_button"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_margin="@dimen/playlist_controls_margin"
+            android:layout_weight="1"
+            android:background="@null"
+            android:contentDescription="@string/playlist_remove_button"
+            android:src="@drawable/plalist_remove_button" />
+    </LinearLayout>
+
+
+</RelativeLayout>

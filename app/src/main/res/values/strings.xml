@@ -23,4 +23,13 @@
     <string name="next_button">Next Button</string>
     <string name="shuffle_button">Shuffle Button</string>
     <string name="icon">Icon</string>
+    <string name="all_songs">All songs</string>
+    <string name="playlist_button">Playlist Button</string>
+    <string name="playlist_add_button">Playlist Add Button</string>
+    <string name="playlist_remove_button">Playlist Remove Button</string>
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="playlist_choosing">Choose a playlist</string>
+    <string name="remove">REMOVE</string>
+    <string name="add">ADD</string>
+    <string name="ok">OK</string>
 </resources>

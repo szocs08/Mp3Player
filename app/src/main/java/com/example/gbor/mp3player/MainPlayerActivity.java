@@ -17,7 +17,6 @@ import android.support.v4.app.LoaderManager.LoaderCallbacks;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
 import android.support.v4.view.ViewPager;
-import android.util.Log;
 import android.widget.Toast;
 
 import java.io.IOException;
@@ -28,7 +27,7 @@ import static com.example.gbor.mp3player.R.id.pager;
 
 public class MainPlayerActivity extends FragmentActivity implements
         PlayerFragment.OnPlayerFragmentInteractionListener,
-        PlaylistFragment.OnListFragmentInteractionListener,
+        PlaylistFragment.OnPlaylistFragmentInteractionListener,
         MediaPlayer.OnCompletionListener,
         OptionsFragment.OnOptionsFragmentInteractionListener,
         LoaderCallbacks<Cursor>{
@@ -57,18 +56,14 @@ public class MainPlayerActivity extends FragmentActivity implements
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        Log.i("DEBUG","1");
         mSettings = getSharedPreferences(SETTINGS_FILE, Context.MODE_PRIVATE);
         setContentView(R.layout.activity_main_player);
         mSongIndex = 0;
-        mPath = mSettings.getString("mPath",Environment.getExternalStorageDirectory().toString());
-
+        mPath = mSettings.getString("path",Environment.getExternalStorageDirectory().toString());
         mViewPager = findViewById(pager);
-        Log.i("DEBUG","2");
         mPagerAdapter = new PlayerPagerAdapter(getSupportFragmentManager(),
                 mSongIndex, mPlayerFragment, mPlaylistFragment, mOptionsFragment, mPath);
         getSupportLoaderManager().initLoader(SONG_QUERY,null,this);
-        Log.i("DEBUG","3");
 
 
 
@@ -78,7 +73,7 @@ public class MainPlayerActivity extends FragmentActivity implements
     public void optionOperations(int position) {
         if(position==0){
             Intent intent = new Intent(this,DirectoryChooserActivity.class);
-            intent.putExtra("mPath", mPath);
+            intent.putExtra("path", mPath);
             startActivityForResult(intent,FOLDER_CHOOSING_REQUEST);
         }
 
@@ -90,11 +85,9 @@ public class MainPlayerActivity extends FragmentActivity implements
         switch(requestCode){
             case FOLDER_CHOOSING_REQUEST:
                 if(resultCode==RESULT_OK){
-
-
                     mPath =data.getDataString();
                     SharedPreferences.Editor editor = mSettings.edit();
-                    editor.putString("mPath", mPath);
+                    editor.putString("path", mPath);
                     editor.apply();
                     mIsSwitching =true;
                     mMediaPlayer.stop();
@@ -259,9 +252,8 @@ public class MainPlayerActivity extends FragmentActivity implements
 
     @NonNull
     @Override
-    public Loader onCreateLoader(int id, Bundle args) {
+    public Loader<Cursor> onCreateLoader(int id, Bundle args) {
         SharedPreferences settings = getSharedPreferences(SETTINGS_FILE, Context.MODE_PRIVATE);
-
         String[] songProj = {MediaStore.Audio.Media._ID,
                 MediaStore.Audio.Media.DATA,
                 MediaStore.Audio.Media.TITLE,
@@ -271,7 +263,7 @@ public class MainPlayerActivity extends FragmentActivity implements
         };
 
         String songSelect = MediaStore.Audio.Media.DATA + " like ?";
-        String[] selectArgs = new String[]{settings.getString("mPath", Environment.getExternalStorageDirectory().toString()) + "%"};
+        String[] selectArgs = new String[]{mPath + "%"};
         return new CursorLoader(this, MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,
                 songProj,
                 songSelect,
@@ -289,9 +281,7 @@ public class MainPlayerActivity extends FragmentActivity implements
         }
         if(mPagerAdapter !=null && cursor!=null){
             mPagerAdapter.changeCursor(cursor);
-            Log.i("CURSOR","OnLoadFinished: fasza");
-        }else
-            Log.v("asdasdasd","OnLoadFinished: mAdapter is null");
+        }
     }
 
     @Override
@@ -325,7 +315,7 @@ public class MainPlayerActivity extends FragmentActivity implements
 
             switch (position) {
                 case 0:
-                    args.putString("mPath",mPath);
+                    args.putString("path",mPath);
                     mOptionsFragment.setArguments(args);
                     return mOptionsFragment;
 

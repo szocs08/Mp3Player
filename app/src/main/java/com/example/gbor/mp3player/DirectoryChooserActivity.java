@@ -2,6 +2,7 @@ package com.example.gbor.mp3player;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
@@ -20,6 +21,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import java.io.File;
+import java.net.URLConnection;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -34,8 +36,8 @@ public class DirectoryChooserActivity extends AppCompatActivity {
         setContentView(R.layout.activity_directory_chooser);
         ListView listView = findViewById(R.id.directory_list);
         mPath = Environment.getExternalStorageDirectory().toString();
-        if(getIntent().hasExtra("mPath"))
-            mPath =getIntent().getStringExtra("mPath");
+        if(getIntent().hasExtra("path"))
+            mPath =getIntent().getStringExtra("path");
 
         final ArrayList<String> values = new ArrayList<>();
         values.add("..");
@@ -75,7 +77,7 @@ public class DirectoryChooserActivity extends AppCompatActivity {
                         Toast.makeText(DirectoryChooserActivity.this, getString(R.string.directory_message), Toast.LENGTH_SHORT).show();
                     }
                 } else {
-                    if(!mPath.equalsIgnoreCase(Environment.getExternalStorageDirectory().toString())) {
+                    if(!mPath.equalsIgnoreCase(Environment.getRootDirectory().toString())) {
                         mPath = mPath.substring(0, mPath.lastIndexOf('/'));
                         values.clear();
                         values.add("..");
@@ -169,9 +171,17 @@ public class DirectoryChooserActivity extends AppCompatActivity {
                     holder.fileSize.setText(getString(R.string.dir));
                     holder.icon.setImageResource(R.drawable.ic_folder);
                 } else {
+                    holder.icon.setImageResource(R.drawable.ic_non_audio_file);
+                    try {
+                        if(URLConnection.guessContentTypeFromName(file.getAbsolutePath()).startsWith("audio"))
+                            holder.icon.setImageResource(R.drawable.ic_audio_file);
+                    } catch (NullPointerException e) {
+                        e.printStackTrace();
+                    }
+
                     holder.fileSize.setText(String.valueOf(file.length() +
                             getString(R.string.bytes)));
-                    holder.icon.setImageResource(R.drawable.ic_file);
+
                 }
             }else{
                 holder.icon.setImageResource(R.drawable.ic_back);
