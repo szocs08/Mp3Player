@@ -1,6 +1,8 @@
 package com.example.gbor.mp3player;
 
+import android.app.Activity;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.provider.MediaStore;
@@ -17,8 +19,12 @@ import android.widget.TextView;
 
 public class PlaylistFragment extends ListFragment implements PlaylistDialogFragment.OnPlaylistDialogFragmentInteractionListener{
 
+    private static final String PLAYLIST_FILE = "com.example.gbor.mp3player.Playlist";
+
     private OnPlaylistFragmentInteractionListener mInteractionListener;
     private SongAdapter mSongAdapter;
+    private SharedPreferences mPlaylist;
+    private Activity mActivity;
 
     public interface OnPlaylistFragmentInteractionListener {
         void startSelectedSong(int position);
@@ -47,6 +53,11 @@ public class PlaylistFragment extends ListFragment implements PlaylistDialogFrag
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        if (getActivity() != null) {
+            mActivity = getActivity();
+        }
+        mPlaylist = mActivity.getSharedPreferences(PLAYLIST_FILE, Context.MODE_PRIVATE);
+
 
     }
 
@@ -57,7 +68,7 @@ public class PlaylistFragment extends ListFragment implements PlaylistDialogFrag
         playlistButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                showDialog(v);
+                showDialog();
             }
         });
         return view;
@@ -81,11 +92,11 @@ public class PlaylistFragment extends ListFragment implements PlaylistDialogFrag
         mInteractionListener = null;
     }
 
-    public void showDialog(View view) {
+    public void showDialog() {
         Bundle args = new Bundle();
         String[] array = {"ITEM1","ITEM2","ITEM3","ITEM4","ITEM5","ITEM6","ITEM7","ITEM8"};
         args.putStringArray("array",array);
-        FragmentManager manager = getActivity().getFragmentManager();
+        FragmentManager manager = mActivity.getFragmentManager();
         PlaylistDialogFragment dialog = new PlaylistDialogFragment();
         dialog.setArguments(args);
         dialog.show(manager,"PlaylistSelectionDialog");

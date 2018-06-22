@@ -35,7 +35,9 @@ public class MainPlayerActivity extends FragmentActivity implements
     private static final int FOLDER_CHOOSING_REQUEST = 1;
     private static final int SONG_QUERY = 1;
 
-    private static final String SETTINGS_FILE = "com.example.gbor.mp3player.mSettings";
+    private static final String SETTINGS_FILE = "com.example.gbor.mp3player.Settings";
+
+
 
     private MediaPlayer mMediaPlayer;
 
@@ -44,6 +46,7 @@ public class MainPlayerActivity extends FragmentActivity implements
     private final OptionsFragment mOptionsFragment = new OptionsFragment();
 
     private SharedPreferences mSettings;
+
     private int mSongIndex;
     private boolean mIsShuffle = false;
     private boolean mIsRepeat = false;
@@ -57,6 +60,7 @@ public class MainPlayerActivity extends FragmentActivity implements
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mSettings = getSharedPreferences(SETTINGS_FILE, Context.MODE_PRIVATE);
+
         setContentView(R.layout.activity_main_player);
         mSongIndex = 0;
         mPath = mSettings.getString("path",Environment.getExternalStorageDirectory().toString());

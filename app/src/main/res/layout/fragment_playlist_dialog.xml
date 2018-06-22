@@ -45,15 +45,5 @@
             android:text="@string/remove"
             android:textColor="@color/playlist_dialog_button" />
 
-        <Button
-            android:id="@+id/ok_button"
-            style="?android:attr/borderlessButtonStyle"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:background="@null"
-            android:padding="@dimen/playlist_item_pad"
-            android:text="@string/ok"
-            android:textColor="@color/playlist_dialog_button" />
     </LinearLayout>
 </RelativeLayout>
