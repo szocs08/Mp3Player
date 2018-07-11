@@ -10,12 +10,13 @@
         android:id="@+id/playlist_list"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_above="@+id/playlist_selection_controlls">
+        android:layout_above="@+id/playlist_selection_controls"
+        android:listSelector="@drawable/list_selector_playlist">
 
     </ListView>
 
     <LinearLayout
-        android:id="@+id/playlist_selection_controlls"
+        android:id="@+id/playlist_selection_controls"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"

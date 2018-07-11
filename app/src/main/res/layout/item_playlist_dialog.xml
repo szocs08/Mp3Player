@@ -1,8 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
-<TextView xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@android:id/text1"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
+    android:layout_height="match_parent"
     android:background="@drawable/list_selector_playlist"
-    android:padding="@dimen/playlist_list_item_pad"
-    android:textSize="@dimen/playlist_item_text_size" />
+    android:padding="@dimen/playlist_list_item_pad">
+
+    <TextView
+        android:id="@+id/dialog_playlist_name"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textColor="@color/playlist_dialog_item"
+        android:textSize="@dimen/playlist_item_text_size" />
+</LinearLayout>

@@ -281,7 +281,7 @@ public class MainPlayerActivity extends FragmentActivity implements
         initialize();
         if(mViewPager.getAdapter()==null) {
             mViewPager.setAdapter(mPagerAdapter);
-            mViewPager.setCurrentItem(1);
+            mViewPager.setCurrentItem(2);
         }
         if(mPagerAdapter !=null && cursor!=null){
             mPagerAdapter.changeCursor(cursor);
