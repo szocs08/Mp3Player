@@ -32,4 +32,6 @@
     <string name="remove">REMOVE</string>
     <string name="add">ADD</string>
     <string name="ok">OK</string>
+    <string name="new_playlist">New Playlist Name</string>
+    <string name="create">Create</string>
 </resources>

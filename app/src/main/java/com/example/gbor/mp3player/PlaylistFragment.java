@@ -15,16 +15,21 @@ import android.widget.CursorAdapter;
 import android.widget.ImageButton;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
 
-public class PlaylistFragment extends ListFragment implements PlaylistDialogFragment.OnPlaylistDialogFragmentInteractionListener{
+public class PlaylistFragment extends ListFragment{
 
-    private static final String PLAYLIST_FILE = "com.example.gbor.mp3player.Playlist";
 
     private OnPlaylistFragmentInteractionListener mInteractionListener;
     private SongAdapter mSongAdapter;
-    private SharedPreferences mPlaylist;
     private Activity mActivity;
+
+
 
     public interface OnPlaylistFragmentInteractionListener {
         void startSelectedSong(int position);
@@ -56,7 +61,7 @@ public class PlaylistFragment extends ListFragment implements PlaylistDialogFrag
         if (getActivity() != null) {
             mActivity = getActivity();
         }
-        mPlaylist = mActivity.getSharedPreferences(PLAYLIST_FILE, Context.MODE_PRIVATE);
+
 
 
     }
@@ -93,12 +98,8 @@ public class PlaylistFragment extends ListFragment implements PlaylistDialogFrag
     }
 
     public void showDialog() {
-        Bundle args = new Bundle();
-        String[] array = {"ITEM1","ITEM2","ITEM3","ITEM4","ITEM5","ITEM6","ITEM7","ITEM8"};
-        args.putStringArray("array",array);
         FragmentManager manager = mActivity.getFragmentManager();
         PlaylistDialogFragment dialog = new PlaylistDialogFragment();
-        dialog.setArguments(args);
         dialog.show(manager,"PlaylistSelectionDialog");
 
     }

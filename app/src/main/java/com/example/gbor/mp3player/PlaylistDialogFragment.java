@@ -1,51 +1,66 @@
 package com.example.gbor.mp3player;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.app.DialogFragment;
 import android.content.Context;
-import android.os.Build;
+import android.content.DialogInterface;
+import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.os.VibrationEffect;
-import android.os.Vibrator;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.v4.content.ContextCompat;
+import android.text.InputType;
+import android.view.HapticFeedbackConstants;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
+import java.util.Map;
 import java.util.TreeMap;
 
 
 public class PlaylistDialogFragment extends DialogFragment {
     private OnPlaylistDialogFragmentInteractionListener mListener;
+    private static final String PLAYLIST_FILE = "com.example.gbor.mp3player.Playlist";
+    private SharedPreferences mPlaylists;
+
 
     ListView mListView;
     Button mRemoveButton;
     Button mAddButton;
     List<Integer> mPositions = new ArrayList<>();
-    final static String ARRAY_KEY = "array";
     boolean mIsSelecting = false;
-    TreeMap<String,Boolean> mMap = new TreeMap<>();
+    TreeMap<String,Boolean> mMap = new TreeMap<>(new PlaylistComparator());
     PlaylistAdapter mAdapter;
 
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
+        mPlaylists = getActivity().getSharedPreferences(PLAYLIST_FILE, Context.MODE_PRIVATE);
+        if (getActivity() instanceof OnPlaylistDialogFragmentInteractionListener) {
+            mListener = (OnPlaylistDialogFragmentInteractionListener) getActivity();
+        } else {
+            throw new RuntimeException(getActivity().toString()
+                    + " must implement OnPlayerFragmentInteractionListener");
+        }
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
+                             final Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_playlist_dialog, container, false);
 
         if (getDialog().getWindow() != null) {
@@ -73,19 +88,11 @@ public class PlaylistDialogFragment extends DialogFragment {
         mListView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
             @Override
             public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
-                Vibrator v = (Vibrator) getActivity().getSystemService(Context.VIBRATOR_SERVICE);
-                if (v != null) {
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                        v.vibrate(VibrationEffect.createOneShot(50,VibrationEffect.DEFAULT_AMPLITUDE));
-                    }else{
-                        v.vibrate(50);
-                    }
-                }
+                view.performHapticFeedback(HapticFeedbackConstants.LONG_PRESS);
                 mIsSelecting = true;
                 mRemoveButton.setEnabled(true);
                 mAddButton.setEnabled(false);
                 mMap.put((String)mMap.keySet().toArray()[0],true);
-                mMap.put((String)mMap.keySet().toArray()[position],true);
                 selecting(position);
                 mAdapter.notifyDataSetChanged();
                 return true;
@@ -95,15 +102,39 @@ public class PlaylistDialogFragment extends DialogFragment {
         mAddButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Toast.makeText(getActivity(),"add button", Toast.LENGTH_LONG).show();
-                dismiss();
+                AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+                final EditText editText = new EditText(getActivity());
+                builder.setTitle(getString(R.string.new_playlist));
+                editText.setInputType(InputType.TYPE_CLASS_TEXT);
+                builder.setView(editText);
+                builder.setPositiveButton(R.string.create, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        String name = editText.getText().toString();
+                        mListener.playlistAddButton(name);
+                        mMap.put(name,false);
+                        mAdapter.add(name);
+                        Collections.sort(mAdapter.mItemData,new PlaylistComparator());
+                        mAdapter.notifyDataSetChanged();
+                        dialog.dismiss();
+                    }
+                });
+                builder.show();
             }
         });
 
         mRemoveButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Toast.makeText(getActivity(),"remove button", Toast.LENGTH_LONG).show();
+                List<String> names = new ArrayList<>();
+                for (int i = 0; i < mAdapter.mItemData.size(); i++){
+                    if (mPositions.contains(i)) {
+                        names.add(mAdapter.mItemData.get(i));
+                    }
+                }
+                mAdapter.mItemData.removeAll(names);
+                mAdapter.notifyDataSetChanged();
+                mListener.playlistRemoveButton(names);
                 dismiss();
             }
         });
@@ -113,16 +144,18 @@ public class PlaylistDialogFragment extends DialogFragment {
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        Bundle arguments = getArguments();
-        String[] stringArray = arguments.getStringArray(ARRAY_KEY);
-        mMap.put(getString(R.string.all_songs),false);
-        if (stringArray != null) {
-            for (String string : stringArray)
-                mMap.put(string,false);
+
+        List<String> array = new ArrayList<>();
+        array.add(getString(R.string.all_songs));
+        for (Map.Entry<String, ?> entry : mPlaylists.getAll().entrySet()){
+            array.add(entry.getKey());
         }
+        for (String string : array)
+            mMap.put(string,false);
+
         try {
             mAdapter = new PlaylistAdapter(getActivity(),
-                    mMap.keySet().toArray(new String[mMap.keySet().size()]));
+                    new ArrayList<>(mMap.keySet()));
             mListView.setAdapter(mAdapter);
         }catch (Exception e) {
             e.printStackTrace();
@@ -132,16 +165,6 @@ public class PlaylistDialogFragment extends DialogFragment {
 
     }
 
-    @Override
-    public void onAttach(Context context) {
-        super.onAttach(context);
-        if (context instanceof OnPlaylistDialogFragmentInteractionListener) {
-            mListener = (OnPlaylistDialogFragmentInteractionListener) context;
-        } else {
-            throw new RuntimeException(context.toString()
-                    + " must implement OnPlaylistDialogFragmentInteractionListener");
-        }
-    }
 
     @Override
     public void onDetach() {
@@ -177,10 +200,10 @@ public class PlaylistDialogFragment extends DialogFragment {
     private class PlaylistAdapter extends ArrayAdapter<String> {
 
         Activity mContext;
-        String[] mItemData;
+        ArrayList<String> mItemData;
 
 
-        PlaylistAdapter(Activity context, String[] itemData) {
+        PlaylistAdapter(Activity context, ArrayList<String> itemData) {
             super(context,R.layout.item_playlist_dialog,itemData);
             mContext=context;
             mItemData = itemData;
@@ -199,16 +222,16 @@ public class PlaylistDialogFragment extends DialogFragment {
             }else{
                 holder = (ViewHolder) convertView.getTag();
             }
-            holder.playlistName.setText(mItemData[position]);
+            holder.playlistName.setText(mItemData.get(position));
             if (position > 0) {
-                if(mMap.get(mItemData[position])) {
-                    convertView.setBackgroundColor(getResources().getColor(R.color.list_select_color));
-                    holder.playlistName.setTextColor(getResources().getColor(R.color.list_color_playlist));
+                if(mMap.get(mItemData.get(position))) {
+                    convertView.setBackgroundColor(ContextCompat.getColor(getContext(),R.color.list_select_color));
+                    holder.playlistName.setTextColor(ContextCompat.getColor(getContext(),R.color.list_color_playlist));
                 }else {
-                    convertView.setBackgroundColor(getResources().getColor(R.color.list_color_playlist));
-                    holder.playlistName.setTextColor(getResources().getColor(R.color.list_color));
+                    convertView.setBackgroundColor(ContextCompat.getColor(getContext(),R.color.list_color_playlist));
+                    holder.playlistName.setTextColor(ContextCompat.getColor(getContext(),R.color.list_color));
                 }
-            }else if (mMap.get(mItemData[position])) {
+            }else if (mMap.get(mItemData.get(position))) {
                 convertView.setEnabled(false);
                 holder.playlistName.setEnabled(false);
             }else {
@@ -223,7 +246,21 @@ public class PlaylistDialogFragment extends DialogFragment {
 
 
     interface OnPlaylistDialogFragmentInteractionListener {
+        void playlistRemoveButton(List<String> names);
+        void playlistAddButton(String name);
+    }
 
+    static class PlaylistComparator implements Comparator<String>{
+        @Override
+        public int compare(String o1, String o2) {
+            if (o1.equalsIgnoreCase(o2))
+                return o1.compareToIgnoreCase(o2);
+            if (o1.equalsIgnoreCase("all songs"))
+                return -1;
+            if (o2.equalsIgnoreCase("all songs"))
+                return 1;
+            return o1.compareToIgnoreCase(o2);
+        }
     }
 
 }

@@ -1,10 +1,13 @@
 package com.example.gbor.mp3player;
 
+import android.content.ContentResolver;
+import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.media.MediaPlayer;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
@@ -17,9 +20,11 @@ import android.support.v4.app.LoaderManager.LoaderCallbacks;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
 import android.support.v4.view.ViewPager;
+import android.util.Log;
 import android.widget.Toast;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.Random;
 
 import static com.example.gbor.mp3player.R.id.pager;
@@ -30,13 +35,14 @@ public class MainPlayerActivity extends FragmentActivity implements
         PlaylistFragment.OnPlaylistFragmentInteractionListener,
         MediaPlayer.OnCompletionListener,
         OptionsFragment.OnOptionsFragmentInteractionListener,
+        PlaylistDialogFragment.OnPlaylistDialogFragmentInteractionListener,
         LoaderCallbacks<Cursor>{
 
     private static final int FOLDER_CHOOSING_REQUEST = 1;
     private static final int SONG_QUERY = 1;
 
     private static final String SETTINGS_FILE = "com.example.gbor.mp3player.Settings";
-
+    private static final String PLAYLIST_FILE = "com.example.gbor.mp3player.Playlist";
 
 
     private MediaPlayer mMediaPlayer;
@@ -46,6 +52,7 @@ public class MainPlayerActivity extends FragmentActivity implements
     private final OptionsFragment mOptionsFragment = new OptionsFragment();
 
     private SharedPreferences mSettings;
+    private SharedPreferences mPlaylist;
 
     private int mSongIndex;
     private boolean mIsShuffle = false;
@@ -60,7 +67,7 @@ public class MainPlayerActivity extends FragmentActivity implements
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mSettings = getSharedPreferences(SETTINGS_FILE, Context.MODE_PRIVATE);
-
+        mPlaylist = getSharedPreferences(PLAYLIST_FILE, Context.MODE_PRIVATE);
         setContentView(R.layout.activity_main_player);
         mSongIndex = 0;
         mPath = mSettings.getString("path",Environment.getExternalStorageDirectory().toString());
@@ -257,7 +264,6 @@ public class MainPlayerActivity extends FragmentActivity implements
     @NonNull
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
-        SharedPreferences settings = getSharedPreferences(SETTINGS_FILE, Context.MODE_PRIVATE);
         String[] songProj = {MediaStore.Audio.Media._ID,
                 MediaStore.Audio.Media.DATA,
                 MediaStore.Audio.Media.TITLE,
@@ -290,6 +296,34 @@ public class MainPlayerActivity extends FragmentActivity implements
 
     @Override
     public void onLoaderReset(@NonNull Loader loader) {
+
+    }
+
+    @Override
+    public void playlistRemoveButton(List<String> names) {
+        SharedPreferences.Editor editor = mPlaylist.edit();
+        for (String name: names) {
+            editor.remove(name);
+        }
+        editor.apply();
+    }
+
+    @Override
+    public void playlistAddButton(String name) {
+        SharedPreferences.Editor editor = mPlaylist.edit();
+        ContentResolver contentResolver = getContentResolver();
+        ContentValues contentValues = new ContentValues();
+        int playlistId = -1;
+        contentValues.put(MediaStore.Audio.Playlists.NAME, name);
+        contentValues.put(MediaStore.Audio.Playlists.DATE_ADDED, System.currentTimeMillis());
+        contentValues.put(MediaStore.Audio.Playlists.DATE_MODIFIED, System.currentTimeMillis());
+        Uri uri = contentResolver.insert(MediaStore.Audio.Playlists.EXTERNAL_CONTENT_URI, contentValues);
+        if (uri != null) {
+            String[] path= uri.getPath().split("/");
+            playlistId = Integer.parseInt(path[path.length - 1]);
+        }
+        editor.putString(name, String.valueOf(playlistId));
+        editor.apply();
 
     }
 
