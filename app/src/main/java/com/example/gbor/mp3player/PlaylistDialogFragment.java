@@ -77,7 +77,8 @@ public class PlaylistDialogFragment extends DialogFragment {
                     selecting(position);
                     mAdapter.notifyDataSetChanged();
                 }else {
-                    Toast.makeText(getActivity(), String.valueOf(position), Toast.LENGTH_LONG).show();
+                    String asdasdas = mAdapter.mItemData.get(position);
+                    mListener.playlistSelection(asdasdas);
                     dismiss();
                 }
             }
@@ -248,6 +249,7 @@ public class PlaylistDialogFragment extends DialogFragment {
     interface OnPlaylistDialogFragmentInteractionListener {
         void playlistRemoveButton(List<String> names);
         void playlistAddButton(String name);
+        void playlistSelection(String name);
     }
 
     static class PlaylistComparator implements Comparator<String>{
