@@ -1,12 +1,11 @@
 package com.example.gbor.mp3player;
 
 import android.app.Activity;
+import android.app.FragmentManager;
 import android.content.Context;
-import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.provider.MediaStore;
-import android.app.FragmentManager;
 import android.support.v4.app.ListFragment;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -15,11 +14,6 @@ import android.widget.CursorAdapter;
 import android.widget.ImageButton;
 import android.widget.ListView;
 import android.widget.TextView;
-import android.widget.Toast;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
 
 
 public class PlaylistFragment extends ListFragment{
@@ -28,6 +22,12 @@ public class PlaylistFragment extends ListFragment{
     private OnPlaylistFragmentInteractionListener mInteractionListener;
     private SongAdapter mSongAdapter;
     private Activity mActivity;
+    private TextView mPlaylistName;
+
+    public enum DialogTypes {
+        SWITCHING,
+        ADDING
+    }
 
 
 
@@ -69,11 +69,19 @@ public class PlaylistFragment extends ListFragment{
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_playlist, container, false);
-        ImageButton playlistButton = view.findViewById(R.id.playlist_button);
-        playlistButton.setOnClickListener(new View.OnClickListener() {
+        mPlaylistName = view.findViewById(R.id.playlist_name);
+        ImageButton playlistEditButton = view.findViewById(R.id.playlist_button);
+        ImageButton playlistSongAddButton = view.findViewById(R.id.playlist_add_button);
+        playlistEditButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                showDialog();
+                showDialog(DialogTypes.SWITCHING);
+            }
+        });
+        playlistSongAddButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                showDialog(DialogTypes.ADDING);
             }
         });
         return view;
@@ -97,11 +105,17 @@ public class PlaylistFragment extends ListFragment{
         mInteractionListener = null;
     }
 
-    public void showDialog() {
+    public void showDialog(DialogTypes type) {
         FragmentManager manager = mActivity.getFragmentManager();
+        Bundle arg = new Bundle();
+        arg.putSerializable("type",type);
         PlaylistDialogFragment dialog = new PlaylistDialogFragment();
         dialog.show(manager,"PlaylistSelectionDialog");
 
+    }
+
+    public void changeName(String name){
+        mPlaylistName.setText(name);
     }
 
     private class SongAdapter extends CursorAdapter {

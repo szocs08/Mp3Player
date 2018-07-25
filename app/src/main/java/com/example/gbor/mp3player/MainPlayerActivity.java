@@ -26,7 +26,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
-import static com.example.gbor.mp3player.R.id.multiply;
 import static com.example.gbor.mp3player.R.id.pager;
 
 
@@ -63,6 +62,7 @@ public class MainPlayerActivity extends FragmentActivity implements
     private PlayerPagerAdapter mPagerAdapter;
     private Cursor mCursor;
     private ViewPager mViewPager;
+    private int mPlaylistID = ALL_SONGS;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -77,8 +77,6 @@ public class MainPlayerActivity extends FragmentActivity implements
                 mSongIndex, mPlayerFragment, mPlaylistFragment, mOptionsFragment, mPath);
         getSupportLoaderManager().initLoader(ALL_SONGS,null,this);
         mUsedIDs.add(ALL_SONGS);
-
-
 
     }
 
@@ -241,11 +239,18 @@ public class MainPlayerActivity extends FragmentActivity implements
 
     }
 
+
+
+    @NonNull
     private String playlistDeletionSelection(List<String> names){
         StringBuilder buffer = new StringBuilder();
         buffer.append(MediaStore.Audio.Playlists._ID).append(" IN (");
         for (String name: names) {
             buffer.append(mPlaylist.getInt(name,-1)).append(", ");
+            if (mPlaylistID == mPlaylist.getInt(name,-1)) {
+                getSupportLoaderManager().restartLoader(ALL_SONGS, null, this);
+                mPlaylistFragment.changeName(getString(R.string.all_songs));
+            }
         }
         buffer.delete(buffer.length()-2,buffer.length());
         buffer.append(")");
@@ -333,7 +338,9 @@ public class MainPlayerActivity extends FragmentActivity implements
         for (String name: names) {
             editor.remove(name);
         }
+        getContentResolver().delete(MediaStore.Audio.Playlists.EXTERNAL_CONTENT_URI,playlistDeletionSelection(names),null);
         editor.apply();
+
     }
 
     @Override
@@ -344,7 +351,6 @@ public class MainPlayerActivity extends FragmentActivity implements
         contentValues.put(MediaStore.Audio.Playlists.NAME, name);
         contentValues.put(MediaStore.Audio.Playlists.DATE_ADDED, System.currentTimeMillis());
         contentValues.put(MediaStore.Audio.Playlists.DATE_MODIFIED, System.currentTimeMillis());
-//        MediaStore.Audio.Playlists.
         Uri uri = getContentResolver().insert(MediaStore.Audio.Playlists.EXTERNAL_CONTENT_URI, contentValues);
         if (uri != null) {
             String[] path= uri.getPath().split("/");
@@ -363,18 +369,18 @@ public class MainPlayerActivity extends FragmentActivity implements
 
     @Override
     public void playlistSelection(String name) {
-        Toast.makeText(this,String.valueOf(mPlaylist.getInt(name,-1)),Toast.LENGTH_LONG).show();
-        int id = mPlaylist.getInt(name,ALL_SONGS);
-        try {
-            if (mUsedIDs.contains(id))
-                getSupportLoaderManager().restartLoader(id,null,this);
-            else {
-                getSupportLoaderManager().initLoader(id, null, this);
-                mUsedIDs.add(id);
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
+        mPlaylistFragment.changeName(name);
+        mPlaylistID = mPlaylist.getInt(name,ALL_SONGS);
+        if (mUsedIDs.contains(mPlaylistID))
+            getSupportLoaderManager().restartLoader(mPlaylistID,null,this);
+        else {
+            getSupportLoaderManager().initLoader(mPlaylistID, null, this);
+            mUsedIDs.add(mPlaylistID);
         }
+    }
+
+    @Override
+    public void addSelectedSongs(String name) {
 
     }
 

@@ -21,7 +21,6 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -34,7 +33,7 @@ import java.util.TreeMap;
 public class PlaylistDialogFragment extends DialogFragment {
     private OnPlaylistDialogFragmentInteractionListener mListener;
     private static final String PLAYLIST_FILE = "com.example.gbor.mp3player.Playlist";
-    private SharedPreferences mPlaylists;
+    private SharedPreferences mPlaylistIDs;
 
 
     ListView mListView;
@@ -44,12 +43,14 @@ public class PlaylistDialogFragment extends DialogFragment {
     boolean mIsSelecting = false;
     TreeMap<String,Boolean> mMap = new TreeMap<>(new PlaylistComparator());
     PlaylistAdapter mAdapter;
+    PlaylistFragment.DialogTypes mType;
 
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        mPlaylists = getActivity().getSharedPreferences(PLAYLIST_FILE, Context.MODE_PRIVATE);
+        mPlaylistIDs = getActivity().getSharedPreferences(PLAYLIST_FILE, Context.MODE_PRIVATE);
+        mType = (PlaylistFragment.DialogTypes) getArguments().getSerializable("type");
         if (getActivity() instanceof OnPlaylistDialogFragmentInteractionListener) {
             mListener = (OnPlaylistDialogFragmentInteractionListener) getActivity();
         } else {
@@ -77,8 +78,14 @@ public class PlaylistDialogFragment extends DialogFragment {
                     selecting(position);
                     mAdapter.notifyDataSetChanged();
                 }else {
-                    String asdasdas = mAdapter.mItemData.get(position);
-                    mListener.playlistSelection(asdasdas);
+                    switch (mType) {
+                        case SWITCHING:
+                            mListener.playlistSelection(mAdapter.mItemData.get(position));
+                            break;
+                        case ADDING:
+                            mListener.addSelectedSongs(mAdapter.mItemData.get(position));
+                            break;
+                    }
                     dismiss();
                 }
             }
@@ -148,7 +155,7 @@ public class PlaylistDialogFragment extends DialogFragment {
 
         List<String> array = new ArrayList<>();
         array.add(getString(R.string.all_songs));
-        for (Map.Entry<String, ?> entry : mPlaylists.getAll().entrySet()){
+        for (Map.Entry<String, ?> entry : mPlaylistIDs.getAll().entrySet()){
             array.add(entry.getKey());
         }
         for (String string : array)
@@ -250,6 +257,7 @@ public class PlaylistDialogFragment extends DialogFragment {
         void playlistRemoveButton(List<String> names);
         void playlistAddButton(String name);
         void playlistSelection(String name);
+        void addSelectedSongs(String name);
     }
 
     static class PlaylistComparator implements Comparator<String>{
