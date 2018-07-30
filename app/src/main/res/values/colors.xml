@@ -13,4 +13,5 @@
     <color name="list_color_playlist">#000000</color>
     <color name="list_playlist_text">#ffffff</color>
     <color name="list_playlist_select_text">#6f6d6d</color>
+    <color name="list_edit_select_color">#fbe50e</color>
 </resources>

@@ -6,14 +6,20 @@ import android.content.Context;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.provider.MediaStore;
+import android.support.annotation.Nullable;
 import android.support.v4.app.ListFragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.CursorAdapter;
 import android.widget.ImageButton;
 import android.widget.ListView;
 import android.widget.TextView;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.TreeMap;
 
 
 public class PlaylistFragment extends ListFragment{
@@ -23,7 +29,8 @@ public class PlaylistFragment extends ListFragment{
     private SongAdapter mSongAdapter;
     private Activity mActivity;
     private TextView mPlaylistName;
-
+    private TreeMap<String,Boolean> mItemSelectionMap = new TreeMap<>();
+    private List<Integer> mPositions = new ArrayList<>();
     public enum DialogTypes {
         SWITCHING,
         ADDING
@@ -33,6 +40,7 @@ public class PlaylistFragment extends ListFragment{
 
     public interface OnPlaylistFragmentInteractionListener {
         void startSelectedSong(int position);
+        void longClick(int positon);
     }
 
     public void updateUI(int pos){
@@ -48,12 +56,15 @@ public class PlaylistFragment extends ListFragment{
             mSongAdapter.changeCursor(newCursor);
         }
     }
+
     @Override
-    public void onListItemClick(ListView l, View v, int position, long id) {
-        v.setSelected(true);
-        l.invalidate();
+    public void onListItemClick(ListView l, View v, int position, long id){
+//        v.setSelected(true);
+//        l.invalidate();
         mInteractionListener.startSelectedSong(position);
     }
+
+
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -84,7 +95,24 @@ public class PlaylistFragment extends ListFragment{
                 showDialog(DialogTypes.ADDING);
             }
         });
+
         return view;
+    }
+
+    @Override
+    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+        getListView().setOnItemLongClickListener(
+                new AdapterView.OnItemLongClickListener() {
+                    @Override
+                    public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
+                        mPositions.add(position);
+                        mSongAdapter.notifyDataSetChanged();
+                        return true;
+                    }
+                }
+        );
+
     }
 
     @Override
@@ -110,6 +138,7 @@ public class PlaylistFragment extends ListFragment{
         Bundle arg = new Bundle();
         arg.putSerializable("type",type);
         PlaylistDialogFragment dialog = new PlaylistDialogFragment();
+        dialog.setArguments(arg);
         dialog.show(manager,"PlaylistSelectionDialog");
 
     }
@@ -137,15 +166,17 @@ public class PlaylistFragment extends ListFragment{
         public void bindView(View view, Context context, Cursor cursor) {
             TextView songArtist = view.findViewById(R.id.songArtist);
             TextView songTitle = view.findViewById(R.id.songTitle);
+            songArtist.setSelected(false);
+            songTitle.setSelected(false);
             if (cursor.getPosition()== mCurrent) {
                 view.setBackgroundResource(R.drawable.list_select_bg);
                 songArtist.setSelected(true);
                 songTitle.setSelected(true);
-            }else {
+            }else if(mPositions.contains(cursor.getPosition()))
+                view.setBackgroundResource(R.drawable.list_edit_bg);
+            else
                 view.setBackgroundResource(R.drawable.list_bg);
-                songArtist.setSelected(false);
-                songTitle.setSelected(false);
-            }
+
             songArtist.setText(cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.ARTIST)));
             songTitle.setText(cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.TITLE)));
         }

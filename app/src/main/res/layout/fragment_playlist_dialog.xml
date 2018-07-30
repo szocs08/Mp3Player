@@ -10,8 +10,7 @@
         android:id="@+id/playlist_list"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_above="@+id/playlist_selection_controls"
-        android:listSelector="@drawable/list_selector_playlist">
+        android:layout_above="@+id/playlist_selection_controls">
 
     </ListView>
 

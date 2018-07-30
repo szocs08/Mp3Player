@@ -52,7 +52,7 @@ public class MainPlayerActivity extends FragmentActivity implements
     private final OptionsFragment mOptionsFragment = new OptionsFragment();
 
     private SharedPreferences mSettings;
-    private SharedPreferences mPlaylist;
+    private SharedPreferences mPlaylistFile;
 
     private int mSongIndex;
     private boolean mIsShuffle = false;
@@ -68,7 +68,7 @@ public class MainPlayerActivity extends FragmentActivity implements
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mSettings = getSharedPreferences(SETTINGS_FILE, Context.MODE_PRIVATE);
-        mPlaylist = getSharedPreferences(PLAYLIST_FILE, Context.MODE_PRIVATE);
+        mPlaylistFile = getSharedPreferences(PLAYLIST_FILE, Context.MODE_PRIVATE);
         setContentView(R.layout.activity_main_player);
         mSongIndex = 0;
         mPath = mSettings.getString("path",Environment.getExternalStorageDirectory().toString());
@@ -223,6 +223,11 @@ public class MainPlayerActivity extends FragmentActivity implements
         }
     }
 
+    @Override
+    public void longClick(int positon) {
+        Toast.makeText(this,String.valueOf(positon),Toast.LENGTH_LONG).show();
+    }
+
     private void initialize(){
         mMediaPlayer = new MediaPlayer();
         mMediaPlayer.setOnCompletionListener(this);
@@ -246,8 +251,8 @@ public class MainPlayerActivity extends FragmentActivity implements
         StringBuilder buffer = new StringBuilder();
         buffer.append(MediaStore.Audio.Playlists._ID).append(" IN (");
         for (String name: names) {
-            buffer.append(mPlaylist.getInt(name,-1)).append(", ");
-            if (mPlaylistID == mPlaylist.getInt(name,-1)) {
+            buffer.append(mPlaylistFile.getInt(name,-1)).append(", ");
+            if (mPlaylistID == mPlaylistFile.getInt(name,-1)) {
                 getSupportLoaderManager().restartLoader(ALL_SONGS, null, this);
                 mPlaylistFragment.changeName(getString(R.string.all_songs));
             }
@@ -334,7 +339,7 @@ public class MainPlayerActivity extends FragmentActivity implements
 
     @Override
     public void playlistRemoveButton(List<String> names) {
-        SharedPreferences.Editor editor = mPlaylist.edit();
+        SharedPreferences.Editor editor = mPlaylistFile.edit();
         for (String name: names) {
             editor.remove(name);
         }
@@ -345,7 +350,7 @@ public class MainPlayerActivity extends FragmentActivity implements
 
     @Override
     public void playlistAddButton(String name) {
-        SharedPreferences.Editor editor = mPlaylist.edit();
+        SharedPreferences.Editor editor = mPlaylistFile.edit();
         ContentValues contentValues = new ContentValues();
         int playlistId = -1;
         contentValues.put(MediaStore.Audio.Playlists.NAME, name);
@@ -370,7 +375,7 @@ public class MainPlayerActivity extends FragmentActivity implements
     @Override
     public void playlistSelection(String name) {
         mPlaylistFragment.changeName(name);
-        mPlaylistID = mPlaylist.getInt(name,ALL_SONGS);
+        mPlaylistID = mPlaylistFile.getInt(name,ALL_SONGS);
         if (mUsedIDs.contains(mPlaylistID))
             getSupportLoaderManager().restartLoader(mPlaylistID,null,this);
         else {

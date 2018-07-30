@@ -39,9 +39,8 @@ public class PlaylistDialogFragment extends DialogFragment {
     ListView mListView;
     Button mRemoveButton;
     Button mAddButton;
-    List<Integer> mPositions = new ArrayList<>();
     boolean mIsSelecting = false;
-    TreeMap<String,Boolean> mMap = new TreeMap<>(new PlaylistComparator());
+    TreeMap<String,Boolean> mItemSelectionMap = new TreeMap<>(new PlaylistComparator());
     PlaylistAdapter mAdapter;
     PlaylistFragment.DialogTypes mType;
 
@@ -51,6 +50,7 @@ public class PlaylistDialogFragment extends DialogFragment {
         super.onCreate(savedInstanceState);
         mPlaylistIDs = getActivity().getSharedPreferences(PLAYLIST_FILE, Context.MODE_PRIVATE);
         mType = (PlaylistFragment.DialogTypes) getArguments().getSerializable("type");
+
         if (getActivity() instanceof OnPlaylistDialogFragmentInteractionListener) {
             mListener = (OnPlaylistDialogFragmentInteractionListener) getActivity();
         } else {
@@ -100,7 +100,7 @@ public class PlaylistDialogFragment extends DialogFragment {
                 mIsSelecting = true;
                 mRemoveButton.setEnabled(true);
                 mAddButton.setEnabled(false);
-                mMap.put((String)mMap.keySet().toArray()[0],true);
+                mItemSelectionMap.put((String) mItemSelectionMap.keySet().toArray()[0],false);
                 selecting(position);
                 mAdapter.notifyDataSetChanged();
                 return true;
@@ -120,7 +120,7 @@ public class PlaylistDialogFragment extends DialogFragment {
                     public void onClick(DialogInterface dialog, int which) {
                         String name = editText.getText().toString();
                         mListener.playlistAddButton(name);
-                        mMap.put(name,false);
+                        mItemSelectionMap.put(name,false);
                         mAdapter.add(name);
                         Collections.sort(mAdapter.mItemData,new PlaylistComparator());
                         mAdapter.notifyDataSetChanged();
@@ -135,11 +135,12 @@ public class PlaylistDialogFragment extends DialogFragment {
             @Override
             public void onClick(View v) {
                 List<String> names = new ArrayList<>();
-                for (int i = 0; i < mAdapter.mItemData.size(); i++){
-                    if (mPositions.contains(i)) {
-                        names.add(mAdapter.mItemData.get(i));
-                    }
+                for (String name:mAdapter.mItemData){
+                    if (!name.equals(getString(R.string.all_songs)) &&
+                            mItemSelectionMap.get(name))
+                        names.add(name);
                 }
+
                 mAdapter.mItemData.removeAll(names);
                 mAdapter.notifyDataSetChanged();
                 mListener.playlistRemoveButton(names);
@@ -154,20 +155,20 @@ public class PlaylistDialogFragment extends DialogFragment {
         super.onActivityCreated(savedInstanceState);
 
         List<String> array = new ArrayList<>();
-        array.add(getString(R.string.all_songs));
+        if (mType == PlaylistFragment.DialogTypes.SWITCHING) {
+            array.add(getString(R.string.all_songs));
+        }
         for (Map.Entry<String, ?> entry : mPlaylistIDs.getAll().entrySet()){
             array.add(entry.getKey());
         }
         for (String string : array)
-            mMap.put(string,false);
+            mItemSelectionMap.put(string,false);
+        mItemSelectionMap.put(getString(R.string.all_songs),true);
 
-        try {
-            mAdapter = new PlaylistAdapter(getActivity(),
-                    new ArrayList<>(mMap.keySet()));
-            mListView.setAdapter(mAdapter);
-        }catch (Exception e) {
-            e.printStackTrace();
-        }
+        mAdapter = new PlaylistAdapter(getActivity(),
+                new ArrayList<>(mItemSelectionMap.keySet()));
+        mListView.setAdapter(mAdapter);
+
 
 
 
@@ -181,21 +182,19 @@ public class PlaylistDialogFragment extends DialogFragment {
     }
 
     private void selecting(int position){
-        List<String> list = new ArrayList<>(mMap.keySet());
-        if (position != 0) {
-            if(mPositions.contains(position)){
-                mMap.put(list.get(position),false);
-                mPositions.remove(Integer.valueOf(position));
+        List<String> keys = new ArrayList<>(mItemSelectionMap.keySet());
+        if (position != 0 || mType == PlaylistFragment.DialogTypes.ADDING) {
+            if(mItemSelectionMap.get(keys.get(position))){
+                mItemSelectionMap.put(keys.get(position),false);
             }else {
-                mPositions.add(position);
-                mMap.put(list.get(position),true);
+                mItemSelectionMap.put(keys.get(position),true);
             }
         }
-        if (mPositions.isEmpty()) {
+        if (!mItemSelectionMap.containsValue(true)) {
             mIsSelecting = false;
             mRemoveButton.setEnabled(false);
             mAddButton.setEnabled(true);
-            mMap.put((String)mMap.keySet().toArray()[0],false);
+            mItemSelectionMap.put(keys.get(0),true);
         }
 
     }
@@ -231,15 +230,15 @@ public class PlaylistDialogFragment extends DialogFragment {
                 holder = (ViewHolder) convertView.getTag();
             }
             holder.playlistName.setText(mItemData.get(position));
-            if (position > 0) {
-                if(mMap.get(mItemData.get(position))) {
-                    convertView.setBackgroundColor(ContextCompat.getColor(getContext(),R.color.list_select_color));
+            if (position > 0 || mType == PlaylistFragment.DialogTypes.ADDING) {
+                if(mItemSelectionMap.get(mItemData.get(position))) {
+                    convertView.setBackgroundResource(R.drawable.list_select_bg);
                     holder.playlistName.setTextColor(ContextCompat.getColor(getContext(),R.color.list_color_playlist));
                 }else {
-                    convertView.setBackgroundColor(ContextCompat.getColor(getContext(),R.color.list_color_playlist));
+                    convertView.setBackgroundResource(R.drawable.list_dark_bg);
                     holder.playlistName.setTextColor(ContextCompat.getColor(getContext(),R.color.list_color));
                 }
-            }else if (mMap.get(mItemData.get(position))) {
+            }else if (!mItemSelectionMap.get(mItemData.get(position))) {
                 convertView.setEnabled(false);
                 holder.playlistName.setEnabled(false);
             }else {
