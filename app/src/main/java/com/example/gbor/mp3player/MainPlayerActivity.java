@@ -223,10 +223,6 @@ public class MainPlayerActivity extends FragmentActivity implements
         }
     }
 
-    @Override
-    public void longClick(int positon) {
-        Toast.makeText(this,String.valueOf(positon),Toast.LENGTH_LONG).show();
-    }
 
     private void initialize(){
         mMediaPlayer = new MediaPlayer();

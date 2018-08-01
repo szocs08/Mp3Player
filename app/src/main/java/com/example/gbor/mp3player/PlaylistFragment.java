@@ -19,7 +19,6 @@ import android.widget.TextView;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.TreeMap;
 
 
 public class PlaylistFragment extends ListFragment{
@@ -29,8 +28,11 @@ public class PlaylistFragment extends ListFragment{
     private SongAdapter mSongAdapter;
     private Activity mActivity;
     private TextView mPlaylistName;
-    private TreeMap<String,Boolean> mItemSelectionMap = new TreeMap<>();
+    private ImageButton mPlaylistButton;
+    private ImageButton mPlaylistSongAddButton;
+    private ImageButton mPlaylistSongRemoveButton;
     private List<Integer> mPositions = new ArrayList<>();
+    private boolean mIsSelecting = false;
     public enum DialogTypes {
         SWITCHING,
         ADDING
@@ -40,7 +42,6 @@ public class PlaylistFragment extends ListFragment{
 
     public interface OnPlaylistFragmentInteractionListener {
         void startSelectedSong(int position);
-        void longClick(int positon);
     }
 
     public void updateUI(int pos){
@@ -57,11 +58,29 @@ public class PlaylistFragment extends ListFragment{
         }
     }
 
+    private void selecting(int position){
+        if(mPositions.contains(position)){
+            mPositions.remove(Integer.valueOf(position));
+        }else {
+            mPositions.add(position);
+        }
+
+        if (mPositions.isEmpty()) {
+            mIsSelecting = false;
+            mPlaylistButton.setEnabled(true);
+            mPlaylistSongRemoveButton.setEnabled(false);
+            mPlaylistSongAddButton.setEnabled(false);
+        }
+
+    }
+
     @Override
     public void onListItemClick(ListView l, View v, int position, long id){
-//        v.setSelected(true);
-//        l.invalidate();
-        mInteractionListener.startSelectedSong(position);
+        if (mIsSelecting) {
+            selecting(position);
+            mSongAdapter.notifyDataSetChanged();
+        }else
+            mInteractionListener.startSelectedSong(position);
     }
 
 
@@ -81,15 +100,19 @@ public class PlaylistFragment extends ListFragment{
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_playlist, container, false);
         mPlaylistName = view.findViewById(R.id.playlist_name);
-        ImageButton playlistEditButton = view.findViewById(R.id.playlist_button);
-        ImageButton playlistSongAddButton = view.findViewById(R.id.playlist_add_button);
-        playlistEditButton.setOnClickListener(new View.OnClickListener() {
+        mPlaylistButton = view.findViewById(R.id.playlist_button);
+        mPlaylistSongAddButton = view.findViewById(R.id.playlist_add_button);
+        mPlaylistSongRemoveButton = view.findViewById(R.id.playlist_remove_button);
+        mPlaylistSongAddButton.setEnabled(false);
+        mPlaylistSongRemoveButton.setEnabled(false);
+
+        mPlaylistButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 showDialog(DialogTypes.SWITCHING);
             }
         });
-        playlistSongAddButton.setOnClickListener(new View.OnClickListener() {
+        mPlaylistSongAddButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 showDialog(DialogTypes.ADDING);
@@ -106,7 +129,11 @@ public class PlaylistFragment extends ListFragment{
                 new AdapterView.OnItemLongClickListener() {
                     @Override
                     public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
-                        mPositions.add(position);
+                        mIsSelecting = true;
+                        mPlaylistButton.setEnabled(false);
+                        mPlaylistSongAddButton.setEnabled(true);
+                        mPlaylistSongRemoveButton.setEnabled(true);
+                        selecting(position);
                         mSongAdapter.notifyDataSetChanged();
                         return true;
                     }

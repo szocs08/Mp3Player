@@ -96,7 +96,6 @@ public class PlaylistDialogFragment extends DialogFragment {
         mListView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
             @Override
             public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
-                view.performHapticFeedback(HapticFeedbackConstants.LONG_PRESS);
                 mIsSelecting = true;
                 mRemoveButton.setEnabled(true);
                 mAddButton.setEnabled(false);

@@ -52,9 +52,10 @@
             android:id="@+id/playlist_button"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_margin="@dimen/playlist_controls_margin"
+            android:layout_marginBottom="@dimen/playlist_control_button_margin"
+            android:layout_marginTop="@dimen/playlist_control_button_margin"
             android:layout_weight="1"
-            android:background="@null"
+            android:background="@drawable/playlist_button_bg"
             android:contentDescription="@string/playlist_button"
             android:src="@drawable/playlist_button" />
 
@@ -62,9 +63,10 @@
             android:id="@+id/playlist_add_button"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_margin="@dimen/playlist_controls_margin"
+            android:layout_marginBottom="@dimen/playlist_control_button_margin"
+            android:layout_marginTop="@dimen/playlist_control_button_margin"
             android:layout_weight="1"
-            android:background="@null"
+            android:background="@drawable/playlist_button_bg"
             android:contentDescription="@string/playlist_add_button"
             android:src="@drawable/playlist_add_button" />
 
@@ -72,11 +74,14 @@
             android:id="@+id/playlist_remove_button"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_margin="@dimen/playlist_controls_margin"
+            android:layout_marginBottom="@dimen/playlist_control_button_margin"
+            android:layout_marginRight="@dimen/playlist_control_button_margin"
+            android:layout_marginTop="@dimen/playlist_control_button_margin"
             android:layout_weight="1"
-            android:background="@null"
+            android:background="@drawable/playlist_button_bg"
             android:contentDescription="@string/playlist_remove_button"
-            android:src="@drawable/plalist_remove_button" />
+            android:src="@drawable/plalist_remove_button"
+            android:layout_marginEnd="@dimen/playlist_control_button_margin" />
     </LinearLayout>
 
 
