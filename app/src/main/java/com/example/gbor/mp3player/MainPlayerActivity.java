@@ -357,12 +357,6 @@ public class MainPlayerActivity extends FragmentActivity implements
             String[] path= uri.getPath().split("/");
             playlistId = Integer.parseInt(path[path.length - 1]);
         }
-        uri = MediaStore.Audio.Playlists.Members.getContentUri("external",playlistId);
-        long i = mCursor.getLong(mCursor.getColumnIndex(MediaStore.Audio.Media._ID));
-        contentValues.clear();
-        contentValues.put(MediaStore.Audio.Playlists.Members.AUDIO_ID,i);
-        contentValues.put(MediaStore.Audio.Playlists.Members.PLAY_ORDER,0);
-        getContentResolver().insert(uri,contentValues);
         editor.putInt(name, playlistId);
         editor.apply();
 
@@ -382,7 +376,29 @@ public class MainPlayerActivity extends FragmentActivity implements
 
     @Override
     public void addSelectedSongs(String name) {
-
+        ContentValues contentValues = new ContentValues();
+        List<Integer> positions = mPlaylistFragment.getSelectedSongs();
+        int id = mPlaylistFile.getInt(name,-1);
+        int order = 1;
+        Uri uri = MediaStore.Audio.Playlists.Members.getContentUri("external",id);
+        Cursor cursor = getContentResolver().query(uri,null,null,null,
+                MediaStore.Audio.Playlists.Members.PLAY_ORDER + " DESC ");
+        if (cursor != null){
+            if (cursor.moveToFirst()){
+                order = cursor.getInt(cursor.getColumnIndex(MediaStore.Audio.Playlists.Members.PLAY_ORDER)) + 1;
+            }
+        }
+        for(int position : positions){
+            mCursor.moveToPosition(position);
+            contentValues.put(MediaStore.Audio.Playlists.Members.AUDIO_ID,
+                    mCursor.getInt(mCursor.getColumnIndex(MediaStore.Audio.Media._ID)));
+            contentValues.put(MediaStore.Audio.Playlists.Members.PLAY_ORDER,order++);
+            getContentResolver().insert(uri,contentValues);
+        }
+        if (cursor != null){
+            cursor.close();
+        }
+        Toast.makeText(this,"Added "+String.valueOf(positions.size())+" song(s) to "+ name,Toast.LENGTH_SHORT).show();
     }
 
     private static class PlayerPagerAdapter extends FragmentPagerAdapter {

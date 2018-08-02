@@ -1,6 +1,7 @@
 package com.example.gbor.mp3player;
 
 import android.app.Activity;
+import android.app.Fragment;
 import android.app.FragmentManager;
 import android.content.Context;
 import android.database.Cursor;
@@ -172,6 +173,17 @@ public class PlaylistFragment extends ListFragment{
 
     public void changeName(String name){
         mPlaylistName.setText(name);
+    }
+
+    public List<Integer> getSelectedSongs(){
+        List<Integer> result = new ArrayList<>(mPositions);
+        mPositions.clear();
+        mIsSelecting = false;
+        mPlaylistButton.setEnabled(true);
+        mPlaylistSongRemoveButton.setEnabled(false);
+        mPlaylistSongAddButton.setEnabled(false);
+        mSongAdapter.notifyDataSetChanged();
+        return result;
     }
 
     private class SongAdapter extends CursorAdapter {
