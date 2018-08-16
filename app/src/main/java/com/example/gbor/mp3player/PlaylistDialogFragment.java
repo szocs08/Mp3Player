@@ -42,6 +42,7 @@ public class PlaylistDialogFragment extends DialogFragment {
     TreeMap<String,Boolean> mItemSelectionMap = new TreeMap<>(new PlaylistComparator());
     PlaylistAdapter mAdapter;
     PlaylistFragment.DialogTypes mType;
+    String mPlaylistName;
 
 
     @Override
@@ -49,7 +50,7 @@ public class PlaylistDialogFragment extends DialogFragment {
         super.onCreate(savedInstanceState);
         mPlaylistIDs = getActivity().getSharedPreferences(PLAYLIST_FILE, Context.MODE_PRIVATE);
         mType = (PlaylistFragment.DialogTypes) getArguments().getSerializable("type");
-
+        mPlaylistName = getArguments().getString("name");
         if (getActivity() instanceof OnPlaylistDialogFragmentInteractionListener) {
             mListener = (OnPlaylistDialogFragmentInteractionListener) getActivity();
         } else {
@@ -117,7 +118,7 @@ public class PlaylistDialogFragment extends DialogFragment {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         String name = editText.getText().toString();
-                        mListener.playlistAddButton(name);
+                        name = mListener.playlistAddButton(name);
                         mItemSelectionMap.put(name,false);
                         mAdapter.add(name);
                         Collections.sort(mAdapter.mItemData,new PlaylistComparator());
@@ -154,14 +155,15 @@ public class PlaylistDialogFragment extends DialogFragment {
 
         List<String> array = new ArrayList<>();
         if (mType == PlaylistFragment.DialogTypes.SWITCHING) {
-            array.add(getString(R.string.all_songs));
+            mItemSelectionMap.put(getString(R.string.all_songs),true);
+
         }
         for (Map.Entry<String, ?> entry : mPlaylistIDs.getAll().entrySet()){
-            array.add(entry.getKey());
+            if (!entry.getKey().equals(mPlaylistName) || mType == PlaylistFragment.DialogTypes.SWITCHING)
+                array.add(entry.getKey());
         }
         for (String string : array)
             mItemSelectionMap.put(string,false);
-        mItemSelectionMap.put(getString(R.string.all_songs),true);
 
         mAdapter = new PlaylistAdapter(getActivity(),
                 new ArrayList<>(mItemSelectionMap.keySet()));
@@ -252,7 +254,7 @@ public class PlaylistDialogFragment extends DialogFragment {
 
     interface OnPlaylistDialogFragmentInteractionListener {
         void playlistRemoveButton(List<String> names);
-        void playlistAddButton(String name);
+        String playlistAddButton(String name);
         void playlistSelection(String name);
         void addSelectedSongs(String name);
     }

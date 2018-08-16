@@ -1,7 +1,6 @@
 package com.example.gbor.mp3player;
 
 import android.app.Activity;
-import android.app.Fragment;
 import android.app.FragmentManager;
 import android.content.Context;
 import android.database.Cursor;
@@ -43,6 +42,7 @@ public class PlaylistFragment extends ListFragment{
 
     public interface OnPlaylistFragmentInteractionListener {
         void startSelectedSong(int position);
+        void removeSelectedSongs(List<Integer> positions);
     }
 
     public void updateUI(int pos){
@@ -55,6 +55,7 @@ public class PlaylistFragment extends ListFragment{
             setListAdapter(mSongAdapter);
         }
         if (newCursor != null) {
+            updateUI(0);
             mSongAdapter.changeCursor(newCursor);
         }
     }
@@ -83,8 +84,6 @@ public class PlaylistFragment extends ListFragment{
         }else
             mInteractionListener.startSelectedSong(position);
     }
-
-
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -117,10 +116,22 @@ public class PlaylistFragment extends ListFragment{
             @Override
             public void onClick(View v) {
                 showDialog(DialogTypes.ADDING);
+                
+            }
+        });
+        mPlaylistSongRemoveButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mInteractionListener.removeSelectedSongs(mPositions);
             }
         });
 
-        return view;
+        try {
+            return view;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 
     @Override
@@ -165,6 +176,7 @@ public class PlaylistFragment extends ListFragment{
         FragmentManager manager = mActivity.getFragmentManager();
         Bundle arg = new Bundle();
         arg.putSerializable("type",type);
+        arg.putString("name",mPlaylistName.getText().toString());
         PlaylistDialogFragment dialog = new PlaylistDialogFragment();
         dialog.setArguments(arg);
         dialog.show(manager,"PlaylistSelectionDialog");
@@ -176,14 +188,16 @@ public class PlaylistFragment extends ListFragment{
     }
 
     public List<Integer> getSelectedSongs(){
-        List<Integer> result = new ArrayList<>(mPositions);
+        return mPositions;
+    }
+
+    public void resetPlaylistUI(){
         mPositions.clear();
         mIsSelecting = false;
         mPlaylistButton.setEnabled(true);
         mPlaylistSongRemoveButton.setEnabled(false);
         mPlaylistSongAddButton.setEnabled(false);
         mSongAdapter.notifyDataSetChanged();
-        return result;
     }
 
     private class SongAdapter extends CursorAdapter {
@@ -211,11 +225,10 @@ public class PlaylistFragment extends ListFragment{
                 view.setBackgroundResource(R.drawable.list_select_bg);
                 songArtist.setSelected(true);
                 songTitle.setSelected(true);
-            }else if(mPositions.contains(cursor.getPosition()))
-                view.setBackgroundResource(R.drawable.list_edit_bg);
-            else
+            }else
                 view.setBackgroundResource(R.drawable.list_bg);
-
+            if(mPositions.contains(cursor.getPosition()))
+                view.setBackgroundResource(R.drawable.list_edit_bg);
             songArtist.setText(cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.ARTIST)));
             songTitle.setText(cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.TITLE)));
         }

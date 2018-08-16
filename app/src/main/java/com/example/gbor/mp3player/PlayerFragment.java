@@ -51,7 +51,7 @@ public class PlayerFragment extends Fragment implements SeekBar.OnSeekBarChangeL
 
         void shuffleButton();
 
-        void updateButton();
+        void updateProgressBar();
 
         void seekButtonMovement(int progress);
 
@@ -194,7 +194,7 @@ public class PlayerFragment extends Fragment implements SeekBar.OnSeekBarChangeL
     }
 
 
-public void updateUI(int songIndex)     {
+    public void updateUI(int songIndex)     {
         try {
             if ((mCursor.getCount()>0)){
                 mCursor.moveToPosition(songIndex);
@@ -255,7 +255,7 @@ public void updateUI(int songIndex)     {
     private Runnable mUpdateTimeTask = new Runnable() {
         @Override
         public void run() {
-            mInteractionListener.updateButton();
+            mInteractionListener.updateProgressBar();
             mHandler.postDelayed(this, 100);
         }
     };
