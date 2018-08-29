@@ -23,6 +23,8 @@ import android.widget.Toast;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Random;
 
@@ -266,6 +268,8 @@ public class MainPlayerActivity extends FragmentActivity implements
         StringBuilder buffer = new StringBuilder();
         buffer.append(MediaStore.Audio.Playlists.Members._ID).append(" IN (");
         for (int position: positions) {
+            if (mSongIndex > position)
+                mSongIndex--;
             mCursor.moveToPosition(position);
             buffer.append(mCursor.getInt(mCursor.getColumnIndex(MediaStore.Audio.Playlists.Members._ID))).append(", ");
         }
@@ -273,7 +277,6 @@ public class MainPlayerActivity extends FragmentActivity implements
         buffer.append(")");
         return buffer.toString();
     }
-
 
     @Override
     public void onCompletion(MediaPlayer mp) {
@@ -312,17 +315,12 @@ public class MainPlayerActivity extends FragmentActivity implements
             String songSelect = MediaStore.Audio.Media.DATA + " like ?";
             String[] selectArgs = new String[]{mPath + "%"};
 
-            try {
-                CursorLoader asdas = new CursorLoader(this, MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,
-                        songProj,
-                        songSelect,
-                        selectArgs,
-                        MediaStore.Audio.Media.ARTIST);
-                return asdas;
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-            return null;
+            return new CursorLoader(this, MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,
+                    songProj,
+                    songSelect,
+                    selectArgs,
+                    MediaStore.Audio.Media.ARTIST);
+
         }
         String[] songProj = {MediaStore.Audio.Playlists.Members._ID,
                 MediaStore.Audio.Playlists.Members.DATA,
@@ -349,34 +347,46 @@ public class MainPlayerActivity extends FragmentActivity implements
     public void onLoadFinished(@NonNull Loader loader, Cursor cursor) {
         if (!mIsRemoved || loader.getId() == ALL_SONGS) {
             this.mCursor = cursor;
-            initialize();
+            if (mMediaPlayer == null || mIsSwitching) {
+                initialize();
+            }
             if(mViewPager.getAdapter()==null) {
                 mViewPager.setAdapter(mPagerAdapter);
-                mViewPager.setCurrentItem(2);
+                mViewPager.setCurrentItem(0);
             }
             if(mPagerAdapter !=null && cursor!=null){
                 mPagerAdapter.changeCursor(cursor);
+                if (mIsSwitching) {
+                    mPlayerFragment.updateUI(0);
+                    mIsSwitching = false;
+                }else{
+                    mPlaylistFragment.updateUI(mSongIndex);
+                }
+
             }
         }else {
             mIsRemoved=false;
-//            playlistSelection("All songs");
         }
 
 
     }
 
-
     @Override
     public void playlistRemoveButton(List<String> names) {
         SharedPreferences.Editor editor = mPlaylistFile.edit();
+        int id;
         for (String name: names) {
-            mUsedIDs.remove((Integer) mPlaylistFile.getInt(name,-2));
+            id = mPlaylistFile.getInt(name,-2);
+            if (id == mPlaylistID)
+                mIsRemoved = true;
+            mUsedIDs.remove((Integer) id);
             editor.remove(name);
         }
-        playlistSelection(getString(R.string.all_songs));
+        if (mIsRemoved)
+            playlistSelection(getString(R.string.all_songs));
         getContentResolver().delete(MediaStore.Audio.Playlists.EXTERNAL_CONTENT_URI,playlistDeletionSelection(names),null);
         editor.apply();
-        mIsRemoved = true;
+
     }
 
     @Override
@@ -409,6 +419,7 @@ public class MainPlayerActivity extends FragmentActivity implements
 
     @Override
     public void playlistSelection(String name) {
+        mIsSwitching = true;
         if (mMediaPlayer.isPlaying()) {
             mMediaPlayer.stop();
         }
@@ -420,7 +431,6 @@ public class MainPlayerActivity extends FragmentActivity implements
             } catch (Exception e) {
                 e.printStackTrace();
             }
-
         else {
             getSupportLoaderManager().initLoader(mPlaylistID, null, this);
         }
@@ -430,6 +440,7 @@ public class MainPlayerActivity extends FragmentActivity implements
     public void addSelectedSongs(String name) {
         ContentValues contentValues = new ContentValues();
         List<Integer> positions = new ArrayList<>(mPlaylistFragment.getSelectedSongs());
+        Collections.sort(positions);
         mPlaylistFragment.resetPlaylistUI();
         int id = mPlaylistFile.getInt(name,-1);
         int order = 1;
@@ -458,6 +469,11 @@ public class MainPlayerActivity extends FragmentActivity implements
     public void removeSelectedSongs(List<Integer> positions) {
         if(mPlaylistID != -1){
             Uri uri = MediaStore.Audio.Playlists.Members.getContentUri("external",mPlaylistID);
+            if (positions.contains(mSongIndex))
+                if (mMediaPlayer.isPlaying()) {
+                    mMediaPlayer.stop();
+                    mSongIndex = 0;
+                }
             getContentResolver().delete(uri,songDeletionSelection(positions),null);
             mPlaylistFragment.resetPlaylistUI();
         }

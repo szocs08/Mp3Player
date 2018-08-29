@@ -247,7 +247,7 @@ public class PlayerFragment extends Fragment implements SeekBar.OnSeekBarChangeL
     public void changeCursor(Cursor newCursor) {
         mCursor = newCursor;
         if (newCursor != null) {
-            updateUI(0);
+//            updateUI(0);
             mBtnPlay.setImageResource(R.drawable.play_button);
         }
     }

@@ -8,6 +8,7 @@ import android.os.Bundle;
 import android.provider.MediaStore;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ListFragment;
+import android.support.v7.widget.helper.ItemTouchHelper;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -39,41 +40,9 @@ public class PlaylistFragment extends ListFragment{
     }
 
 
-
     public interface OnPlaylistFragmentInteractionListener {
         void startSelectedSong(int position);
         void removeSelectedSongs(List<Integer> positions);
-    }
-
-    public void updateUI(int pos){
-        mSongAdapter.updatePosition(pos);
-    }
-
-    public void changeCursor(Cursor newCursor) {
-        if(mSongAdapter ==null) {
-            mSongAdapter = new SongAdapter(getActivity(), null,0);
-            setListAdapter(mSongAdapter);
-        }
-        if (newCursor != null) {
-            updateUI(0);
-            mSongAdapter.changeCursor(newCursor);
-        }
-    }
-
-    private void selecting(int position){
-        if(mPositions.contains(position)){
-            mPositions.remove(Integer.valueOf(position));
-        }else {
-            mPositions.add(position);
-        }
-
-        if (mPositions.isEmpty()) {
-            mIsSelecting = false;
-            mPlaylistButton.setEnabled(true);
-            mPlaylistSongRemoveButton.setEnabled(false);
-            mPlaylistSongAddButton.setEnabled(false);
-        }
-
     }
 
     @Override
@@ -116,7 +85,7 @@ public class PlaylistFragment extends ListFragment{
             @Override
             public void onClick(View v) {
                 showDialog(DialogTypes.ADDING);
-                
+
             }
         });
         mPlaylistSongRemoveButton.setOnClickListener(new View.OnClickListener() {
@@ -126,12 +95,8 @@ public class PlaylistFragment extends ListFragment{
             }
         });
 
-        try {
-            return view;
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return null;
+        return view;
+
     }
 
     @Override
@@ -144,7 +109,9 @@ public class PlaylistFragment extends ListFragment{
                         mIsSelecting = true;
                         mPlaylistButton.setEnabled(false);
                         mPlaylistSongAddButton.setEnabled(true);
-                        mPlaylistSongRemoveButton.setEnabled(true);
+                        if (!mPlaylistName.getText().equals(getString(R.string.all_songs))) {
+                            mPlaylistSongRemoveButton.setEnabled(true);
+                        }
                         selecting(position);
                         mSongAdapter.notifyDataSetChanged();
                         return true;
@@ -170,6 +137,37 @@ public class PlaylistFragment extends ListFragment{
     public void onDetach() {
         super.onDetach();
         mInteractionListener = null;
+    }
+
+    public void updateUI(int pos){
+        mSongAdapter.updatePosition(pos);
+    }
+
+    public void changeCursor(Cursor newCursor) {
+        if(mSongAdapter ==null) {
+            mSongAdapter = new SongAdapter(getActivity(), null,0);
+            setListAdapter(mSongAdapter);
+        }
+        if (newCursor != null) {
+            updateUI(0);
+            mSongAdapter.changeCursor(newCursor);
+        }
+    }
+
+    private void selecting(int position){
+        if(mPositions.contains(position)){
+            mPositions.remove(Integer.valueOf(position));
+        }else {
+            mPositions.add(position);
+        }
+
+        if (mPositions.isEmpty()) {
+            mIsSelecting = false;
+            mPlaylistButton.setEnabled(true);
+            mPlaylistSongRemoveButton.setEnabled(false);
+            mPlaylistSongAddButton.setEnabled(false);
+        }
+
     }
 
     public void showDialog(DialogTypes type) {

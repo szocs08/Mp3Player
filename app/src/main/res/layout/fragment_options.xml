@@ -4,15 +4,14 @@
     android:layout_height="match_parent"
     android:orientation="vertical">
 
-    <ListView
-        android:id="@android:id/list"
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/options_list"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:background="@color/background_color"
-        android:divider="@color/divider_color"
-        android:dividerHeight="1dp"
-        android:listSelector="@drawable/list_selector">
+        android:scrollbars="vertical">
 
-    </ListView>
+
+    </android.support.v7.widget.RecyclerView>
 
 </LinearLayout>

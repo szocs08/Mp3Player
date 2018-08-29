@@ -1,34 +1,28 @@
 package com.example.gbor.mp3player;
 
-import android.app.Activity;
 import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.support.v4.app.ListFragment;
+import android.support.v4.app.Fragment;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
-import android.widget.ListView;
 import android.widget.TextView;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 
-public class OptionsFragment extends ListFragment {
+public class OptionsFragment extends Fragment {
 
     private OnOptionsFragmentInteractionListener mInteractionListener;
     private OptionsAdapter mOptionsAdapter;
     private HashMap<String, String> mOptionData;
+    private RecyclerView mOptionsList;
 
     public interface OnOptionsFragmentInteractionListener {
         void optionOperations(int position);
-    }
-
-    @Override
-    public void onListItemClick(ListView l, View v, int position, long id) {
-        mInteractionListener.optionOperations(position);
     }
 
     @Override
@@ -45,17 +39,20 @@ public class OptionsFragment extends ListFragment {
             optionDataList.add(mOptionData);
         }
 
-        mOptionsAdapter = new OptionsAdapter(getActivity(),optionDataList);
+        mOptionsAdapter = new OptionsAdapter(optionDataList);
 
-
-        setListAdapter(mOptionsAdapter);
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-
-        return inflater.inflate(R.layout.fragment_options, container, false);
+        View view = inflater.inflate(R.layout.fragment_options, container, false);
+        mOptionsList = view.findViewById(R.id.options_list);
+        mOptionsList.setHasFixedSize(true);
+        RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getContext());
+        mOptionsList.setLayoutManager(mLayoutManager);
+        mOptionsList.setAdapter(mOptionsAdapter);
+        return view;
     }
 
     @Override
@@ -81,19 +78,24 @@ public class OptionsFragment extends ListFragment {
 
     }
 
-    static class ViewHolder{
-        TextView optionName;
-        TextView optionValue;
-    }
 
-    private class OptionsAdapter extends ArrayAdapter<HashMap<String, String>> {
 
-        private final Activity mContext;
+    private class OptionsAdapter extends RecyclerView.Adapter<OptionsAdapter.OptionsViewHolder> {
+
         private ArrayList<HashMap<String, String>> mItemData;
 
-        OptionsAdapter(Activity context, ArrayList<HashMap<String, String>> itemData) {
-            super(context, R.layout.item_options, itemData);
-            this.mContext = context;
+        class OptionsViewHolder extends RecyclerView.ViewHolder{
+            TextView optionName;
+            TextView optionValue;
+
+            OptionsViewHolder(View itemView) {
+                super(itemView);
+                optionName = itemView.findViewById(R.id.option_name);
+                optionValue = itemView.findViewById(R.id.option_value);
+            }
+        }
+
+        OptionsAdapter(ArrayList<HashMap<String, String>> itemData) {
             this.mItemData = itemData;
 
 
@@ -101,25 +103,27 @@ public class OptionsFragment extends ListFragment {
 
         @NonNull
         @Override
-        public View getView(int position, @Nullable View convertView, @NonNull ViewGroup parent) {
-            LayoutInflater li = mContext.getLayoutInflater();
-            ViewHolder holder;
-            if(convertView == null){
-                holder = new ViewHolder();
-                convertView = li.inflate(R.layout.item_options, parent, false);
-                holder.optionName =  convertView.findViewById(R.id.option_name);
-                holder.optionValue = convertView.findViewById(R.id.option_value);
-                convertView.setTag(holder);
-            }else{
-                holder = (ViewHolder) convertView.getTag();
-            }
+        public OptionsViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+            final View view = LayoutInflater.from(parent.getContext()).
+                    inflate(R.layout.item_options,parent,false);
+            view.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    mInteractionListener.optionOperations(mOptionsList.getChildAdapterPosition(v));
+                }
+            });
+            return new OptionsViewHolder(view);
+        }
 
-
+        @Override
+        public void onBindViewHolder(@NonNull OptionsViewHolder holder, int position) {
             holder.optionName.setText(mItemData.get(position).get("optionName"));
             holder.optionValue.setText(mItemData.get(position).get("optionValue"));
+        }
 
-            return convertView;
+        @Override
+        public int getItemCount() {
+            return mItemData.size();
         }
     }
-
 }

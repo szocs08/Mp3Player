@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
+    android:layout_height="wrap_content"
     android:background="@drawable/list_selector"
     android:gravity="top"
     android:orientation="vertical"
@@ -12,6 +12,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:padding="@dimen/option_pad"
+        android:textColor="@color/list_color_playlist"
         android:textSize="@dimen/option_name_text_size" />
 
     <TextView
@@ -19,6 +20,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:padding="@dimen/option_pad"
+        android:textColor="@color/list_color_playlist"
         android:textSize="@dimen/option_value_text_size"
         android:textStyle="italic" />
 
