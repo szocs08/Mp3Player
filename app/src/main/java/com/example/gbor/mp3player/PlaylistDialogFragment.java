@@ -1,6 +1,5 @@
 package com.example.gbor.mp3player;
 
-import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.DialogFragment;
 import android.content.Context;
@@ -8,17 +7,15 @@ import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 import android.support.v4.content.ContextCompat;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.text.InputType;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.ListView;
 import android.widget.TextView;
 
 import java.util.ArrayList;
@@ -35,14 +32,16 @@ public class PlaylistDialogFragment extends DialogFragment {
     private SharedPreferences mPlaylistIDs;
 
 
-    ListView mListView;
+    RecyclerView mPlaylistList;
     Button mRemoveButton;
     Button mAddButton;
     boolean mIsSelecting = false;
     TreeMap<String,Boolean> mItemSelectionMap = new TreeMap<>(new PlaylistComparator());
     PlaylistAdapter mAdapter;
+    LinearLayoutManager mLayoutManager;
     PlaylistFragment.DialogTypes mType;
     String mPlaylistName;
+    ArrayList<String> mPlaylistItems;
 
 
     @Override
@@ -67,44 +66,9 @@ public class PlaylistDialogFragment extends DialogFragment {
         if (getDialog().getWindow() != null) {
             getDialog().getWindow().setTitle(getString(R.string.playlist_choosing));
         }
-        mListView = view.findViewById(R.id.playlist_list);
+        mPlaylistList = view.findViewById(R.id.playlist_list);
         mRemoveButton = view.findViewById(R.id.remove_button);
         mAddButton = view.findViewById(R.id.add_button);
-
-        mListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                if (mIsSelecting){
-                    selecting(position);
-                    mAdapter.notifyDataSetChanged();
-                }else {
-                    switch (mType) {
-                        case SWITCHING:
-                            mListener.playlistSelection(mAdapter.mItemData.get(position));
-                            break;
-                        case ADDING:
-                            mListener.addSelectedSongs(mAdapter.mItemData.get(position));
-                            break;
-                    }
-                    dismiss();
-                }
-            }
-        });
-
-
-
-        mListView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
-            @Override
-            public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
-                mIsSelecting = true;
-                mRemoveButton.setEnabled(true);
-                mAddButton.setEnabled(false);
-                mItemSelectionMap.put((String) mItemSelectionMap.keySet().toArray()[0],false);
-                selecting(position);
-                mAdapter.notifyDataSetChanged();
-                return true;
-            }
-        });
 
         mAddButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -120,7 +84,7 @@ public class PlaylistDialogFragment extends DialogFragment {
                         String name = editText.getText().toString();
                         name = mListener.playlistAddButton(name);
                         mItemSelectionMap.put(name,false);
-                        mAdapter.add(name);
+                        mPlaylistItems.add(name);
                         Collections.sort(mAdapter.mItemData,new PlaylistComparator());
                         mAdapter.notifyDataSetChanged();
                         dialog.dismiss();
@@ -140,10 +104,11 @@ public class PlaylistDialogFragment extends DialogFragment {
                         names.add(name);
                 }
 
-                mAdapter.mItemData.removeAll(names);
+                mPlaylistItems.removeAll(names);
+                mItemSelectionMap.keySet().removeAll(names);
+                selecting(0);
                 mAdapter.notifyDataSetChanged();
                 mListener.playlistRemoveButton(names);
-                dismiss();
             }
         });
         return view;
@@ -164,10 +129,14 @@ public class PlaylistDialogFragment extends DialogFragment {
         }
         for (String string : array)
             mItemSelectionMap.put(string,false);
-
-        mAdapter = new PlaylistAdapter(getActivity(),
-                new ArrayList<>(mItemSelectionMap.keySet()));
-        mListView.setAdapter(mAdapter);
+        mPlaylistItems = new ArrayList<>(mItemSelectionMap.keySet());
+        mAdapter = new PlaylistAdapter(mPlaylistItems);
+        mLayoutManager = new LinearLayoutManager(getActivity());
+        mPlaylistList.setLayoutManager(mLayoutManager);
+        CustomDividerItemDecoration itemDecor = new CustomDividerItemDecoration(getActivity(), mLayoutManager.getOrientation());
+        itemDecor.setDrawable(ContextCompat.getDrawable(getActivity(),R.drawable.dialog_divider));
+        mPlaylistList.addItemDecoration(itemDecor);
+        mPlaylistList.setAdapter(mAdapter);
 
 
 
@@ -199,53 +168,90 @@ public class PlaylistDialogFragment extends DialogFragment {
 
     }
 
+    private class PlaylistAdapter extends RecyclerView.Adapter<PlaylistAdapter.PlaylistViewHolder> {
 
-    static class ViewHolder{
-        TextView playlistName;
-    }
-
-    private class PlaylistAdapter extends ArrayAdapter<String> {
-
-        Activity mContext;
         ArrayList<String> mItemData;
 
 
-        PlaylistAdapter(Activity context, ArrayList<String> itemData) {
-            super(context,R.layout.item_playlist_dialog,itemData);
-            mContext=context;
+
+        class PlaylistViewHolder extends RecyclerView.ViewHolder{
+            TextView playlistName;
+
+            PlaylistViewHolder(View itemView) {
+                super(itemView);
+                playlistName = itemView.findViewById(R.id.dialog_playlist_name);
+            }
+        }
+
+        PlaylistAdapter( ArrayList<String> itemData) {
             mItemData = itemData;
         }
 
         @NonNull
         @Override
-        public View getView(int position, @Nullable View convertView, @NonNull ViewGroup parent) {
+        public PlaylistViewHolder onCreateViewHolder(@NonNull final ViewGroup parent, int viewType) {
+            final View view = LayoutInflater.from(getActivity()).
+                    inflate(R.layout.item_playlist_dialog,parent,false);
+            view.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    int position = mPlaylistList.getChildAdapterPosition(v);
+                    if (mIsSelecting){
+                        selecting(position);
+                        mAdapter.notifyDataSetChanged();
+                    }else {
+                        switch (mType) {
+                            case SWITCHING:
+                                mListener.playlistSelection(mAdapter.mItemData.get(position));
+                                break;
+                            case ADDING:
+                                mListener.addSelectedSongs(mAdapter.mItemData.get(position));
+                                break;
+                        }
+                        dismiss();
+                    }
 
-            ViewHolder holder;
-            if(convertView == null){
-                holder = new ViewHolder();
-                convertView = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_playlist_dialog,parent,false);
-                holder.playlistName =  convertView.findViewById(R.id.dialog_playlist_name);
-                convertView.setTag(holder);
-            }else{
-                holder = (ViewHolder) convertView.getTag();
-            }
+                }
+            });
+            view.setOnLongClickListener(new View.OnLongClickListener() {
+                @Override
+                public boolean onLongClick(View v) {
+                    int position = mPlaylistList.getChildAdapterPosition(v);
+                    mIsSelecting = true;
+                    mRemoveButton.setEnabled(true);
+                    mAddButton.setEnabled(false);
+                    mItemSelectionMap.put((String) mItemSelectionMap.keySet().toArray()[0], false);
+                    selecting(position);
+                    mAdapter.notifyDataSetChanged();
+                    return true;
+                }
+            });
+            return new PlaylistViewHolder(view);
+        }
+
+        @Override
+        public void onBindViewHolder(@NonNull PlaylistViewHolder holder, int position) {
             holder.playlistName.setText(mItemData.get(position));
             if (position > 0 || mType == PlaylistFragment.DialogTypes.ADDING) {
                 if(mItemSelectionMap.get(mItemData.get(position))) {
-                    convertView.setBackgroundResource(R.drawable.list_select_bg);
-                    holder.playlistName.setTextColor(ContextCompat.getColor(getContext(),R.color.list_color_playlist));
+                    holder.itemView.setBackgroundResource(R.drawable.list_select_bg);
+                    holder.playlistName.setTextColor(ContextCompat.getColor(getActivity(),R.color.list_color_playlist));
                 }else {
-                    convertView.setBackgroundResource(R.drawable.list_dark_bg);
-                    holder.playlistName.setTextColor(ContextCompat.getColor(getContext(),R.color.list_color));
+                    holder.itemView.setBackgroundResource(R.drawable.list_dark_bg);
+                    holder.playlistName.setTextColor(ContextCompat.getColor(getActivity(),R.color.list_color));
                 }
             }else if (!mItemSelectionMap.get(mItemData.get(position))) {
-                convertView.setEnabled(false);
+                holder.itemView.setEnabled(false);
                 holder.playlistName.setEnabled(false);
             }else {
-                convertView.setEnabled(true);
+                holder.itemView.setEnabled(true);
                 holder.playlistName.setEnabled(true);
             }
-            return convertView;
+        }
+
+        @Override
+        public int getItemCount() {
+            return mItemData.size();
         }
     }
 

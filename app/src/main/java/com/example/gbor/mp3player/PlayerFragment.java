@@ -24,8 +24,6 @@ public class PlayerFragment extends Fragment implements SeekBar.OnSeekBarChangeL
 
 
     private ImageButton mBtnPlay;
-    private ImageButton mBtnPrevious;
-    private ImageButton mBtnNext;
     private ImageButton mBtnShuffle;
     private ImageButton mBtnRepeat;
     private ImageView mImgAlbum;
@@ -70,8 +68,8 @@ public class PlayerFragment extends Fragment implements SeekBar.OnSeekBarChangeL
         View view = inflater.inflate(R.layout.fragment_player, container, false);
         mContext =getContext();
         mBtnPlay = view.findViewById(R.id.play_button);
-        mBtnPrevious = view.findViewById(R.id.previous_button);
-        mBtnNext = view.findViewById(R.id.next_button);
+        ImageButton mBtnPrevious = view.findViewById(R.id.previous_button);
+        ImageButton mBtnNext = view.findViewById(R.id.next_button);
         mBtnShuffle = view.findViewById(R.id.shuffle_button);
         mBtnRepeat = view.findViewById(R.id.repeat_button);
         mImgAlbum = view.findViewById(R.id.song_album_thumbnail);
@@ -195,42 +193,39 @@ public class PlayerFragment extends Fragment implements SeekBar.OnSeekBarChangeL
 
 
     public void updateUI(int songIndex)     {
-        try {
-            if ((mCursor.getCount()>0)){
-                mCursor.moveToPosition(songIndex);
-                mSongTitleLabel.setText(mCursor.getString(mCursor.getColumnIndex(MediaStore.Audio.Media.TITLE)));
+        if ((mCursor.getCount()>0)){
+            mCursor.moveToPosition(songIndex);
+            mSongTitleLabel.setText(mCursor.getString(mCursor.getColumnIndex(MediaStore.Audio.Media.TITLE)));
 
-                mSongArtistLabel.setText(mCursor.getString(mCursor.getColumnIndex(MediaStore.Audio.Media.ARTIST)));
+            mSongArtistLabel.setText(mCursor.getString(mCursor.getColumnIndex(MediaStore.Audio.Media.ARTIST)));
 
-                mSongAlbumLabel.setText(mCursor.getString(mCursor.getColumnIndex(MediaStore.Audio.Media.ALBUM)));
+            mSongAlbumLabel.setText(mCursor.getString(mCursor.getColumnIndex(MediaStore.Audio.Media.ALBUM)));
 
-                MediaMetadataRetriever mmr = new MediaMetadataRetriever();
-                mmr.setDataSource(mCursor.getString(mCursor.getColumnIndex(MediaStore.Audio.Media.DATA)));
-                if(mmr.getEmbeddedPicture()!=null)
-                    mImgAlbum.setImageBitmap(BitmapFactory.decodeByteArray(mmr.getEmbeddedPicture(),0,mmr.getEmbeddedPicture().length));
-                else
-                    mImgAlbum.setImageDrawable(ContextCompat.getDrawable(mContext, R.drawable.img_adele));
-
-            }else {
-                mSongTitleLabel.setText(getString(R.string.song_title));
-
-                mSongArtistLabel.setText(getString(R.string.song_artist));
-
-                mSongAlbumLabel.setText(getString(R.string.album));
+            MediaMetadataRetriever mmr = new MediaMetadataRetriever();
+            mmr.setDataSource(mCursor.getString(mCursor.getColumnIndex(MediaStore.Audio.Media.DATA)));
+            if(mmr.getEmbeddedPicture()!=null)
+                mImgAlbum.setImageBitmap(BitmapFactory.decodeByteArray(mmr.getEmbeddedPicture(),0,mmr.getEmbeddedPicture().length));
+            else
                 mImgAlbum.setImageDrawable(ContextCompat.getDrawable(mContext, R.drawable.img_adele));
-                mCurrentTimeLabel.setText(R.string.start_time);
-                mCurrentTimeLabel.setText(R.string.end_time);
-            }
 
-            mBtnPlay.setImageResource(R.drawable.pause_button);
+        }else {
+            mSongTitleLabel.setText(getString(R.string.song_title));
 
-            mProgressSeekBar.setProgress(0);
-            mProgressSeekBar.setMax(100);
-            updateProgressBar();
+            mSongArtistLabel.setText(getString(R.string.song_artist));
 
-        } catch (IllegalArgumentException | IllegalStateException e) {
-            e.printStackTrace();
+            mSongAlbumLabel.setText(getString(R.string.album));
+            mImgAlbum.setImageDrawable(ContextCompat.getDrawable(mContext, R.drawable.img_adele));
+            mCurrentTimeLabel.setText(R.string.start_time);
+            mCurrentTimeLabel.setText(R.string.end_time);
         }
+
+        mBtnPlay.setImageResource(R.drawable.pause_button);
+
+        mProgressSeekBar.setProgress(0);
+        mProgressSeekBar.setMax(100);
+        updateProgressBar();
+
+
 
         mSongArtistLabel.setSelected(true);
         mSongTitleLabel.setSelected(true);
@@ -247,7 +242,6 @@ public class PlayerFragment extends Fragment implements SeekBar.OnSeekBarChangeL
     public void changeCursor(Cursor newCursor) {
         mCursor = newCursor;
         if (newCursor != null) {
-//            updateUI(0);
             mBtnPlay.setImageResource(R.drawable.play_button);
         }
     }

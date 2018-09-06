@@ -6,23 +6,23 @@ import android.content.Context;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.provider.MediaStore;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.v4.app.ListFragment;
-import android.support.v7.widget.helper.ItemTouchHelper;
+import android.support.v4.app.Fragment;
+import android.support.v4.content.ContextCompat;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
-import android.widget.CursorAdapter;
 import android.widget.ImageButton;
-import android.widget.ListView;
 import android.widget.TextView;
 
 import java.util.ArrayList;
 import java.util.List;
 
 
-public class PlaylistFragment extends ListFragment{
+public class PlaylistFragment extends Fragment{
 
 
     private OnPlaylistFragmentInteractionListener mInteractionListener;
@@ -33,6 +33,8 @@ public class PlaylistFragment extends ListFragment{
     private ImageButton mPlaylistSongAddButton;
     private ImageButton mPlaylistSongRemoveButton;
     private List<Integer> mPositions = new ArrayList<>();
+    private RecyclerView mPlaylist;
+    private Cursor mCursor;
     private boolean mIsSelecting = false;
     public enum DialogTypes {
         SWITCHING,
@@ -45,14 +47,13 @@ public class PlaylistFragment extends ListFragment{
         void removeSelectedSongs(List<Integer> positions);
     }
 
-    @Override
-    public void onListItemClick(ListView l, View v, int position, long id){
-        if (mIsSelecting) {
-            selecting(position);
-            mSongAdapter.notifyDataSetChanged();
-        }else
-            mInteractionListener.startSelectedSong(position);
-    }
+//    public void onListItemClick(ListView l, View v, int position, long id){
+//        if (mIsSelecting) {
+//            selecting(position);
+//            mSongAdapter.notifyDataSetChanged();
+//        }else
+//            mInteractionListener.startSelectedSong(position);
+//    }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -66,7 +67,7 @@ public class PlaylistFragment extends ListFragment{
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_playlist, container, false);
         mPlaylistName = view.findViewById(R.id.playlist_name);
         mPlaylistButton = view.findViewById(R.id.playlist_button);
@@ -74,7 +75,13 @@ public class PlaylistFragment extends ListFragment{
         mPlaylistSongRemoveButton = view.findViewById(R.id.playlist_remove_button);
         mPlaylistSongAddButton.setEnabled(false);
         mPlaylistSongRemoveButton.setEnabled(false);
-
+        mPlaylist = view.findViewById(R.id.playlist);
+        LinearLayoutManager mLayoutManager = new LinearLayoutManager(mActivity);
+        mPlaylist.setLayoutManager(mLayoutManager);
+        mPlaylist.setAdapter(mSongAdapter);
+        CustomDividerItemDecoration itemDecor = new CustomDividerItemDecoration(mActivity, mLayoutManager.getOrientation());
+        itemDecor.setDrawable(ContextCompat.getDrawable(getActivity(),R.drawable.playlist_divider));
+        mPlaylist.addItemDecoration(itemDecor);
         mPlaylistButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -102,22 +109,22 @@ public class PlaylistFragment extends ListFragment{
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        getListView().setOnItemLongClickListener(
-                new AdapterView.OnItemLongClickListener() {
-                    @Override
-                    public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
-                        mIsSelecting = true;
-                        mPlaylistButton.setEnabled(false);
-                        mPlaylistSongAddButton.setEnabled(true);
-                        if (!mPlaylistName.getText().equals(getString(R.string.all_songs))) {
-                            mPlaylistSongRemoveButton.setEnabled(true);
-                        }
-                        selecting(position);
-                        mSongAdapter.notifyDataSetChanged();
-                        return true;
-                    }
-                }
-        );
+//        getListView().setOnItemLongClickListener(
+//                new AdapterView.OnItemLongClickListener() {
+//                    @Override
+//                    public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
+//                        mIsSelecting = true;
+//                        mPlaylistButton.setEnabled(false);
+//                        mPlaylistSongAddButton.setEnabled(true);
+//                        if (!mPlaylistName.getText().equals(getString(R.string.all_songs))) {
+//                            mPlaylistSongRemoveButton.setEnabled(true);
+//                        }
+//                        selecting(position);
+//                        mSongAdapter.notifyDataSetChanged();
+//                        return true;
+//                    }
+//                }
+//        );
 
     }
 
@@ -144,9 +151,8 @@ public class PlaylistFragment extends ListFragment{
     }
 
     public void changeCursor(Cursor newCursor) {
-        if(mSongAdapter ==null) {
-            mSongAdapter = new SongAdapter(getActivity(), null,0);
-            setListAdapter(mSongAdapter);
+        if(mSongAdapter == null) {
+            mSongAdapter = new SongAdapter(null,0);
         }
         if (newCursor != null) {
             updateUI(0);
@@ -198,38 +204,91 @@ public class PlaylistFragment extends ListFragment{
         mSongAdapter.notifyDataSetChanged();
     }
 
-    private class SongAdapter extends CursorAdapter {
+    private class SongAdapter extends RecyclerView.Adapter<SongAdapter.PlaylistViewHolder> {
 
         private int mCurrent;
+        private Cursor mCursor;
 
-        SongAdapter(Context context, Cursor c,int position) {
-            super(context, c, 0);
+
+
+        class PlaylistViewHolder extends RecyclerView.ViewHolder{
+            TextView songArtist;
+            TextView songTitle;
+
+            PlaylistViewHolder(View itemView) {
+                super(itemView);
+                songArtist = itemView.findViewById(R.id.songArtist);
+                songTitle = itemView.findViewById(R.id.songTitle);            }
+        }
+
+        SongAdapter(Cursor c,int position) {
             mCurrent = position;
+            mCursor = c;
         }
 
-
+        @NonNull
         @Override
-        public View newView(Context context, Cursor cursor, ViewGroup parent) {
-            return LayoutInflater.from(getContext()).inflate(R.layout.item_playlist,parent,false);
+        public PlaylistViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+            final View view = LayoutInflater.from(mActivity).inflate(R.layout.item_playlist,parent,false);
+
+            return new PlaylistViewHolder(view);
         }
 
         @Override
-        public void bindView(View view, Context context, Cursor cursor) {
-            TextView songArtist = view.findViewById(R.id.songArtist);
-            TextView songTitle = view.findViewById(R.id.songTitle);
-            songArtist.setSelected(false);
-            songTitle.setSelected(false);
-            if (cursor.getPosition()== mCurrent) {
-                view.setBackgroundResource(R.drawable.list_select_bg);
-                songArtist.setSelected(true);
-                songTitle.setSelected(true);
+        public void onBindViewHolder(@NonNull PlaylistViewHolder holder, int position) {
+            mCursor.moveToPosition(position);
+            holder.songArtist.setSelected(false);
+            holder.songTitle.setSelected(false);
+            if (mCursor.getPosition()== mCurrent) {
+                holder.itemView.setBackgroundResource(R.drawable.list_select_bg);
+                holder.songArtist.setSelected(true);
+                holder.songTitle.setSelected(true);
             }else
-                view.setBackgroundResource(R.drawable.list_bg);
-            if(mPositions.contains(cursor.getPosition()))
-                view.setBackgroundResource(R.drawable.list_edit_bg);
-            songArtist.setText(cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.ARTIST)));
-            songTitle.setText(cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.TITLE)));
+                holder.itemView.setBackgroundResource(R.drawable.list_bg);
+            if(mPositions.contains(mCursor.getPosition()))
+                holder.itemView.setBackgroundResource(R.drawable.list_edit_bg);
+            holder.songArtist.setText(mCursor.getString(mCursor.getColumnIndex(MediaStore.Audio.Media.ARTIST)));
+            holder.songTitle.setText(mCursor.getString(mCursor.getColumnIndex(MediaStore.Audio.Media.TITLE)));
+
         }
+
+        @Override
+        public int getItemCount() {
+            return mCursor.getCount();
+        }
+
+        void changeCursor(Cursor newCursor) {
+            Cursor old = mCursor;
+            mCursor = newCursor;
+            if (old != null)
+                old.close();
+            notifyDataSetChanged();
+        }
+
+
+
+//        @Override
+//        public View newView(Context context, Cursor cursor, ViewGroup parent) {
+//            return LayoutInflater.from(getContext()).inflate(R.layout.item_playlist,parent,false);
+//        }
+//
+//        @Override
+//        public void bindView(View view, Context context, Cursor cursor) {
+//            TextView songArtist = view.findViewById(R.id.songArtist);
+//            TextView songTitle = view.findViewById(R.id.songTitle);
+//            songArtist.setSelected(false);
+//            songTitle.setSelected(false);
+//            if (cursor.getPosition()== mCurrent) {
+//                view.setBackgroundResource(R.drawable.list_select_bg);
+//                songArtist.setSelected(true);
+//                songTitle.setSelected(true);
+//            }else
+//                view.setBackgroundResource(R.drawable.list_bg);
+//            if(mPositions.contains(cursor.getPosition()))
+//                view.setBackgroundResource(R.drawable.list_edit_bg);
+//            songArtist.setText(cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.ARTIST)));
+//            songTitle.setText(cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.TITLE)));
+//        }
 
         void updatePosition(int pos){
             mCurrent =pos;

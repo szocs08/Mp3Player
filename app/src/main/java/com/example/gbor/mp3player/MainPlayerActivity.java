@@ -23,7 +23,6 @@ import android.widget.Toast;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Random;
@@ -352,15 +351,17 @@ public class MainPlayerActivity extends FragmentActivity implements
             }
             if(mViewPager.getAdapter()==null) {
                 mViewPager.setAdapter(mPagerAdapter);
-                mViewPager.setCurrentItem(0);
+                mViewPager.setCurrentItem(2);
             }
             if(mPagerAdapter !=null && cursor!=null){
                 mPagerAdapter.changeCursor(cursor);
                 if (mIsSwitching) {
                     mPlayerFragment.updateUI(0);
+                    mPlayerFragment.updatePlayButton(mMediaPlayer.isPlaying());
                     mIsSwitching = false;
                 }else{
-                    mPlaylistFragment.updateUI(mSongIndex);
+                    mPlayerFragment.updateUI(mSongIndex);
+                    mPlayerFragment.updatePlayButton(mMediaPlayer.isPlaying());
                 }
 
             }

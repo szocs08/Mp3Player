@@ -23,18 +23,15 @@
             android:textSize="18sp" />
     </LinearLayout>
 
-    <ListView
-        android:id="@android:id/list"
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/playlist"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_above="@+id/playlist_controls"
         android:layout_below="@+id/playlist_title"
-        android:background="@color/background_color"
-        android:divider="@color/divider_color"
-        android:dividerHeight="1dp"
-        android:listSelector="@drawable/list_selector">
+        android:background="@color/list_color">
 
-    </ListView>
+    </android.support.v7.widget.RecyclerView>
 
 
     <LinearLayout

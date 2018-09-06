@@ -197,49 +197,6 @@ public class DirectoryChooserActivity extends AppCompatActivity {
         }
 
 
-
-//        @NonNull
-//        @Override
-//        public View getView(int position, @Nullable View convertView, @NonNull ViewGroup parent) {
-//            LayoutInflater li = mContext.getLayoutInflater();
-//            DirectoryViewHolder holder;
-//            if (convertView == null){
-//                convertView = li.inflate(R.layout.item_file, parent, false);
-//                holder = new DirectoryViewHolder();
-//                holder.icon = convertView.findViewById(R.id.icon_view);
-//                holder.fileName = convertView.findViewById(R.id.file_name);
-//                holder.fileSize = convertView.findViewById(R.id.file_size);
-//                convertView.setTag(holder);
-//            }else{
-//                holder = (DirectoryViewHolder) convertView.getTag();
-//            }
-//
-//            holder.fileName.setText(mItemData.get(position).substring(mItemData.get(position).lastIndexOf('/')+1));
-//            File file = new File(mItemData.get(position));
-//            if(!mItemData.get(position).equalsIgnoreCase("..")) {
-//                if (file.isDirectory()) {
-//                    holder.fileSize.setText(getString(R.string.dir));
-//                    holder.icon.setImageResource(R.drawable.ic_folder);
-//                } else {
-//                    holder.icon.setImageResource(R.drawable.ic_non_audio_file);
-//                    try {
-//                        if(URLConnection.guessContentTypeFromName(file.getAbsolutePath()).startsWith("audio"))
-//                            holder.icon.setImageResource(R.drawable.ic_audio_file);
-//                    } catch (NullPointerException e) {
-//                        e.printStackTrace();
-//                    }
-//
-//                    holder.fileSize.setText(String.valueOf(file.length() +
-//                            getString(R.string.bytes)));
-//
-//                }
-//            }else{
-//                holder.icon.setImageResource(R.drawable.ic_back);
-//                holder.fileSize.setText(getString(R.string.previous));
-//
-//            }
-//            return convertView;
-//        }
     }
 
 }

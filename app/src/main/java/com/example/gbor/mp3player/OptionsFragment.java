@@ -4,6 +4,7 @@ import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -20,6 +21,7 @@ public class OptionsFragment extends Fragment {
     private OptionsAdapter mOptionsAdapter;
     private HashMap<String, String> mOptionData;
     private RecyclerView mOptionsList;
+    private Context mContext;
 
     public interface OnOptionsFragmentInteractionListener {
         void optionOperations(int position);
@@ -29,7 +31,8 @@ public class OptionsFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         ArrayList<HashMap<String, String>> optionDataList = new ArrayList<>();
-
+        if (getContext() != null)
+            mContext = getContext();
         for (String option : getResources().getStringArray(R.array.options_list)) {
             mOptionData = new HashMap<>();
             mOptionData.put("optionName", option);
@@ -49,8 +52,11 @@ public class OptionsFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_options, container, false);
         mOptionsList = view.findViewById(R.id.options_list);
         mOptionsList.setHasFixedSize(true);
-        RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getContext());
+        LinearLayoutManager mLayoutManager = new LinearLayoutManager(mContext);
         mOptionsList.setLayoutManager(mLayoutManager);
+        CustomDividerItemDecoration itemDecor = new CustomDividerItemDecoration(mContext, mLayoutManager.getOrientation());
+        itemDecor.setDrawable(ContextCompat.getDrawable(getActivity(),R.drawable.playlist_divider));
+        mOptionsList.addItemDecoration(itemDecor);
         mOptionsList.setAdapter(mOptionsAdapter);
         return view;
     }
@@ -97,8 +103,6 @@ public class OptionsFragment extends Fragment {
 
         OptionsAdapter(ArrayList<HashMap<String, String>> itemData) {
             this.mItemData = itemData;
-
-
         }
 
         @NonNull

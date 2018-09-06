@@ -153,8 +153,12 @@
             android:layout_marginLeft="@dimen/button_margin"
             android:layout_marginRight="@dimen/button_margin"
             android:layout_weight="1"
+            android:adjustViewBounds="true"
             android:background="@null"
             android:contentDescription="@string/repeat_button"
+            android:paddingLeft="@dimen/button_pad"
+            android:paddingRight="@dimen/button_pad"
+            android:scaleType="fitXY"
             android:src="@drawable/repeat_button"
             android:visibility="visible" />
 
@@ -165,8 +169,10 @@
             android:layout_marginLeft="@dimen/button_margin"
             android:layout_marginRight="@dimen/button_margin"
             android:layout_weight="1"
+            android:adjustViewBounds="true"
             android:background="@null"
             android:contentDescription="@string/previous_button"
+            android:scaleType="fitXY"
             android:src="@drawable/previous_button"
             android:visibility="visible" />
 
@@ -177,8 +183,10 @@
             android:layout_marginLeft="@dimen/button_margin"
             android:layout_marginRight="@dimen/button_margin"
             android:layout_weight="1"
+            android:adjustViewBounds="true"
             android:background="@null"
             android:contentDescription="@string/play_button"
+            android:scaleType="fitXY"
             android:src="@drawable/play_button"
             android:visibility="visible" />
 
@@ -192,6 +200,7 @@
             android:adjustViewBounds="true"
             android:background="@null"
             android:contentDescription="@string/next_button"
+            android:scaleType="fitXY"
             android:src="@drawable/next_button"
             android:visibility="visible" />
 
@@ -202,8 +211,10 @@
             android:layout_marginLeft="@dimen/button_margin"
             android:layout_marginRight="@dimen/button_margin"
             android:layout_weight="1"
+            android:adjustViewBounds="true"
             android:background="@null"
             android:contentDescription="@string/shuffle_button"
+            android:scaleType="fitXY"
             android:src="@drawable/shuffle_button"
             android:visibility="visible" />
 
