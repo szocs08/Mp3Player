@@ -1,5 +1,6 @@
 package com.example.gbor.mp3player;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.FragmentManager;
 import android.content.Context;
@@ -12,20 +13,23 @@ import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.helper.ItemTouchHelper;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import java.util.ArrayList;
 import java.util.List;
 
 
-public class PlaylistFragment extends Fragment{
+public class PlaylistFragment extends Fragment implements PlaylistItemDragListener{
 
 
-    private OnPlaylistFragmentInteractionListener mInteractionListener;
+    private OnPlaylistFragmentInteractionListener mPlaylistFragmentInteractionListener;
     private SongAdapter mSongAdapter;
     private Activity mActivity;
     private TextView mPlaylistName;
@@ -34,8 +38,11 @@ public class PlaylistFragment extends Fragment{
     private ImageButton mPlaylistSongRemoveButton;
     private List<Integer> mPositions = new ArrayList<>();
     private RecyclerView mPlaylist;
-    private Cursor mCursor;
+    private PlaylistItemTouchHelperCallback mItemTouchHelperCallback;
+    private ItemTouchHelper mItemTouchHelper;
     private boolean mIsSelecting = false;
+
+
     public enum DialogTypes {
         SWITCHING,
         ADDING
@@ -45,15 +52,10 @@ public class PlaylistFragment extends Fragment{
     public interface OnPlaylistFragmentInteractionListener {
         void startSelectedSong(int position);
         void removeSelectedSongs(List<Integer> positions);
+        void removeSelectedSong(int position);
+        void swapSongPositions(int from, int to);
     }
 
-//    public void onListItemClick(ListView l, View v, int position, long id){
-//        if (mIsSelecting) {
-//            selecting(position);
-//            mSongAdapter.notifyDataSetChanged();
-//        }else
-//            mInteractionListener.startSelectedSong(position);
-//    }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -79,8 +81,8 @@ public class PlaylistFragment extends Fragment{
         LinearLayoutManager mLayoutManager = new LinearLayoutManager(mActivity);
         mPlaylist.setLayoutManager(mLayoutManager);
         mPlaylist.setAdapter(mSongAdapter);
-        CustomDividerItemDecoration itemDecor = new CustomDividerItemDecoration(mActivity, mLayoutManager.getOrientation());
-        itemDecor.setDrawable(ContextCompat.getDrawable(getActivity(),R.drawable.playlist_divider));
+        CustomDividerItemDecoration itemDecor = new CustomDividerItemDecoration(mActivity,
+                ContextCompat.getColor(mActivity,R.color.playlist_background),1);
         mPlaylist.addItemDecoration(itemDecor);
         mPlaylistButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -98,9 +100,11 @@ public class PlaylistFragment extends Fragment{
         mPlaylistSongRemoveButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                mInteractionListener.removeSelectedSongs(mPositions);
+                mPlaylistFragmentInteractionListener.removeSelectedSongs(mPositions);
+//                mSongAdapter.notifyDataSetChanged();
             }
         });
+
 
         return view;
 
@@ -109,23 +113,12 @@ public class PlaylistFragment extends Fragment{
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-//        getListView().setOnItemLongClickListener(
-//                new AdapterView.OnItemLongClickListener() {
-//                    @Override
-//                    public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
-//                        mIsSelecting = true;
-//                        mPlaylistButton.setEnabled(false);
-//                        mPlaylistSongAddButton.setEnabled(true);
-//                        if (!mPlaylistName.getText().equals(getString(R.string.all_songs))) {
-//                            mPlaylistSongRemoveButton.setEnabled(true);
-//                        }
-//                        selecting(position);
-//                        mSongAdapter.notifyDataSetChanged();
-//                        return true;
-//                    }
-//                }
-//        );
 
+    }
+
+    @Override
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
     }
 
     @Override
@@ -133,7 +126,7 @@ public class PlaylistFragment extends Fragment{
         super.onAttach(context);
 
         if (context instanceof OnPlaylistFragmentInteractionListener) {
-            mInteractionListener = (OnPlaylistFragmentInteractionListener) context;
+            mPlaylistFragmentInteractionListener = (OnPlaylistFragmentInteractionListener) context;
         } else {
             throw new RuntimeException(context.toString()
                     + " must implement OnPlayerFragmentInteractionListener");
@@ -143,16 +136,32 @@ public class PlaylistFragment extends Fragment{
     @Override
     public void onDetach() {
         super.onDetach();
-        mInteractionListener = null;
+        mPlaylistFragmentInteractionListener = null;
+    }
+
+    @Override
+    public void onDrag(RecyclerView.ViewHolder viewHolder) {
+        mItemTouchHelper.startDrag(viewHolder);
     }
 
     public void updateUI(int pos){
         mSongAdapter.updatePosition(pos);
+        if (mPlaylistName!= null) {
+            mItemTouchHelper = new ItemTouchHelper(mItemTouchHelperCallback);
+            mItemTouchHelper.attachToRecyclerView(mPlaylist);
+            if(mPlaylistName.getText() != getString(R.string.all_songs)){
+                mItemTouchHelperCallback.setEditable(true);
+            }else {
+                mItemTouchHelperCallback.setEditable(false);
+            }
+        }
     }
 
     public void changeCursor(Cursor newCursor) {
         if(mSongAdapter == null) {
-            mSongAdapter = new SongAdapter(null,0);
+            mSongAdapter = new SongAdapter(null,0, this);
+            mSongAdapter.setHasStableIds(true);
+            mItemTouchHelperCallback = new PlaylistItemTouchHelperCallback(mSongAdapter);
         }
         if (newCursor != null) {
             updateUI(0);
@@ -201,37 +210,90 @@ public class PlaylistFragment extends Fragment{
         mPlaylistButton.setEnabled(true);
         mPlaylistSongRemoveButton.setEnabled(false);
         mPlaylistSongAddButton.setEnabled(false);
-        mSongAdapter.notifyDataSetChanged();
     }
 
-    private class SongAdapter extends RecyclerView.Adapter<SongAdapter.PlaylistViewHolder> {
+    private class SongAdapter extends RecyclerView.Adapter<SongAdapter.PlaylistViewHolder>
+            implements PlaylistItemTouchHelper{
 
         private int mCurrent;
         private Cursor mCursor;
+        PlaylistItemDragListener mPlaylistItemDragListener;
 
 
-
-        class PlaylistViewHolder extends RecyclerView.ViewHolder{
+        class PlaylistViewHolder extends RecyclerView.ViewHolder implements PlaylistItemTouchHelperViewHolder{
             TextView songArtist;
             TextView songTitle;
+            ImageView dragIcon;
+
 
             PlaylistViewHolder(View itemView) {
                 super(itemView);
                 songArtist = itemView.findViewById(R.id.songArtist);
-                songTitle = itemView.findViewById(R.id.songTitle);            }
+                songTitle = itemView.findViewById(R.id.songTitle);
+                dragIcon = itemView.findViewById(R.id.drag_icon);
+            }
+
+            @Override
+            public void onItemSelected() {
+
+            }
+
+            @Override
+            public void itemClear() {
+
+            }
         }
 
-        SongAdapter(Cursor c,int position) {
+        SongAdapter(Cursor c,int position, PlaylistItemDragListener playlistItemDragListener) {
             mCurrent = position;
             mCursor = c;
+            mPlaylistItemDragListener = playlistItemDragListener;
         }
 
+        @SuppressLint("ClickableViewAccessibility")
         @NonNull
         @Override
         public PlaylistViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
             final View view = LayoutInflater.from(mActivity).inflate(R.layout.item_playlist,parent,false);
-
-            return new PlaylistViewHolder(view);
+            final PlaylistViewHolder playlistViewHolder = new PlaylistViewHolder(view);
+            playlistViewHolder.itemView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    int position = mPlaylist.getChildAdapterPosition(v);
+                    if (mIsSelecting) {
+                        selecting(position);
+                        mSongAdapter.notifyDataSetChanged();
+                    }else
+                        mPlaylistFragmentInteractionListener.startSelectedSong(position);
+                }
+            });
+            playlistViewHolder.itemView.setOnLongClickListener(new View.OnLongClickListener() {
+                @Override
+                public boolean onLongClick(View v) {
+                    int position = mPlaylist.getChildAdapterPosition(v);
+                    mIsSelecting = true;
+                    mPlaylistButton.setEnabled(false);
+                    mPlaylistSongAddButton.setEnabled(true);
+                    if (!mPlaylistName.getText().equals(getString(R.string.all_songs))) {
+                        mPlaylistSongRemoveButton.setEnabled(true);
+                    }
+                    selecting(position);
+                    mSongAdapter.notifyDataSetChanged();
+                    return true;
+                }
+            });
+            playlistViewHolder.dragIcon.setOnTouchListener(new View.OnTouchListener() {
+                @Override
+                public boolean onTouch(View v, MotionEvent event) {
+                    if (event.getAction() ==
+                            MotionEvent.ACTION_DOWN) {
+                        mPlaylistItemDragListener.onDrag(playlistViewHolder);
+                    }
+                    return true;
+                }
+            });
+            playlistViewHolder.dragIcon.performClick();
+            return playlistViewHolder;
         }
 
         @Override
@@ -239,16 +301,21 @@ public class PlaylistFragment extends Fragment{
             mCursor.moveToPosition(position);
             holder.songArtist.setSelected(false);
             holder.songTitle.setSelected(false);
-            if (mCursor.getPosition()== mCurrent) {
+            if(mPositions.contains(mCursor.getPosition())) {
+                holder.itemView.setBackgroundResource(R.drawable.list_edit_bg);
+                holder.dragIcon.setBackgroundResource(R.drawable.border_drag_edit);
+            }else if (mCursor.getPosition()== mCurrent) {
                 holder.itemView.setBackgroundResource(R.drawable.list_select_bg);
+                holder.dragIcon.setBackgroundResource(R.drawable.border_drag_selected);
                 holder.songArtist.setSelected(true);
                 holder.songTitle.setSelected(true);
-            }else
+            }else{
                 holder.itemView.setBackgroundResource(R.drawable.list_bg);
-            if(mPositions.contains(mCursor.getPosition()))
-                holder.itemView.setBackgroundResource(R.drawable.list_edit_bg);
+                holder.dragIcon.setBackgroundResource(R.drawable.border_drag);
+            }
             holder.songArtist.setText(mCursor.getString(mCursor.getColumnIndex(MediaStore.Audio.Media.ARTIST)));
             holder.songTitle.setText(mCursor.getString(mCursor.getColumnIndex(MediaStore.Audio.Media.TITLE)));
+            holder.dragIcon.setImageResource(R.drawable.ic_drag_handle);
 
         }
 
@@ -265,36 +332,29 @@ public class PlaylistFragment extends Fragment{
             notifyDataSetChanged();
         }
 
-
-
-//        @Override
-//        public View newView(Context context, Cursor cursor, ViewGroup parent) {
-//            return LayoutInflater.from(getContext()).inflate(R.layout.item_playlist,parent,false);
-//        }
-//
-//        @Override
-//        public void bindView(View view, Context context, Cursor cursor) {
-//            TextView songArtist = view.findViewById(R.id.songArtist);
-//            TextView songTitle = view.findViewById(R.id.songTitle);
-//            songArtist.setSelected(false);
-//            songTitle.setSelected(false);
-//            if (cursor.getPosition()== mCurrent) {
-//                view.setBackgroundResource(R.drawable.list_select_bg);
-//                songArtist.setSelected(true);
-//                songTitle.setSelected(true);
-//            }else
-//                view.setBackgroundResource(R.drawable.list_bg);
-//            if(mPositions.contains(cursor.getPosition()))
-//                view.setBackgroundResource(R.drawable.list_edit_bg);
-//            songArtist.setText(cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.ARTIST)));
-//            songTitle.setText(cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.TITLE)));
-//        }
-
         void updatePosition(int pos){
             mCurrent =pos;
             notifyDataSetChanged();
         }
 
+        @Override
+        public long getItemId(int position) {
+            mCursor.moveToPosition(position);
+            return mCursor.getLong(mCursor.getColumnIndex(MediaStore.Audio.Media._ID));
+        }
+
+        @Override
+        public void onItemMove(int fromPosition, int toPosition) {
+            mPlaylistFragmentInteractionListener.swapSongPositions(fromPosition,toPosition);
+            notifyDataSetChanged();
+//            notifyItemMoved(fromPosition,toPosition);
+
+        }
+
+        @Override
+        public void onItemDismiss(int position) {
+            mPlaylistFragmentInteractionListener.removeSelectedSong(position);
+        }
     }
 
 }

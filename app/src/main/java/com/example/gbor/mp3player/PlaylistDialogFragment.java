@@ -131,10 +131,11 @@ public class PlaylistDialogFragment extends DialogFragment {
             mItemSelectionMap.put(string,false);
         mPlaylistItems = new ArrayList<>(mItemSelectionMap.keySet());
         mAdapter = new PlaylistAdapter(mPlaylistItems);
+        mAdapter.setHasStableIds(true);
         mLayoutManager = new LinearLayoutManager(getActivity());
         mPlaylistList.setLayoutManager(mLayoutManager);
-        CustomDividerItemDecoration itemDecor = new CustomDividerItemDecoration(getActivity(), mLayoutManager.getOrientation());
-        itemDecor.setDrawable(ContextCompat.getDrawable(getActivity(),R.drawable.dialog_divider));
+        CustomDividerItemDecoration itemDecor = new CustomDividerItemDecoration(getActivity(),
+                ContextCompat.getColor(getActivity(),R.color.background_color),2);
         mPlaylistList.addItemDecoration(itemDecor);
         mPlaylistList.setAdapter(mAdapter);
 
@@ -252,6 +253,11 @@ public class PlaylistDialogFragment extends DialogFragment {
         @Override
         public int getItemCount() {
             return mItemData.size();
+        }
+
+        @Override
+        public long getItemId(int position) {
+            return mItemData.get(position).hashCode();
         }
     }
 

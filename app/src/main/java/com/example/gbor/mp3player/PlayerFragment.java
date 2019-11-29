@@ -160,7 +160,7 @@ public class PlayerFragment extends Fragment implements SeekBar.OnSeekBarChangeL
     }
 
     public void updatePlayButton(boolean playing) {
-        if (playing) {
+        if (!playing) {
             mBtnPlay.setImageResource(R.drawable.play_button);
         } else {
             mBtnPlay.setImageResource(R.drawable.pause_button);
@@ -206,7 +206,7 @@ public class PlayerFragment extends Fragment implements SeekBar.OnSeekBarChangeL
             if(mmr.getEmbeddedPicture()!=null)
                 mImgAlbum.setImageBitmap(BitmapFactory.decodeByteArray(mmr.getEmbeddedPicture(),0,mmr.getEmbeddedPicture().length));
             else
-                mImgAlbum.setImageDrawable(ContextCompat.getDrawable(mContext, R.drawable.img_adele));
+                mImgAlbum.setImageDrawable(ContextCompat.getDrawable(mContext, R.drawable.img_album_art));
 
         }else {
             mSongTitleLabel.setText(getString(R.string.song_title));
@@ -214,7 +214,7 @@ public class PlayerFragment extends Fragment implements SeekBar.OnSeekBarChangeL
             mSongArtistLabel.setText(getString(R.string.song_artist));
 
             mSongAlbumLabel.setText(getString(R.string.album));
-            mImgAlbum.setImageDrawable(ContextCompat.getDrawable(mContext, R.drawable.img_adele));
+            mImgAlbum.setImageDrawable(ContextCompat.getDrawable(mContext, R.drawable.img_album_art));
             mCurrentTimeLabel.setText(R.string.start_time);
             mCurrentTimeLabel.setText(R.string.end_time);
         }
@@ -241,7 +241,7 @@ public class PlayerFragment extends Fragment implements SeekBar.OnSeekBarChangeL
 
     public void changeCursor(Cursor newCursor) {
         mCursor = newCursor;
-        if (newCursor != null) {
+        if (newCursor != null && mBtnPlay != null) {
             mBtnPlay.setImageResource(R.drawable.play_button);
         }
     }

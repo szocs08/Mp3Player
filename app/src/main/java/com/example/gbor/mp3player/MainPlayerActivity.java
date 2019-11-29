@@ -1,24 +1,32 @@
 package com.example.gbor.mp3player;
 
+import android.Manifest;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.media.MediaPlayer;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
 import android.support.annotation.NonNull;
+import android.support.annotation.RequiresApi;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.app.LoaderManager.LoaderCallbacks;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
 import android.support.v4.view.ViewPager;
+import android.util.AttributeSet;
+import android.view.View;
 import android.widget.Toast;
 
 import java.io.IOException;
@@ -40,6 +48,8 @@ public class MainPlayerActivity extends FragmentActivity implements
 
     private static final int FOLDER_CHOOSING_REQUEST = 1;
     private static final int ALL_SONGS = -1;
+    private static final int MY_PERMISSIONS_REQUEST_READ_EXTERNAL_STORAGE = 18;
+
 
     private static final String SETTINGS_FILE = "com.example.gbor.mp3player.Settings";
     private static final String PLAYLIST_FILE = "com.example.gbor.mp3player.Playlist";
@@ -66,6 +76,7 @@ public class MainPlayerActivity extends FragmentActivity implements
     private ViewPager mViewPager;
     private int mPlaylistID = ALL_SONGS;
 
+    @RequiresApi(api = Build.VERSION_CODES.M)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -74,12 +85,27 @@ public class MainPlayerActivity extends FragmentActivity implements
         mPlaylistFile = getSharedPreferences(PLAYLIST_FILE, Context.MODE_PRIVATE);
         mPath = mSettings.getString("path",Environment.getExternalStorageDirectory().toString());
         mViewPager = findViewById(pager);
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            if (checkSelfPermission(Manifest.permission.READ_EXTERNAL_STORAGE)
+                    != PackageManager.PERMISSION_GRANTED) {
+                shouldShowRequestPermissionRationale(
+                        Manifest.permission.READ_EXTERNAL_STORAGE);
+                requestPermissions(new String[]{Manifest.permission.READ_EXTERNAL_STORAGE},
+                        MY_PERMISSIONS_REQUEST_READ_EXTERNAL_STORAGE);
+            }
+        }
         mPagerAdapter = new PlayerPagerAdapter(getSupportFragmentManager(),
                 mSongIndex, mPlayerFragment, mPlaylistFragment, mOptionsFragment, mPath);
-        getSupportLoaderManager().initLoader(ALL_SONGS,null,this);
+        mViewPager.setAdapter(mPagerAdapter);
 
     }
 
+    @Override
+    public View onCreateView(View parent, String name, Context context, AttributeSet attrs) {
+//        getSupportLoaderManager().initLoader(ALL_SONGS,null,this);
+        return super.onCreateView(parent, name, context, attrs);
+    }
 
     @Override
     public void optionOperations(int position) {
@@ -94,33 +120,29 @@ public class MainPlayerActivity extends FragmentActivity implements
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 
-        switch(requestCode){
-            case FOLDER_CHOOSING_REQUEST:
-                if(resultCode==RESULT_OK){
-                    mPath =data.getDataString();
-                    SharedPreferences.Editor editor = mSettings.edit();
-                    editor.putString("path", mPath);
-                    editor.apply();
-                    mIsSwitching =true;
-                    mMediaPlayer.stop();
-                    getSupportLoaderManager().restartLoader(ALL_SONGS,null,this);
-                    mSongIndex = 0;
-                    mOptionsFragment.updateUI(mPath);
-                }
-
-                break;
-
+        if (requestCode == FOLDER_CHOOSING_REQUEST) {
+            if (resultCode == RESULT_OK) {
+                mPath = data.getDataString();
+                SharedPreferences.Editor editor = mSettings.edit();
+                editor.putString("path", mPath);
+                editor.apply();
+                mIsSwitching = true;
+                mMediaPlayer.stop();
+                getSupportLoaderManager().restartLoader(ALL_SONGS, null, this);
+                mSongIndex = 0;
+                mOptionsFragment.updateUI(mPath);
+            }
         }
     }
 
     @Override
     public void playButton() {
-        mPlayerFragment.updatePlayButton(mMediaPlayer.isPlaying());
         if (mMediaPlayer.isPlaying()) {
             mMediaPlayer.pause();
         } else {
             mMediaPlayer.start();
         }
+        mPlayerFragment.updatePlayButton(mMediaPlayer.isPlaying());
 
     }
 
@@ -326,7 +348,8 @@ public class MainPlayerActivity extends FragmentActivity implements
                 MediaStore.Audio.Playlists.Members.TITLE,
                 MediaStore.Audio.Playlists.Members.ARTIST,
                 MediaStore.Audio.Playlists.Members.ALBUM,
-                MediaStore.Audio.Playlists.Members.DATA
+                MediaStore.Audio.Playlists.Members.DATA,
+                MediaStore.Audio.Playlists.Members.PLAY_ORDER
         };
 
         return new CursorLoader(this, MediaStore.Audio.Playlists.Members.getContentUri("external",id),
@@ -350,7 +373,6 @@ public class MainPlayerActivity extends FragmentActivity implements
                 initialize();
             }
             if(mViewPager.getAdapter()==null) {
-                mViewPager.setAdapter(mPagerAdapter);
                 mViewPager.setCurrentItem(2);
             }
             if(mPagerAdapter !=null && cursor!=null){
@@ -463,7 +485,7 @@ public class MainPlayerActivity extends FragmentActivity implements
         if (cursor != null){
             cursor.close();
         }
-        Toast.makeText(this,"Added "+String.valueOf(positions.size())+" song(s) to "+ name,Toast.LENGTH_SHORT).show();
+        Toast.makeText(this,"Added "+ positions.size() +" song(s) to "+ name,Toast.LENGTH_SHORT).show();
     }
 
     @Override
@@ -478,6 +500,51 @@ public class MainPlayerActivity extends FragmentActivity implements
             getContentResolver().delete(uri,songDeletionSelection(positions),null);
             mPlaylistFragment.resetPlaylistUI();
         }
+
+    }
+
+    @Override
+    public void removeSelectedSong(int position) {
+        if(mPlaylistID != -1){
+            Uri uri = MediaStore.Audio.Playlists.Members.getContentUri("external",mPlaylistID);
+            if (position == mSongIndex)
+                if (mMediaPlayer.isPlaying()) {
+                    mMediaPlayer.stop();
+                    mSongIndex = 0;
+                }
+            mCursor.moveToPosition(position);
+            int indexID = mCursor.getColumnIndex(MediaStore.Audio.Playlists.Members._ID);
+            int positionID = mCursor.getInt(indexID);
+            String whereString = MediaStore.Audio.Playlists.Members._ID + " = ?";
+            String[] whereArgs = new String[]{Integer.toString(positionID)};
+            getContentResolver().delete(uri,whereString,whereArgs);
+        }
+    }
+
+    @Override
+    public void swapSongPositions(int from, int to) {
+        int indexPlayOrder = mCursor.getColumnIndex(MediaStore.Audio.Playlists.Members.PLAY_ORDER);
+        int indexID = mCursor.getColumnIndex(MediaStore.Audio.Playlists.Members._ID);
+
+        mCursor.moveToPosition(from);
+        int fromPlayOrder = mCursor.getInt(indexPlayOrder);
+        int fromID = mCursor.getInt(indexID);
+
+        mCursor.moveToPosition(to);
+        int toPlayOrder = mCursor.getInt(indexPlayOrder);
+        int toID = mCursor.getInt(indexID);
+
+        ContentValues updateValues = new ContentValues();
+        Uri uri = MediaStore.Audio.Playlists.Members.getContentUri("external",mPlaylistID);
+        String whereString = MediaStore.Audio.Playlists.Members._ID + " = ?";
+
+        updateValues.put(MediaStore.Audio.Playlists.Members.PLAY_ORDER,fromPlayOrder);
+        String[] whereArgs = new String[]{Integer.toString(toID)};
+        int success = getContentResolver().update(uri,updateValues,whereString,whereArgs);
+
+        updateValues.put(MediaStore.Audio.Playlists.Members.PLAY_ORDER,toPlayOrder);
+        whereArgs = new String[]{Integer.toString(fromID)};
+        getContentResolver().update(uri, updateValues, whereString, whereArgs);
 
     }
 

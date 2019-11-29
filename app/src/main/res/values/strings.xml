@@ -34,4 +34,5 @@
     <string name="ok">OK</string>
     <string name="new_playlist">New Playlist Name</string>
     <string name="create">Create</string>
+    <string name="drag_icon">Drag Icon</string>
 </resources>

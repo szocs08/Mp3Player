@@ -54,8 +54,8 @@ public class OptionsFragment extends Fragment {
         mOptionsList.setHasFixedSize(true);
         LinearLayoutManager mLayoutManager = new LinearLayoutManager(mContext);
         mOptionsList.setLayoutManager(mLayoutManager);
-        CustomDividerItemDecoration itemDecor = new CustomDividerItemDecoration(mContext, mLayoutManager.getOrientation());
-        itemDecor.setDrawable(ContextCompat.getDrawable(getActivity(),R.drawable.playlist_divider));
+        CustomDividerItemDecoration itemDecor = new CustomDividerItemDecoration(mContext,
+                ContextCompat.getColor(mContext,R.color.playlist_background),1);
         mOptionsList.addItemDecoration(itemDecor);
         mOptionsList.setAdapter(mOptionsAdapter);
         return view;
