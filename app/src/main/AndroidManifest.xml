@@ -11,7 +11,7 @@
         android:theme="@android:style/Theme.NoTitleBar"
         android:allowBackup="false">
         <activity
-            android:name=".MainPlayerActivity"
+            android:name="hu.application.gbor.mp3player.MainPlayerActivity"
             android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -20,7 +20,7 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".DirectoryChooserActivity"
+            android:name="hu.application.gbor.mp3player.DirectoryChooserActivity"
             android:label="@string/title_activity_directory_chooser"
             android:theme="@style/AppTheme.NoActionBar" />
     </application>

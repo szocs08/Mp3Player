@@ -1,7 +1,7 @@
-package com.example.gbor.mp3player;
+package hu.application.gbor.mp3player;
 
 import android.app.AlertDialog;
-import android.app.DialogFragment;
+import android.support.v4.app.DialogFragment;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.SharedPreferences;
@@ -18,6 +18,8 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 
+import com.example.gbor.mp3player.R;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -28,7 +30,7 @@ import java.util.TreeMap;
 
 public class PlaylistDialogFragment extends DialogFragment {
     private OnPlaylistDialogFragmentInteractionListener mListener;
-    private static final String PLAYLIST_FILE = "com.example.gbor.mp3player.Playlist";
+    private static final String PLAYLIST_FILE = "com.application.gbor.mp3player.Playlist";
     private SharedPreferences mPlaylistIDs;
 
 

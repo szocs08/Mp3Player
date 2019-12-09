@@ -4,7 +4,7 @@
     android:id="@+id/LinearLayout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".PlaylistDialogFragment">
+    tools:context="hu.application.gbor.mp3player.PlaylistDialogFragment">
 
     <android.support.v7.widget.RecyclerView
         android:id="@+id/playlist_list"

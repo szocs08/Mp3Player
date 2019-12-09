@@ -1,6 +1,7 @@
-package com.example.gbor.mp3player;
+package hu.application.gbor.mp3player;
 
 import android.Manifest;
+import android.arch.lifecycle.ViewModel;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
@@ -15,19 +16,19 @@ import android.os.Environment;
 import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.support.annotation.RequiresApi;
-import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.app.LoaderManager.LoaderCallbacks;
-import android.support.v4.content.ContextCompat;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
 import android.support.v4.view.ViewPager;
 import android.util.AttributeSet;
 import android.view.View;
 import android.widget.Toast;
+
+import com.example.gbor.mp3player.R;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -51,8 +52,8 @@ public class MainPlayerActivity extends FragmentActivity implements
     private static final int MY_PERMISSIONS_REQUEST_READ_EXTERNAL_STORAGE = 18;
 
 
-    private static final String SETTINGS_FILE = "com.example.gbor.mp3player.Settings";
-    private static final String PLAYLIST_FILE = "com.example.gbor.mp3player.Playlist";
+    private static final String SETTINGS_FILE = "hu.application.gbor.mp3player.Settings";
+    private static final String PLAYLIST_FILE = "hu.application.gbor.mp3player.Playlist";
 
 
     private MediaPlayer mMediaPlayer;
@@ -95,6 +96,7 @@ public class MainPlayerActivity extends FragmentActivity implements
                         MY_PERMISSIONS_REQUEST_READ_EXTERNAL_STORAGE);
             }
         }
+
         mPagerAdapter = new PlayerPagerAdapter(getSupportFragmentManager(),
                 mSongIndex, mPlayerFragment, mPlaylistFragment, mOptionsFragment, mPath);
         mViewPager.setAdapter(mPagerAdapter);

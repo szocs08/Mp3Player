@@ -1,5 +1,6 @@
-package com.example.gbor.mp3player;
+package hu.application.gbor.mp3player;
 
+import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.helper.ItemTouchHelper;
 
@@ -35,7 +36,7 @@ public class PlaylistItemTouchHelperCallback extends ItemTouchHelper.Callback {
     }
 
     @Override
-    public boolean onMove(RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder, RecyclerView.ViewHolder target) {
+    public boolean onMove(@NonNull RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder, RecyclerView.ViewHolder target) {
         mPlaylistItemTouchHelper.onItemMove(viewHolder.getAdapterPosition(),target.getAdapterPosition());
         return true;
     }

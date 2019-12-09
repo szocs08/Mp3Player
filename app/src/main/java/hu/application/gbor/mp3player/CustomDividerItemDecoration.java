@@ -1,4 +1,4 @@
-package com.example.gbor.mp3player;
+package hu.application.gbor.mp3player;
 
 import android.content.Context;
 import android.graphics.Canvas;

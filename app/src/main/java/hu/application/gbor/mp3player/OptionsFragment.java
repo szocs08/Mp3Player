@@ -1,4 +1,4 @@
-package com.example.gbor.mp3player;
+package hu.application.gbor.mp3player;
 
 import android.content.Context;
 import android.os.Bundle;
@@ -11,6 +11,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+
+import com.example.gbor.mp3player.R;
 
 import java.util.ArrayList;
 import java.util.HashMap;

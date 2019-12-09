@@ -1,4 +1,4 @@
-package com.example.gbor.mp3player;
+package hu.application.gbor.mp3player;
 
 import android.content.Context;
 import android.database.Cursor;
@@ -18,6 +18,8 @@ import android.widget.ImageView;
 import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import com.example.gbor.mp3player.R;
 
 
 public class PlayerFragment extends Fragment implements SeekBar.OnSeekBarChangeListener {

@@ -1,4 +1,4 @@
-package com.example.gbor.mp3player;
+package hu.application.gbor.mp3player;
 
 import android.content.Intent;
 import android.net.Uri;
@@ -15,6 +15,8 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import com.example.gbor.mp3player.R;
 
 import java.io.File;
 import java.net.URLConnection;

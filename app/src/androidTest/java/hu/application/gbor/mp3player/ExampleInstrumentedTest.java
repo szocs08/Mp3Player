@@ -1,4 +1,4 @@
-package com.example.gbor.mp3player;
+package hu.application.gbor.mp3player;
 
 import android.content.Context;
 import android.support.test.InstrumentationRegistry;
@@ -21,6 +21,6 @@ public class ExampleInstrumentedTest {
         // Context of the app under test.
         Context appContext = InstrumentationRegistry.getTargetContext();
 
-        assertEquals("com.example.gbor.mp3player", appContext.getPackageName());
+        assertEquals("com.application.gbor.mp3player", appContext.getPackageName());
     }
 }

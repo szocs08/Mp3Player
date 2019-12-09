@@ -1,8 +1,7 @@
-package com.example.gbor.mp3player;
+package hu.application.gbor.mp3player;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
-import android.app.FragmentManager;
 import android.content.Context;
 import android.database.Cursor;
 import android.os.Bundle;
@@ -10,6 +9,7 @@ import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -21,6 +21,8 @@ import android.view.ViewGroup;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
+
+import com.example.gbor.mp3player.R;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -186,7 +188,7 @@ public class PlaylistFragment extends Fragment implements PlaylistItemDragListen
     }
 
     public void showDialog(DialogTypes type) {
-        FragmentManager manager = mActivity.getFragmentManager();
+        FragmentManager manager = getFragmentManager();
         Bundle arg = new Bundle();
         arg.putSerializable("type",type);
         arg.putString("name",mPlaylistName.getText().toString());

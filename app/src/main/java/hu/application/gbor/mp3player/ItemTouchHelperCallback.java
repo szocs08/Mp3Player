@@ -1,5 +1,6 @@
-package com.example.gbor.mp3player;
+package hu.application.gbor.mp3player;
 
+import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.helper.ItemTouchHelper;
 
@@ -15,7 +16,7 @@ public class ItemTouchHelperCallback extends ItemTouchHelper.Callback {
     }
 
     @Override
-    public void onSwiped(RecyclerView.ViewHolder viewHolder, int direction) {
+    public void onSwiped( RecyclerView.ViewHolder viewHolder, int direction) {
 
     }
 }
