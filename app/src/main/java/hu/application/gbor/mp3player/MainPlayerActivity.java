@@ -1,7 +1,8 @@
 package hu.application.gbor.mp3player;
 
+import static com.example.gbor.mp3player.R.id.pager;
+
 import android.Manifest;
-import android.arch.lifecycle.ViewModel;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
@@ -36,7 +37,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Random;
 
-import static com.example.gbor.mp3player.R.id.pager;
 
 
 public class MainPlayerActivity extends FragmentActivity implements
@@ -47,36 +47,60 @@ public class MainPlayerActivity extends FragmentActivity implements
         PlaylistDialogFragment.OnPlaylistDialogFragmentInteractionListener,
         LoaderCallbacks<Cursor>{
 
+    //Új mappa választásának kódja
     private static final int FOLDER_CHOOSING_REQUEST = 1;
+    //Az összes dalt tartalmazó lista kódja
     private static final int ALL_SONGS = -1;
+    //Az olvasási engedély kérés kódja
     private static final int MY_PERMISSIONS_REQUEST_READ_EXTERNAL_STORAGE = 18;
 
-
+    //A beállításokat tartalmazó fájl neve
     private static final String SETTINGS_FILE = "hu.application.gbor.mp3player.Settings";
+    //A lejátszási listákat tartalmazó fájl neve
     private static final String PLAYLIST_FILE = "hu.application.gbor.mp3player.Playlist";
 
-
+    //A lejátszást végző mediaplayer
     private MediaPlayer mMediaPlayer;
+    //A már felhasznált lejátszási listák kódját tartalmazó lista
     private List<Integer> mUsedIDs = new ArrayList<>();
 
+    //A lejátszó felhasználói felülete
     private final PlayerFragment mPlayerFragment = new PlayerFragment();
+    //A lejátszási lista felhasználói felülete
     private final PlaylistFragment mPlaylistFragment = new PlaylistFragment();
+    //A beállítások felhasználói felülete
     private final OptionsFragment mOptionsFragment = new OptionsFragment();
 
+    //A beállítások tartalmazó fájl
     private SharedPreferences mSettings;
+    //A lejátszási listákat tartalmazó fájl
     private SharedPreferences mPlaylistFile;
 
+    //A lejátszott zene sorszáma
     private int mSongIndex;
+    //A lista kevert lejátszása
     private boolean mIsShuffle = false;
+    //A lista ismétlődő lejátszása
     private boolean mIsRepeat = false;
+    //A lejátszási lista váltása
     private boolean mIsSwitching = false;
+    //A lejátszási lista törölve lett
     private boolean mIsRemoved = false;
+    //Az aktuálisan játszott zene elérési útja
     private String mPath;
+    //A lejátszó felhasználói felületének megjelenítésére
     private PlayerPagerAdapter mPagerAdapter;
+    //A betöltött zenék bejárására szolgál
     private Cursor mCursor;
+    //A program fő felületének megjelenítésére szolgál
     private ViewPager mViewPager;
+    //Az aktuális lejátszási lista kódja
     private int mPlaylistID = ALL_SONGS;
 
+    /**
+     * @param savedInstanceState a régebbi futattást tartalmazza
+     *
+     */
     @RequiresApi(api = Build.VERSION_CODES.M)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -129,7 +153,8 @@ public class MainPlayerActivity extends FragmentActivity implements
                 editor.putString("path", mPath);
                 editor.apply();
                 mIsSwitching = true;
-                mMediaPlayer.stop();
+                if(mMediaPlayer != null)
+                    mMediaPlayer.stop();
                 getSupportLoaderManager().restartLoader(ALL_SONGS, null, this);
                 mSongIndex = 0;
                 mOptionsFragment.updateUI(mPath);
