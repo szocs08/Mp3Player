@@ -98,8 +98,8 @@ public class MainPlayerActivity extends FragmentActivity implements
     private int mPlaylistID = ALL_SONGS;
 
     /**
-     * @param savedInstanceState a régebbi futattást tartalmazza
-     *
+     * A program létrejöttekor futó metódus
+     * @param savedInstanceState a régebbi futtatását tartalmazza
      */
     @RequiresApi(api = Build.VERSION_CODES.M)
     @Override
@@ -129,10 +129,13 @@ public class MainPlayerActivity extends FragmentActivity implements
 
     @Override
     public View onCreateView(View parent, String name, Context context, AttributeSet attrs) {
-//        getSupportLoaderManager().initLoader(ALL_SONGS,null,this);
         return super.onCreateView(parent, name, context, attrs);
     }
 
+    /**
+     * A beállításokat végző metódus
+     * @param position A kattintot lista elem pozíciója
+     */
     @Override
     public void optionOperations(int position) {
         if(position==0){
@@ -143,6 +146,12 @@ public class MainPlayerActivity extends FragmentActivity implements
 
     }
 
+    /**
+     * Az indított activity bezárása esetén lefutó metódus
+     * @param requestCode Az activity indításának célját jelzi
+     * @param resultCode A bezárás módját adja meg
+     * @param data Az activity által vissza adott adat
+     */
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 
@@ -162,6 +171,9 @@ public class MainPlayerActivity extends FragmentActivity implements
         }
     }
 
+    /**
+     * A play gomb megnyomása esetén lefutó metódus
+     */
     @Override
     public void playButton() {
         if (mMediaPlayer.isPlaying()) {
@@ -173,6 +185,9 @@ public class MainPlayerActivity extends FragmentActivity implements
 
     }
 
+    /**
+     * A next gomb megnyomása esetén lefutó metódus
+     */
     @Override
     public void nextButton() {
         if (mIsShuffle) {
@@ -193,6 +208,9 @@ public class MainPlayerActivity extends FragmentActivity implements
         }
     }
 
+    /**
+     * A previous gomb megnyomása esetén lefutó metódus
+     */
     @Override
     public void previousButton() {
         if (mIsShuffle) {
@@ -212,6 +230,9 @@ public class MainPlayerActivity extends FragmentActivity implements
         }
     }
 
+    /**
+     * A repeat gomb megnyomása esetén lefutó metódus
+     */
     @Override
     public void repeatButton() {
         mPlayerFragment.updateRepeatButton(mIsRepeat);
@@ -224,6 +245,9 @@ public class MainPlayerActivity extends FragmentActivity implements
 
     }
 
+    /**
+     * A shuffle gomb megnyomása esetén lefutó metódus
+     */
     @Override
     public void shuffleButton() {
         mPlayerFragment.updateShuffleButton(mIsShuffle);
@@ -237,6 +261,9 @@ public class MainPlayerActivity extends FragmentActivity implements
         }
     }
 
+    /**
+     * A folyamat jelző frissítését végző metódus
+     */
     @Override
     public void updateProgressBar() {
         if (mCursor.getCount()==0)
@@ -245,11 +272,19 @@ public class MainPlayerActivity extends FragmentActivity implements
             mPlayerFragment.timerUpdate(mMediaPlayer.getDuration(), mMediaPlayer.getCurrentPosition());
     }
 
+    /**
+     * A zene tekerésért felelős metódus
+     * @param progress az idő ahova ugrani szeretnénk
+     */
     @Override
     public void seekButtonMovement(int progress) {
         mMediaPlayer.seekTo(Utilities.progressToTimer(progress, mMediaPlayer.getDuration()));
     }
 
+    /**
+     * A kapott pozíción lévő zene lejátszása lejátszási listáról
+     * @param position a lejátszandó zene pozíciója
+     */
     @Override
     public void startSelectedSong(int position) {
         mSongIndex = position;
@@ -258,6 +293,10 @@ public class MainPlayerActivity extends FragmentActivity implements
 
     }
 
+    /**
+     * A zene lejátszást elindító metódus
+     * @param songIndex
+     */
     private void playSong(int songIndex) {
         try {
             mPlayerFragment.updatePlayButton(mMediaPlayer.isPlaying());
@@ -273,6 +312,9 @@ public class MainPlayerActivity extends FragmentActivity implements
         }
     }
 
+    /**
+     * A kezdeti beállítást végző metódus
+     */
     private void initialize(){
         mSongIndex = 0;
         if (mMediaPlayer == null) {
