@@ -6,7 +6,7 @@ import android.graphics.BitmapFactory;
 import android.media.MediaMetadataRetriever;
 
 class Song {
-    static private MediaMetadataRetriever mediaMetadataRetriever = new MediaMetadataRetriever();
+    static private final MediaMetadataRetriever mediaMetadataRetriever = new MediaMetadataRetriever();
     private String title;
     private String artist;
     private String album;

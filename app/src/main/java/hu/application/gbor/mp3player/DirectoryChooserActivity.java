@@ -100,7 +100,7 @@ public class DirectoryChooserActivity extends AppCompatActivity {
 
     private class DirectoryAdapter extends RecyclerView.Adapter<DirectoryAdapter.DirectoryViewHolder>{
 
-        private ArrayList<String> mItemData;
+        private final ArrayList<String> mItemData;
 
         class DirectoryViewHolder extends RecyclerView.ViewHolder{
             TextView fileName;
@@ -185,8 +185,8 @@ public class DirectoryChooserActivity extends AppCompatActivity {
                         e.printStackTrace();
                     }
 
-                    holder.fileSize.setText(String.valueOf(file.length() +
-                            getString(R.string.bytes)));
+                    holder.fileSize.setText(file.length() +
+                            getString(R.string.bytes));
 
                 }
             }else{

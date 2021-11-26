@@ -40,7 +40,7 @@ public class PlaylistFragment extends Fragment implements PlaylistItemDragListen
     private ImageButton mPlaylistButton;
     private ImageButton mPlaylistSongAddButton;
     private ImageButton mPlaylistSongRemoveButton;
-    private List<Integer> mPositions = new ArrayList<>();
+    private final List<Integer> mPositions = new ArrayList<>();
     private RecyclerView mPlaylistView;
     private PlaylistItemTouchHelperCallback mItemTouchHelperCallback;
     private ItemTouchHelper mItemTouchHelper;
@@ -151,11 +151,7 @@ public class PlaylistFragment extends Fragment implements PlaylistItemDragListen
         if (mPlaylistName!= null) {
             mItemTouchHelper = new ItemTouchHelper(mItemTouchHelperCallback);
             mItemTouchHelper.attachToRecyclerView(mPlaylistView);
-            if(mPlaylistName.getText() != getString(R.string.all_songs)){
-                mItemTouchHelperCallback.setEditable(true);
-            }else {
-                mItemTouchHelperCallback.setEditable(false);
-            }
+            mItemTouchHelperCallback.setEditable(mPlaylistName.getText() != getString(R.string.all_songs));
         }
     }
 
@@ -219,7 +215,7 @@ public class PlaylistFragment extends Fragment implements PlaylistItemDragListen
 
         private int mCurrent;
         PlaylistItemDragListener mPlaylistItemDragListener;
-        private Playlist mPlaylist;
+        private final Playlist mPlaylist;
 
         class PlaylistViewHolder extends RecyclerView.ViewHolder implements PlaylistItemTouchHelperViewHolder{
             TextView songArtist;

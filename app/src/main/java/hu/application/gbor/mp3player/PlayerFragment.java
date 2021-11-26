@@ -39,7 +39,7 @@ public class PlayerFragment extends Fragment implements SeekBar.OnSeekBarChangeL
     private TextView mSongAlbumLabel;
     private TextView mCurrentTimeLabel;
     private TextView mTotalTimeLabel;
-    private Handler mHandler = new Handler();
+    private final Handler mHandler = new Handler();
     private Context mContext;
     private OnPlayerFragmentInteractionListener mInteractionListener;
     private PlayerViewModel mViewModel;
@@ -262,7 +262,7 @@ public class PlayerFragment extends Fragment implements SeekBar.OnSeekBarChangeL
 //        }
 //    }
 
-    private Runnable mUpdateTimeTask = new Runnable() {
+    private final Runnable mUpdateTimeTask = new Runnable() {
         @Override
         public void run() {
             mInteractionListener.updateProgressBar();

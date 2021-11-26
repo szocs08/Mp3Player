@@ -55,7 +55,7 @@ public class MainPlayerActivity extends FragmentActivity implements
     //A lejátszást végző mediaplayer
     private MediaPlayer mMediaPlayer;
     //A már felhasznált lejátszási listák kódját tartalmazó lista
-    private List<Integer> mUsedIDs = new ArrayList<>();
+    private final List<Integer> mUsedIDs = new ArrayList<>();
 
 //    //A lejátszó felhasználói felülete
 //    private PlayerFragment mPlayerFragment;

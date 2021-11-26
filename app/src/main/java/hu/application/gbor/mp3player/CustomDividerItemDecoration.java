@@ -11,7 +11,7 @@ import android.view.View;
 public class CustomDividerItemDecoration extends RecyclerView.ItemDecoration {
 
     private final Paint mPaint;
-    private int mAlpha;
+    private final int mAlpha;
 
     CustomDividerItemDecoration(Context context, int color, float heightDp) {
         mPaint = new Paint();

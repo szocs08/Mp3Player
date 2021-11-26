@@ -90,7 +90,7 @@ public class OptionsFragment extends Fragment {
 
     private class OptionsAdapter extends RecyclerView.Adapter<OptionsAdapter.OptionsViewHolder> {
 
-        private ArrayList<HashMap<String, String>> mItemData;
+        private final ArrayList<HashMap<String, String>> mItemData;
 
         class OptionsViewHolder extends RecyclerView.ViewHolder{
             TextView optionName;
