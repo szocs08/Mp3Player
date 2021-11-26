@@ -3,13 +3,16 @@
   <component name="DesignSurface">
     <option name="filePathToZoomLevelMap">
       <map>
+        <entry key="..\:/SULI/Android/Mp3Player/app/src/main/res/layout-land/fragment_player.xml" value="0.22727272727272727" />
+        <entry key="..\:/SULI/Android/Mp3Player/app/src/main/res/layout/activity_main_player.xml" value="0.3541666666666667" />
+        <entry key="..\:/SULI/Android/Mp3Player/app/src/main/res/layout/fragment_player.xml" value="0.3541666666666667" />
         <entry key="..\:/SULI/Android/Mp3Player/app/src/main/res/layout/fragment_playlist_dialog.xml" value="0.5087209302325582" />
       </map>
     </option>
   </component>
   <component name="NullableNotNullManager">
     <option name="myDefaultNullable" value="android.support.annotation.Nullable" />
-    <option name="myDefaultNotNull" value="android.support.annotation.NonNull" />
+    <option name="myDefaultNotNull" value="androidx.annotation.NonNull" />
     <option name="myNullables">
       <value>
         <list size="15">

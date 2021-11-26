@@ -1,6 +1,6 @@
 package hu.application.gbor.mp3player;
 
-import android.support.v7.widget.RecyclerView;
+import androidx.recyclerview.widget.RecyclerView;
 
 public interface PlaylistItemDragListener {
     void onDrag(RecyclerView.ViewHolder viewHolder);

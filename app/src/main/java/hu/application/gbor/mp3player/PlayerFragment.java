@@ -7,9 +7,13 @@ import android.media.MediaMetadataRetriever;
 import android.os.Bundle;
 import android.os.Handler;
 import android.provider.MediaStore;
-import android.support.annotation.NonNull;
-import android.support.v4.app.Fragment;
-import android.support.v4.content.ContextCompat;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.fragment.app.Fragment;
+import androidx.core.content.ContextCompat;
+import androidx.lifecycle.Observer;
+import androidx.lifecycle.ViewModelProvider;
+
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -36,9 +40,9 @@ public class PlayerFragment extends Fragment implements SeekBar.OnSeekBarChangeL
     private TextView mCurrentTimeLabel;
     private TextView mTotalTimeLabel;
     private Handler mHandler = new Handler();
-    private Cursor mCursor;
     private Context mContext;
     private OnPlayerFragmentInteractionListener mInteractionListener;
+    private PlayerViewModel mViewModel;
 
     interface OnPlayerFragmentInteractionListener {
         void playButton();
@@ -60,6 +64,7 @@ public class PlayerFragment extends Fragment implements SeekBar.OnSeekBarChangeL
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
 
 
     }
@@ -122,10 +127,19 @@ public class PlayerFragment extends Fragment implements SeekBar.OnSeekBarChangeL
                 mInteractionListener.playButton();
             }
         });
+        mViewModel = new ViewModelProvider(requireActivity()).get(PlayerViewModel.class);
+
 
         return view;
     }
 
+    @Override
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+        mViewModel.getPlaylist().observe(getViewLifecycleOwner(), playlist -> {
+            updateUI(playlist.getCurrentSong());
+        });
+    }
 
     @Override
     public void onAttach(Context context) {
@@ -194,17 +208,17 @@ public class PlayerFragment extends Fragment implements SeekBar.OnSeekBarChangeL
     }
 
 
-    public void updateUI(int songIndex)     {
-        if ((mCursor.getCount()>0)){
-            mCursor.moveToPosition(songIndex);
-            mSongTitleLabel.setText(mCursor.getString(mCursor.getColumnIndex(MediaStore.Audio.Media.TITLE)));
+    public void updateUI(Song currentSong)
+    {
+        if (currentSong!=null){
+            mSongTitleLabel.setText(currentSong.getTitle());
 
-            mSongArtistLabel.setText(mCursor.getString(mCursor.getColumnIndex(MediaStore.Audio.Media.ARTIST)));
+            mSongArtistLabel.setText(currentSong.getArtist());
 
-            mSongAlbumLabel.setText(mCursor.getString(mCursor.getColumnIndex(MediaStore.Audio.Media.ALBUM)));
+            mSongAlbumLabel.setText(currentSong.getAlbum());
 
             MediaMetadataRetriever mmr = new MediaMetadataRetriever();
-            mmr.setDataSource(mCursor.getString(mCursor.getColumnIndex(MediaStore.Audio.Media.DATA)));
+            mmr.setDataSource(currentSong.getData());
             if(mmr.getEmbeddedPicture()!=null)
                 mImgAlbum.setImageBitmap(BitmapFactory.decodeByteArray(mmr.getEmbeddedPicture(),0,mmr.getEmbeddedPicture().length));
             else
@@ -241,12 +255,12 @@ public class PlayerFragment extends Fragment implements SeekBar.OnSeekBarChangeL
         mHandler.postDelayed(mUpdateTimeTask, 100);
     }
 
-    public void changeCursor(Cursor newCursor) {
-        mCursor = newCursor;
-        if (newCursor != null && mBtnPlay != null) {
-            mBtnPlay.setImageResource(R.drawable.play_button);
-        }
-    }
+//    public void changeCursor(Cursor newCursor) {
+//        mCursor = newCursor;
+//        if (newCursor != null && mBtnPlay != null) {
+//            mBtnPlay.setImageResource(R.drawable.play_button);
+//        }
+//    }
 
     private Runnable mUpdateTimeTask = new Runnable() {
         @Override
