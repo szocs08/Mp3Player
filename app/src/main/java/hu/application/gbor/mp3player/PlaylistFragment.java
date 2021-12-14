@@ -3,18 +3,7 @@ package hu.application.gbor.mp3player;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
-import android.database.Cursor;
 import android.os.Bundle;
-import android.provider.MediaStore;
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentManager;
-import androidx.core.content.ContextCompat;
-import androidx.lifecycle.ViewModelProvider;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
-import androidx.recyclerview.widget.ItemTouchHelper;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
@@ -22,7 +11,16 @@ import android.view.ViewGroup;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.core.content.ContextCompat;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
+import androidx.lifecycle.ViewModelProvider;
+import androidx.recyclerview.widget.ItemTouchHelper;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.gbor.mp3player.R;
 
@@ -68,9 +66,6 @@ public class PlaylistFragment extends Fragment implements PlaylistItemDragListen
         if (getActivity() != null) {
             mActivity = getActivity();
         }
-
-
-
     }
 
     @Override
@@ -90,25 +85,10 @@ public class PlaylistFragment extends Fragment implements PlaylistItemDragListen
         CustomDividerItemDecoration itemDecor = new CustomDividerItemDecoration(mActivity,
                 ContextCompat.getColor(mActivity,R.color.playlist_background),1);
         mPlaylistView.addItemDecoration(itemDecor);
-        mPlaylistButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                showDialog(DialogTypes.SWITCHING);
-            }
-        });
-        mPlaylistSongAddButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                showDialog(DialogTypes.ADDING);
-
-            }
-        });
-        mPlaylistSongRemoveButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                mPlaylistFragmentInteractionListener.removeSelectedSongs(mPositions);
-//                mSongAdapter.notifyDataSetChanged();
-            }
+        mPlaylistButton.setOnClickListener(v -> showDialog(DialogTypes.SWITCHING));
+        mPlaylistSongAddButton.setOnClickListener(v -> showDialog(DialogTypes.ADDING));
+        mPlaylistSongRemoveButton.setOnClickListener(v -> {
+            mPlaylistFragmentInteractionListener.removeSelectedSongs(mPositions);
         });
         mViewModel.getPlaylist().observe(getViewLifecycleOwner(),playlist ->{
             mSongAdapter = new SongAdapter(playlist,this);
@@ -125,7 +105,7 @@ public class PlaylistFragment extends Fragment implements PlaylistItemDragListen
     }
 
     @Override
-    public void onAttach(Context context) {
+    public void onAttach(@NonNull Context context) {
         super.onAttach(context);
 
         if (context instanceof OnPlaylistFragmentInteractionListener) {
@@ -184,7 +164,7 @@ public class PlaylistFragment extends Fragment implements PlaylistItemDragListen
     }
 
     public void showDialog(DialogTypes type) {
-        FragmentManager manager = getFragmentManager();
+        FragmentManager manager = getChildFragmentManager();
         Bundle arg = new Bundle();
         arg.putSerializable("type",type);
         arg.putString("name",mPlaylistName.getText().toString());
@@ -213,7 +193,6 @@ public class PlaylistFragment extends Fragment implements PlaylistItemDragListen
     private class SongAdapter extends RecyclerView.Adapter<SongAdapter.PlaylistViewHolder>
             implements PlaylistItemTouchHelper{
 
-        private int mCurrent;
         PlaylistItemDragListener mPlaylistItemDragListener;
         private final Playlist mPlaylist;
 
@@ -300,7 +279,7 @@ public class PlaylistFragment extends Fragment implements PlaylistItemDragListen
             if(mPositions.contains(position)) {
                 holder.itemView.setBackgroundResource(R.drawable.list_edit_bg);
                 holder.dragIcon.setBackgroundResource(R.drawable.border_drag_edit);
-            }else if (position == mCurrent) {
+            }else if (position == mPlaylist.getCurrentSongIndex()) {
                 holder.itemView.setBackgroundResource(R.drawable.list_select_bg);
                 holder.dragIcon.setBackgroundResource(R.drawable.border_drag_selected);
                 holder.songArtist.setSelected(true);

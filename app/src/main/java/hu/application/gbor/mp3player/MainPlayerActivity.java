@@ -1,6 +1,5 @@
 package hu.application.gbor.mp3player;
 
-import static com.example.gbor.mp3player.R.id.action_context_bar;
 import static com.example.gbor.mp3player.R.id.pager;
 
 import android.Manifest;
@@ -23,7 +22,6 @@ import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentActivity;
-import androidx.lifecycle.ViewModelProvider;
 import androidx.viewpager2.adapter.FragmentStateAdapter;
 import androidx.viewpager2.widget.ViewPager2;
 
@@ -112,13 +110,6 @@ public class MainPlayerActivity extends FragmentActivity implements
             }
         }
         //A UI megjelenítéséhez szükséges adatok
-        PlayerViewModel mPlayerViewModel;
-        mPlayerViewModel = new ViewModelProvider(this).get(PlayerViewModel.class);
-//        mPlayerViewModel.getPlaylist().observe(this, playlist -> {
-//            mPagerAdapter = new PlayerPagerAdapter(this,playlist);
-//            mViewPager.setAdapter(mPagerAdapter);
-//            mViewPager.setCurrentItem(2);
-//        });
         mPagerAdapter = new PlayerPagerAdapter(this);
         mViewPager.setAdapter(mPagerAdapter);
         mViewPager.setCurrentItem(2);
@@ -127,7 +118,7 @@ public class MainPlayerActivity extends FragmentActivity implements
     }
 
     @Override
-    public View onCreateView(View parent, String name, Context context, AttributeSet attrs) {
+    public View onCreateView(View parent, @NonNull String name, @NonNull Context context, @NonNull AttributeSet attrs) {
         return super.onCreateView(parent, name, context, attrs);
     }
 
